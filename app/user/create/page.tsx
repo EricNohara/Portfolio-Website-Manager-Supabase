@@ -2,7 +2,7 @@ import CreateUserForm from "./create-user-form";
 import { createClient } from "@/utils/supabase/server";
 import { Typography, Container } from "@mui/material";
 
-export default async function Account() {
+export default async function CreateUserPage() {
   return (
     <Container maxWidth="sm">
       <Typography
