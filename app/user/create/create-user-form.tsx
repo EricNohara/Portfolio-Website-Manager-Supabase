@@ -1,13 +1,13 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { type User } from "@supabase/supabase-js";
 import { Button, TextField, Link } from "@mui/material";
 import { signup } from "../login/actions";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-export default function CreateUserForm({ user }: { user: User | null }) {
+export default function CreateUserForm() {
   const supabase = createClient();
+  const router = useRouter();
   const [userData, setUserData] = useState({
     email: "",
     name: "",
@@ -20,43 +20,6 @@ export default function CreateUserForm({ user }: { user: User | null }) {
     transcript_url: "",
   });
   const [password, setPassword] = useState("");
-
-  const getProfile = useCallback(async () => {
-    try {
-      const { data, error, status } = await supabase
-        .from("users")
-        .select()
-        .eq("id", user?.id)
-        .single();
-
-      if (error && status !== 406) {
-        console.log(error);
-        throw error;
-      }
-
-      if (data) {
-        const parsedData = {
-          email: data.email,
-          name: data.name,
-          phone_number: data.phone_number,
-          location: data.location,
-          github_url: data.github_url,
-          linkedin_url: data.linkedin_url,
-          portrait_url: data.portrait_url,
-          resume_url: data.resume_url,
-          transcript_url: data.transcript_url,
-        };
-        setUserData(parsedData);
-      }
-    } catch (error) {
-      alert("Error loading user data!");
-      console.error(error);
-    }
-  }, [user, supabase]);
-
-  useEffect(() => {
-    getProfile();
-  }, [user, getProfile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -71,6 +34,10 @@ export default function CreateUserForm({ user }: { user: User | null }) {
     try {
       await signup(userData.email, password);
 
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       const { error } = await supabase
         .from("users")
         .update(userData)
@@ -78,11 +45,11 @@ export default function CreateUserForm({ user }: { user: User | null }) {
 
       if (error) throw error;
 
-      alert("Profile updated!");
-      redirect("/account");
+      alert("Successfully Created User!");
+      router.push("/user");
     } catch (error) {
       console.error(error);
-      alert("Error updating the data!");
+      alert("Error creating user!");
     }
   };
 
@@ -96,7 +63,6 @@ export default function CreateUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.email}
       />
       <TextField
         label="Password"
@@ -116,7 +82,6 @@ export default function CreateUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.name}
       />
       <TextField
         label="Phone number"
@@ -125,7 +90,6 @@ export default function CreateUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.phone_number}
       />
       <TextField
         label="Address"
@@ -134,7 +98,6 @@ export default function CreateUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.location}
       />
       <TextField
         label="GitHub URL"
@@ -143,7 +106,6 @@ export default function CreateUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.github_url}
       />
       <TextField
         label="LinkedIn URL"
@@ -153,7 +115,6 @@ export default function CreateUserForm({ user }: { user: User | null }) {
         margin="dense"
         className="mb-10"
         size="small"
-        value={userData.linkedin_url}
       />
       <Button type="submit" variant="contained" color="primary">
         Create

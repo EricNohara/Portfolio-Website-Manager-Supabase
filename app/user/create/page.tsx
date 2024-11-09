@@ -3,12 +3,6 @@ import { createClient } from "@/utils/supabase/server";
 import { Typography, Container } from "@mui/material";
 
 export default async function Account() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   return (
     <Container maxWidth="sm">
       <Typography
@@ -19,7 +13,7 @@ export default async function Account() {
       >
         New User Sign Up
       </Typography>
-      <CreateUserForm user={user} />
+      <CreateUserForm />
     </Container>
   );
 }
