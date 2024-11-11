@@ -4,8 +4,16 @@ import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
 import { Typography, Link, Button } from "@mui/material";
+import { useAuth } from "../context/AuthProvider";
+import { useRouter } from "next/navigation";
 
 export default function UserList({ user }: { user: User | null }) {
+  const router = useRouter();
+  const { setIsLoggedIn } = useAuth();
+  useEffect(() => {
+    if (user) setIsLoggedIn(true); // Only set the state inside useEffect
+  }, [setIsLoggedIn, user]); // Make sure to list setIsLoggedIn as a dependency
+
   const supabase = createClient();
   const [userData, setUserData] = useState({
     email: "",
@@ -55,6 +63,11 @@ export default function UserList({ user }: { user: User | null }) {
   useEffect(() => {
     getProfile();
   }, [user, getProfile]);
+
+  const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    router.push("/user/edit");
+  };
 
   return (
     <>
@@ -185,7 +198,12 @@ export default function UserList({ user }: { user: User | null }) {
           </Link>
         </Typography>
       )}
-      <Button type="submit" variant="contained" color="primary">
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        onClick={handleEdit}
+      >
         Edit
       </Button>
       <Button type="submit" variant="contained" color="error">

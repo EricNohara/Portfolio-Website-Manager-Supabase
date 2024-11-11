@@ -19,7 +19,7 @@ export async function login(email: string, password: string) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/user/account");
+  redirect("/user");
 }
 
 export async function signup(email: string, password: string) {

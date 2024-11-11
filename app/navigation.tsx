@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import { useAuth } from "./context/AuthProvider";
+import { useRouter } from "next/navigation";
 
 export default function Navigation() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
+  const router = useRouter();
+  const { isLoggedIn, setIsLoggedIn } = useAuth();
+  // const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
   const supabase = createClient();
 
   // Fetch user when component mounts
@@ -20,7 +24,22 @@ export default function Navigation() {
     };
 
     fetchUser();
-  }, [supabase]);
+  }, [supabase, setIsLoggedIn]);
+
+  const handleSignOut = async () => {
+    try {
+      const res = await fetch("/auth/signout", { method: "POST" });
+
+      if (res.ok) {
+        setIsLoggedIn(false);
+        router.push("/user/login");
+      } else {
+        alert("Failed to sign out");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return isLoggedIn ? (
     <AppBar position="sticky">
@@ -29,7 +48,9 @@ export default function Navigation() {
           Portfolio Editor
         </Typography>
         <Button color="inherit">Home</Button>
-        <Button color="inherit">Sign out</Button>
+        <Button color="inherit" onClick={handleSignOut}>
+          Sign out
+        </Button>
       </Toolbar>
     </AppBar>
   ) : null; // Return null if the user is not logged in
