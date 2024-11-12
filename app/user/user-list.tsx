@@ -69,6 +69,22 @@ export default function UserList({ user }: { user: User | null }) {
     router.push("/user/edit");
   };
 
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("/auth/deleteUser", { method: "POST" });
+
+      if (!res.ok) {
+        alert("Failed to delete user");
+      } else {
+        setIsLoggedIn(false);
+        router.push("/user/login");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <>
       <Typography
@@ -206,7 +222,12 @@ export default function UserList({ user }: { user: User | null }) {
       >
         Edit
       </Button>
-      <Button type="submit" variant="contained" color="error">
+      <Button
+        type="submit"
+        variant="contained"
+        color="error"
+        onClick={handleDelete}
+      >
         Delete
       </Button>
     </>
