@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
-import { Typography, Link, Button } from "@mui/material";
+import { Typography, Link, Button, Box } from "@mui/material";
 import { useAuth } from "../context/AuthProvider";
 import { useRouter } from "next/navigation";
 
@@ -83,6 +83,10 @@ export default function UserList({ user }: { user: User | null }) {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleAddDocuments = () => {
+    router.push("/user/documents");
   };
 
   return (
@@ -214,22 +218,38 @@ export default function UserList({ user }: { user: User | null }) {
           </Link>
         </Typography>
       )}
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        onClick={handleEdit}
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        gap="1rem"
+        marginTop="1rem"
       >
-        Edit
-      </Button>
-      <Button
-        type="submit"
-        variant="contained"
-        color="error"
-        onClick={handleDelete}
-      >
-        Delete
-      </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          onClick={handleEdit}
+        >
+          Edit
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="secondary"
+          onClick={handleAddDocuments}
+        >
+          Documents
+        </Button>
+        <Button
+          type="submit"
+          variant="contained"
+          color="error"
+          onClick={handleDelete}
+        >
+          Delete
+        </Button>
+      </Box>
     </>
   );
 }

@@ -41,13 +41,19 @@ export default function Navigation() {
     }
   };
 
+  const handleHome = () => {
+    router.push("/user");
+  };
+
   return isLoggedIn ? (
     <AppBar position="sticky">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Portfolio Editor
         </Typography>
-        <Button color="inherit">Home</Button>
+        <Button color="inherit" onClick={handleHome}>
+          Home
+        </Button>
         <Button color="inherit" onClick={handleSignOut}>
           Sign out
         </Button>
