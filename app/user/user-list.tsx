@@ -72,7 +72,7 @@ export default function UserList({ user }: { user: User | null }) {
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      const res = await fetch("/auth/deleteUser", { method: "POST" });
+      const res = await fetch("/api/auth/deleteUser", { method: "POST" });
 
       if (!res.ok) {
         alert("Failed to delete user");

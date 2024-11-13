@@ -3,9 +3,11 @@
 import { Input, Typography, Button } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function EditDocumentsForm() {
   const router = useRouter();
+  const supabase = createClient();
   const [portrait, setPortrait] = useState<File | null>(null);
   const [resume, setResume] = useState<File | null>(null);
   const [transcript, setTranscript] = useState<File | null>(null);
@@ -24,14 +26,36 @@ export default function EditDocumentsForm() {
   };
 
   const handleSaveChanges = () => {
+    const uploadFile = async (file: File, bucketName: string) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("bucketName", bucketName);
+
+      const res = await fetch("/api/storage/upload", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "bucket-name": bucketName,
+          "file-name": file.name,
+          "content-type": file.type,
+        },
+      });
+
+      if (res.ok) {
+        alert("Error uploading file!");
+      } else {
+        alert("Successfully uploaded file");
+      }
+    };
+
     if (portrait) {
-      console.log("Portrait file selected:", portrait);
+      uploadFile(portrait, "portraits");
     }
     if (resume) {
-      console.log("Resume file selected:", resume);
+      uploadFile(resume, "resumes");
     }
     if (transcript) {
-      console.log("Transcript file selected:", transcript);
+      uploadFile(transcript, "transcripts");
     }
   };
 
