@@ -29,6 +29,7 @@ export default function UserList({ user }: { user: User | null }) {
 
   const getProfile = useCallback(async () => {
     try {
+      console.log(user);
       const { data, error, status } = await supabase
         .from("users")
         .select()
@@ -39,6 +40,8 @@ export default function UserList({ user }: { user: User | null }) {
         console.log(error);
         throw error;
       }
+
+      console.log({ data, error, status });
 
       if (data) {
         const parsedData = {
@@ -72,7 +75,7 @@ export default function UserList({ user }: { user: User | null }) {
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/auth/deleteUser", { method: "POST" });
+      const res = await fetch("/auth/deleteUser", { method: "POST" });
 
       if (!res.ok) {
         alert("Failed to delete user");

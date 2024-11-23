@@ -3,17 +3,15 @@
 import { Input, Typography, Button } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/client";
 
 export default function EditDocumentsForm() {
   const router = useRouter();
-  const supabase = createClient();
   const [portrait, setPortrait] = useState<File | null>(null);
   const [resume, setResume] = useState<File | null>(null);
   const [transcript, setTranscript] = useState<File | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0] || null;
+    const selectedFile: File | null = e.target.files?.[0] || null;
     const { name } = e.target;
 
     if (name === "portrait") {
@@ -34,11 +32,6 @@ export default function EditDocumentsForm() {
       const res = await fetch("/api/storage/upload", {
         method: "POST",
         body: formData,
-        headers: {
-          "bucket-name": bucketName,
-          "file-name": file.name,
-          "content-type": file.type,
-        },
       });
 
       if (res.ok) {

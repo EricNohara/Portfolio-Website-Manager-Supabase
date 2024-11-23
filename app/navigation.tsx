@@ -28,7 +28,7 @@ export default function Navigation() {
 
   const handleSignOut = async () => {
     try {
-      const res = await fetch("/api/auth/signout", { method: "POST" });
+      const res = await fetch("/auth/signout", { method: "POST" });
 
       if (res.ok) {
         setIsLoggedIn(false);

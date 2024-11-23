@@ -2,9 +2,26 @@ import { createServerClient } from "@/utils/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
+export const config = {
+  api: {
+    bodyParser: false, // Disable the default body parser to handle multipart form data manually
+  },
+};
+
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const serverSupabase = await createServerClient();
+
+  const formData = await req.formData();
+  const file = formData.get("file") as File | null;
+  const bucketName = formData.get("bucketName") as string | null;
+
+  if (!file || !bucketName) {
+    return NextResponse.json(
+      { message: "Invalid upload arguments" },
+      { status: 400 }
+    );
+  }
 
   // Check if a user's logged in
   const {
@@ -18,61 +35,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  try {
-    const bucketName = req.headers.get("bucket-name") as string;
-    const contentType = req.headers.get("content-type") as string;
-    const fileName = req.headers.get("file-name") as string;
+  // upload to supabase
+  const fileContent = await file.arrayBuffer();
+  const buffer = Buffer.from(fileContent);
 
-    if (!bucketName || !contentType || !fileName) {
-      return NextResponse.json(
-        { message: "More information required" },
-        { status: 400 }
-      );
-    }
+  const { error } = await serverSupabase.storage
+    .from(bucketName)
+    .upload(`${file.name}`, buffer, {
+      contentType: file.type,
+    });
 
-    const reader = req.body?.getReader();
-    const chunks: Uint8Array[] = [];
-
-    if (!reader) {
-      return NextResponse.json(
-        { message: "Failed to get request body reader" },
-        { status: 400 }
-      );
-    }
-
-    // Read the stream
-    let done = false;
-    while (!done) {
-      const { value, done: isDone } = await reader.read();
-      if (value) {
-        chunks.push(value);
-      }
-      done = isDone;
-    }
-
-    const buffer = Buffer.concat(chunks);
-
-    // Upload to Supabase Storage
-    const { error } = await serverSupabase.storage
-      .from(bucketName)
-      .upload(`${fileName}`, buffer, {
-        contentType: contentType,
-      });
-
-    if (error) {
-      console.error(error);
-      return NextResponse.json({ message: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(
-      { message: "File uploaded successfully" },
-      { status: 200 }
-    );
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json(
-      { message: "File upload failed" },
-      { status: 500 }
-    );
+  if (error) {
+    return NextResponse.json({ message: error }, { status: 500 });
   }
+
+  // return the public URL
+  const { data } = await supabase.storage
+    .from(bucketName)
+    .getPublicUrl(`${file.name}`);
+
+  return NextResponse.json({ url: data.publicUrl }, { status: 200 });
 }
