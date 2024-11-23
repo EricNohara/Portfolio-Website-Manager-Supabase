@@ -3,6 +3,8 @@
 import { Input, Typography, Button } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import imageCompression from "browser-image-compression";
+import { PDFDocument } from "pdf-lib";
 
 export default function EditDocumentsForm() {
   const router = useRouter();
@@ -23,7 +25,47 @@ export default function EditDocumentsForm() {
     }
   };
 
-  const handleSaveChanges = () => {
+  // image compression
+  const compressImage = async (file: File) => {
+    const options = {
+      maxSizeMB: 1, // Target size in MB
+      maxWidthOrHeight: 1080, // Max width/height
+      useWebWorker: true, // Use Web Worker for performance
+    };
+
+    try {
+      const compressedBlob = await imageCompression(file, options);
+
+      // Convert Blob back to File to preserve the original file name and type
+      const compressedFile = new File([compressedBlob], file.name, {
+        type: file.type,
+        lastModified: Date.now(),
+      });
+
+      return compressedFile;
+    } catch (error) {
+      console.error("Error compressing image:", error);
+      return file; // Return original file if compression fails
+    }
+  };
+
+  const compressPDF = async (file: File) => {
+    try {
+      const fileBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(fileBuffer);
+
+      // Optionally remove unnecessary information or reduce image quality
+      const compressedPdfBytes = await pdfDoc.save({ useObjectStreams: false });
+
+      return new File([compressedPdfBytes], file.name, {
+        type: "application/pdf",
+      });
+    } catch {
+      return file; // Return original if compression fails
+    }
+  };
+
+  const handleSaveChanges = async () => {
     const uploadFile = async (file: File, bucketName: string) => {
       const formData = new FormData();
       formData.append("file", file);
@@ -34,7 +76,7 @@ export default function EditDocumentsForm() {
         body: formData,
       });
 
-      if (res.ok) {
+      if (!res.ok) {
         alert("Error uploading file!");
       } else {
         alert("Successfully uploaded file");
@@ -42,13 +84,16 @@ export default function EditDocumentsForm() {
     };
 
     if (portrait) {
-      uploadFile(portrait, "portraits");
+      const compressedPortrait = await compressImage(portrait);
+      uploadFile(compressedPortrait, "portraits");
     }
     if (resume) {
-      uploadFile(resume, "resumes");
+      const compressedResume = await compressPDF(resume);
+      uploadFile(compressedResume, "resumes");
     }
     if (transcript) {
-      uploadFile(transcript, "transcripts");
+      const compressedTranscript = await compressPDF(transcript);
+      uploadFile(compressedTranscript, "transcripts");
     }
   };
 
