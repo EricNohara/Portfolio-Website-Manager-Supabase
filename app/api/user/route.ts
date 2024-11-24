@@ -70,6 +70,32 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function PUT(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const userData = await req.json();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { error } = await supabase
+      .from("users")
+      .update(userData)
+      .eq("id", user?.id);
+
+    if (error) throw error;
+
+    return NextResponse.json({ message: "Update successful" }, { status: 200 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "Error updating user information" },
+      { status: 400 }
+    );
+  }
+}
+
 // user only able to delete its own account and only if it is logged in
 export async function DELETE(req: NextRequest) {
   const serviceRoleSupabase = createServiceRoleClient();

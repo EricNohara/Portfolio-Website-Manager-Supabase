@@ -52,14 +52,18 @@ export default function EditUserForm({ user }: { user: User | null }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const { error } = await supabase
-        .from("users")
-        .update(userData)
-        .eq("id", user?.id);
+      const res = await fetch("/api/user", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
 
-      if (error) throw error;
+      const data = await res.json();
 
-      alert("Profile updated!");
+      if (!res.ok) {
+        throw new Error(data.message);
+      }
+
       router.push("/user");
     } catch (error) {
       console.error(error);
