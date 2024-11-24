@@ -45,9 +45,28 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const user: IUser = await req.json();
+    const userData: IUser = await req.json();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { error } = await supabase
+      .from("users")
+      .update(userData)
+      .eq("id", user?.id);
+
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json(
+      { messgae: "User successfully created" },
+      { status: 200 }
+    );
   } catch (err) {
     console.error(err);
+    return NextResponse.json({ message: err }, { status: 400 });
   }
 }
 

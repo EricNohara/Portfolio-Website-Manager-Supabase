@@ -1,12 +1,10 @@
 "use client";
 import { useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { Button, TextField, Link } from "@mui/material";
 import { useRouter } from "next/navigation";
 import IUser from "@/app/interfaces/IUser";
 
 export default function CreateUserForm() {
-  const supabase = createClient();
   const router = useRouter();
   const [userData, setUserData] = useState<IUser>({
     email: "",
@@ -44,20 +42,20 @@ export default function CreateUserForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        console.error(data.message);
-        router.push("/error");
+        throw new Error(data.message);
       }
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const resUpdate = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
 
-      const { error } = await supabase
-        .from("users")
-        .update(userData)
-        .eq("id", user?.id);
+      const dataUpdate = await resUpdate.json();
 
-      if (error) throw error;
+      if (!resUpdate.ok) {
+        throw new Error(dataUpdate.message);
+      }
 
       alert("Successfully Created User!");
       router.push("/user");
