@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button, TextField, Link } from "@mui/material";
-import { signup } from "../login/actions";
 import { useRouter } from "next/navigation";
 import IUser from "@/app/interfaces/IUser";
 
@@ -33,7 +32,21 @@ export default function CreateUserForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await signup(userData.email, password);
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userData.email,
+          password: password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error(data.message);
+        router.push("/error");
+      }
 
       const {
         data: { user },

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { login } from "./actions";
 import { Link, Button, TextField } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { Router } from "next/router";
 
 export default function LoginForm() {
+  const router = useRouter();
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -18,14 +20,31 @@ export default function LoginForm() {
     }));
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { ContentType: "application/json" },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message);
+      }
+
+      router.push("/user");
+    } catch (err) {
+      alert(err);
+      router.push("/error");
+    }
+  };
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        login(credentials.email, credentials.password);
-      }}
-      className="flex flex-col"
-    >
+    <form onSubmit={handleSubmit} className="flex flex-col">
       <TextField
         label="email"
         name="email"

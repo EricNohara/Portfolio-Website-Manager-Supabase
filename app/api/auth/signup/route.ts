@@ -23,9 +23,12 @@ export async function POST(req: NextRequest) {
       throw error;
     }
 
-    NextResponse.json({ message: "Sign up successful" }, { status: 200 });
+    return NextResponse.json(
+      { message: "Sign up successful" },
+      { status: 200 }
+    );
   } catch (err) {
     console.error(err);
-    NextResponse.json({ message: err }, { status: 400 });
+    return NextResponse.json({ message: err }, { status: 400 });
   }
 }
