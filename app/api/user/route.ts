@@ -1,11 +1,12 @@
-import { createClient } from "@/utils/supabase/client";
+import { createClient, createServiceRoleClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function GET(req: NextRequest) {
-  const supabase = createClient();
+  const userID = req.nextUrl.searchParams.get("id"); // ?id=<user id>
 
   try {
-    const userID = req.nextUrl.searchParams.get("id"); // ?id=<user id>
+    const supabase = await createClient();
 
     const { data, error, status } = await supabase
       .from("users")
@@ -34,6 +35,49 @@ export async function GET(req: NextRequest) {
     };
 
     return NextResponse.json({ userData: userData }, { status: 200 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ message: err }, { status: 400 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// user only able to delete its own account and only if it is logged in
+export async function DELETE(req: NextRequest) {
+  const serviceRoleSupabase = createServiceRoleClient();
+
+  try {
+    //   Check if a user's logged in
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "User not signed in." },
+        { status: 404 }
+      );
+    }
+
+    const { error } = await serviceRoleSupabase.auth.admin.deleteUser(user.id);
+
+    if (error) {
+      throw new Error(error.message);
+    } else {
+      revalidatePath("/", "layout");
+      return NextResponse.redirect(new URL("/user/login", req.url), {
+        status: 302,
+      });
+    }
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: err }, { status: 400 });

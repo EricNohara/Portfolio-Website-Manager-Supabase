@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
 import { Typography, Link, Button, Box } from "@mui/material";
 import { useAuth } from "../context/AuthProvider";
@@ -14,7 +13,6 @@ export default function UserList({ user }: { user: User | null }) {
     if (user) setIsLoggedIn(true); // Only set the state inside useEffect
   }, [setIsLoggedIn, user]); // Make sure to list setIsLoggedIn as a dependency
 
-  const supabase = createClient();
   const [userData, setUserData] = useState({
     email: "",
     name: "",
@@ -55,7 +53,7 @@ export default function UserList({ user }: { user: User | null }) {
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/auth/deleteUser", { method: "POST" });
+      const res = await fetch("/api/user", { method: "DELETE" });
 
       if (!res.ok) {
         alert("Failed to delete user");

@@ -1,6 +1,6 @@
-import { createServerClient } from "@/utils/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
+import { createServiceRoleClient } from "@/utils/supabase/server";
 
 export const config = {
   api: {
@@ -10,7 +10,7 @@ export const config = {
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
-  const serverSupabase = await createServerClient();
+  const serviceRoleSupabase = createServiceRoleClient();
 
   const formData = await req.formData();
   const file = formData.get("file") as File | null;
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   const fileContent = await file.arrayBuffer();
   const buffer = Buffer.from(fileContent);
 
-  const { error } = await serverSupabase.storage
+  const { error } = await serviceRoleSupabase.storage
     .from(bucketName)
     .upload(`${file.name}`, buffer, {
       contentType: file.type,
