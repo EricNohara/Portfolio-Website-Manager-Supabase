@@ -1,18 +1,34 @@
-import { createClient } from "@/utils/supabase/server";
+"use client";
+
 import { Container } from "@mui/material";
 import UserList from "./user-list";
-import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default async function AccountPage() {
-  const supabase = await createClient();
+export default function AccountPage() {
+  const router = useRouter();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [user, setUser] = useState(null);
 
-  if (!user) {
-    redirect("/");
-  }
+  useEffect(() => {
+    const authenticator = async () => {
+      try {
+        const res = await fetch("/api/auth/authenticated", { method: "GET" });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message);
+        }
+
+        setUser(data.user);
+      } catch (err) {
+        console.error(err);
+        router.push("/");
+      }
+    };
+
+    authenticator();
+  }, [router]);
 
   return (
     <Container maxWidth="sm">
