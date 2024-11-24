@@ -4,7 +4,7 @@ import { Input, Typography, Button } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
-import { PDFDocument } from "pdf-lib";
+import { assertEachIs, PDFDocument } from "pdf-lib";
 
 export default function EditDocumentsForm() {
   const router = useRouter();
@@ -66,6 +66,8 @@ export default function EditDocumentsForm() {
   };
 
   const handleSaveChanges = async () => {
+    let success = true;
+
     const uploadFile = async (file: File, bucketName: string) => {
       const formData = new FormData();
       formData.append("file", file);
@@ -78,8 +80,12 @@ export default function EditDocumentsForm() {
 
       if (!res.ok) {
         alert("Error uploading file!");
+        success = false;
       } else {
         alert("Successfully uploaded file");
+        const data = await res.json();
+        const url = data.url;
+        console.log(url);
       }
     };
 
@@ -94,6 +100,14 @@ export default function EditDocumentsForm() {
     if (transcript) {
       const compressedTranscript = await compressPDF(transcript);
       uploadFile(compressedTranscript, "transcripts");
+    }
+
+    if (success) {
+      setPortrait(null);
+      setResume(null);
+      setTranscript(null);
+
+      router.push("/user/documents");
     }
   };
 

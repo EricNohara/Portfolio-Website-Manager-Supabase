@@ -29,42 +29,22 @@ export default function UserList({ user }: { user: User | null }) {
 
   const getProfile = useCallback(async () => {
     try {
-      console.log(user);
-      const { data, error, status } = await supabase
-        .from("users")
-        .select()
-        .eq("id", user?.id)
-        .single();
+      const res = await fetch(`/api/user?id=${user?.id}`, { method: "GET" });
+      const data = await res.json();
 
-      if (error && status !== 406) {
-        console.log(error);
-        throw error;
+      if (!res.ok) {
+        throw new Error(data.message);
       }
 
-      console.log({ data, error, status });
-
-      if (data) {
-        const parsedData = {
-          email: data.email,
-          name: data.name,
-          phone_number: data.phone_number,
-          location: data.location,
-          github_url: data.github_url,
-          linkedin_url: data.linkedin_url,
-          portrait_url: data.portrait_url,
-          resume_url: data.resume_url,
-          transcript_url: data.transcript_url,
-        };
-        setUserData(parsedData);
-      }
+      setUserData(data.userData);
     } catch (error) {
       alert("Error loading user data!");
       console.error(error);
     }
-  }, [user, supabase]);
+  }, [user]);
 
   useEffect(() => {
-    getProfile();
+    if (user?.id) getProfile();
   }, [user, getProfile]);
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -75,7 +55,7 @@ export default function UserList({ user }: { user: User | null }) {
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      const res = await fetch("/auth/deleteUser", { method: "POST" });
+      const res = await fetch("/api/auth/deleteUser", { method: "POST" });
 
       if (!res.ok) {
         alert("Failed to delete user");
@@ -100,7 +80,7 @@ export default function UserList({ user }: { user: User | null }) {
         gutterBottom
         className="text-center"
       >
-        {userData.name}
+        {userData?.name}
       </Typography>
       <Typography
         variant="body1"
@@ -108,7 +88,7 @@ export default function UserList({ user }: { user: User | null }) {
         gutterBottom
         className="text-center"
       >
-        {userData.email}
+        {userData?.email}
       </Typography>
       <Typography
         variant="body1"
@@ -116,7 +96,7 @@ export default function UserList({ user }: { user: User | null }) {
         gutterBottom
         className="text-center"
       >
-        {userData.phone_number}
+        {userData?.phone_number}
       </Typography>
       <Typography
         variant="body1"
@@ -124,10 +104,10 @@ export default function UserList({ user }: { user: User | null }) {
         gutterBottom
         className="text-center"
       >
-        {userData.location}
+        {userData?.location}
       </Typography>
       {/* Display the URLs as clickable links with a label */}
-      {userData.github_url && (
+      {userData?.github_url && (
         <Typography
           variant="body1"
           component="p"
@@ -146,7 +126,7 @@ export default function UserList({ user }: { user: User | null }) {
         </Typography>
       )}
 
-      {userData.linkedin_url && (
+      {userData?.linkedin_url && (
         <Typography
           variant="body1"
           component="p"
@@ -165,7 +145,7 @@ export default function UserList({ user }: { user: User | null }) {
         </Typography>
       )}
 
-      {userData.resume_url && (
+      {userData?.resume_url && (
         <Typography
           variant="body1"
           component="p"
@@ -184,7 +164,7 @@ export default function UserList({ user }: { user: User | null }) {
         </Typography>
       )}
 
-      {userData.transcript_url && (
+      {userData?.transcript_url && (
         <Typography
           variant="body1"
           component="p"
@@ -203,7 +183,7 @@ export default function UserList({ user }: { user: User | null }) {
         </Typography>
       )}
 
-      {userData.portrait_url && (
+      {userData?.portrait_url && (
         <Typography
           variant="body1"
           component="p"
