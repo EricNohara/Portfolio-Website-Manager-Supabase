@@ -1,14 +1,15 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
 import { Button, TextField, Link } from "@mui/material";
 import { useRouter } from "next/navigation";
+import IUser from "@/app/interfaces/IUser";
 
 export default function EditUserForm({ user }: { user: User | null }) {
   const supabase = createClient();
   const router = useRouter();
-  const [userData, setUserData] = useState({
+  const [userData, setUserData] = useState<IUser>({
     email: "",
     name: "",
     phone_number: "",
@@ -20,42 +21,25 @@ export default function EditUserForm({ user }: { user: User | null }) {
     transcript_url: "",
   });
 
-  const getProfile = useCallback(async () => {
-    try {
-      const { data, error, status } = await supabase
-        .from("users")
-        .select()
-        .eq("id", user?.id)
-        .single();
-
-      if (error && status !== 406) {
-        console.log(error);
-        throw error;
-      }
-
-      if (data) {
-        const parsedData = {
-          email: data.email,
-          name: data.name,
-          phone_number: data.phone_number,
-          location: data.location,
-          github_url: data.github_url,
-          linkedin_url: data.linkedin_url,
-          portrait_url: data.portrait_url,
-          resume_url: data.resume_url,
-          transcript_url: data.transcript_url,
-        };
-        setUserData(parsedData);
-      }
-    } catch (error) {
-      alert("Error loading user data!");
-      console.error(error);
-    }
-  }, [user, supabase]);
-
   useEffect(() => {
-    getProfile();
-  }, [user, getProfile]);
+    const fetcher = async () => {
+      try {
+        const res = await fetch(`/api/user?id=${user?.id}`, { method: "GET" });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message);
+        }
+
+        setUserData(data.userData);
+      } catch (err) {
+        console.error(err);
+        alert(err);
+      }
+    };
+
+    fetcher();
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
