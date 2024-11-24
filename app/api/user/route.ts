@@ -1,6 +1,7 @@
 import { createClient, createServiceRoleClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
+import IUser from "@/app/interfaces/IUser";
 
 export async function GET(req: NextRequest) {
   const userID = req.nextUrl.searchParams.get("id"); // ?id=<user id>
@@ -44,6 +45,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
+    const user: IUser = await req.json();
   } catch (err) {
     console.error(err);
   }

@@ -4,11 +4,12 @@ import { createClient } from "@/utils/supabase/client";
 import { Button, TextField, Link } from "@mui/material";
 import { signup } from "../login/actions";
 import { useRouter } from "next/navigation";
+import IUser from "@/app/interfaces/IUser";
 
 export default function CreateUserForm() {
   const supabase = createClient();
   const router = useRouter();
-  const [userData, setUserData] = useState({
+  const [userData, setUserData] = useState<IUser>({
     email: "",
     name: "",
     phone_number: "",
