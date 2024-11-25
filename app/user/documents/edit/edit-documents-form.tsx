@@ -85,6 +85,8 @@ export default function EditDocumentsForm() {
           throw new Error(data.message.message);
         }
 
+        console.log(data.url);
+
         let userData;
 
         if (bucketName === "portraits") {
@@ -105,12 +107,9 @@ export default function EditDocumentsForm() {
 
         if (!updateRes.ok) {
           // delete the file from storage
-          const deleteRes = await fetch(
-            `/api/storage?bucket=${bucketName}&filename=${file.name}`,
-            {
-              method: "DELETE",
-            }
-          );
+          const deleteRes = await fetch(`/api/storage?publicURL=${data.url}`, {
+            method: "DELETE",
+          });
 
           if (!deleteRes.ok) {
             throw new Error("Error deleting file from storage");

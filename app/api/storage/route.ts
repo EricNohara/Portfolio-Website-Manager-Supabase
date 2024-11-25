@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     // return the public URL
     const { data } = await supabase.storage
       .from(bucketName)
-      .getPublicUrl(`${file.name}`);
+      .getPublicUrl(`${user.id}-${file.name}`);
 
     return NextResponse.json({ url: data.publicUrl }, { status: 200 });
   } catch (err) {
@@ -61,11 +61,22 @@ export async function DELETE(req: NextRequest) {
   const serviceRoleSupabase = createServiceRoleClient();
 
   try {
-    const bucket: string | null = req.nextUrl.searchParams.get("bucket");
-    const filename: string | null = req.nextUrl.searchParams.get("filename");
+    let bucket;
+    let filename;
+    const publicURL: string | null = req.nextUrl.searchParams.get("publicURL");
 
-    if (!bucket || !filename) {
-      throw new Error("Bucket or filename required");
+    if (publicURL) {
+      const splitURL = publicURL.split("/");
+      bucket = splitURL[splitURL.length - 2];
+      const encodedName = splitURL[splitURL.length - 1];
+      filename = decodeURIComponent(encodedName);
+    } else {
+      bucket = req.nextUrl.searchParams.get("bucket");
+      filename = req.nextUrl.searchParams.get("filename");
+
+      if (!bucket || !filename) {
+        throw new Error("Bucket and filename or public url required");
+      }
     }
 
     const { error } = await serviceRoleSupabase.storage

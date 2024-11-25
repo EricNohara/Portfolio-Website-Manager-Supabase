@@ -16,9 +16,9 @@ export default function Navigation() {
 
       if (!res.ok) {
         setIsLoggedIn(false);
+      } else {
+        setIsLoggedIn(true);
       }
-
-      setIsLoggedIn(true);
     };
 
     fetchUser();
