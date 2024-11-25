@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { type User } from "@supabase/supabase-js";
-import { Typography, Link, Button, Box } from "@mui/material";
+import { Typography, Link, Button, Box, Avatar } from "@mui/material";
 import { useAuth } from "../context/AuthProvider";
 import { useRouter } from "next/navigation";
 
@@ -72,140 +72,142 @@ export default function UserList({ user }: { user: User | null }) {
 
   return (
     <>
-      <Typography
-        variant="h4"
-        component="h2"
-        gutterBottom
-        className="text-center"
-      >
-        {userData?.name}
-      </Typography>
-      <Typography
-        variant="body1"
-        component="p"
-        gutterBottom
-        className="text-center"
-      >
-        {userData?.email}
-      </Typography>
-      <Typography
-        variant="body1"
-        component="p"
-        gutterBottom
-        className="text-center"
-      >
-        {userData?.phone_number}
-      </Typography>
-      <Typography
-        variant="body1"
-        component="p"
-        gutterBottom
-        className="text-center"
-      >
-        {userData?.location}
-      </Typography>
-      {/* Display the URLs as clickable links with a label */}
-      {userData?.github_url && (
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <Typography
+          variant="h4"
+          component="h2"
+          gutterBottom
+          className="text-center"
+        >
+          {userData?.name}
+        </Typography>
+        {userData.portrait_url && (
+          <Avatar
+            alt="avatar"
+            src={userData.portrait_url}
+            sx={{ width: 150, height: 150, marginBottom: "1rem" }}
+          />
+        )}
         <Typography
           variant="body1"
           component="p"
           gutterBottom
           className="text-center"
         >
-          <strong>GitHub URL:</strong>{" "}
-          <Link
-            underline="hover"
-            href={userData.github_url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {userData.github_url}
-          </Link>
+          {userData?.email}
         </Typography>
-      )}
+        <Typography
+          variant="body1"
+          component="p"
+          gutterBottom
+          className="text-center"
+        >
+          {userData?.phone_number}
+        </Typography>
+        <Typography
+          variant="body1"
+          component="p"
+          gutterBottom
+          className="text-center"
+        >
+          {userData?.location}
+        </Typography>
+        {userData?.github_url && (
+          <Typography
+            variant="body1"
+            component="p"
+            gutterBottom
+            className="text-center"
+          >
+            <strong>GitHub URL:</strong>{" "}
+            <Link
+              underline="hover"
+              href={userData.github_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {userData.github_url}
+            </Link>
+          </Typography>
+        )}
 
-      {userData?.linkedin_url && (
-        <Typography
-          variant="body1"
-          component="p"
-          gutterBottom
-          className="text-center"
-        >
-          <strong>LinkedIn URL:</strong>{" "}
-          <Link
-            underline="hover"
-            href={userData.linkedin_url}
-            target="_blank"
-            rel="noopener noreferrer"
+        {userData?.linkedin_url && (
+          <Typography
+            variant="body1"
+            component="p"
+            gutterBottom
+            className="text-center"
           >
-            {userData.linkedin_url}
-          </Link>
-        </Typography>
-      )}
+            <strong>LinkedIn URL:</strong>{" "}
+            <Link
+              underline="hover"
+              href={userData.linkedin_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {userData.linkedin_url}
+            </Link>
+          </Typography>
+        )}
 
-      {userData?.resume_url && (
-        <Typography
-          variant="body1"
-          component="p"
-          gutterBottom
-          className="text-center"
-        >
-          <strong>Resume URL:</strong>{" "}
-          <Link
-            underline="hover"
-            href={userData.resume_url}
-            target="_blank"
-            rel="noopener noreferrer"
+        {userData?.resume_url && (
+          <Typography
+            variant="body1"
+            component="p"
+            gutterBottom
+            className="text-center"
           >
-            {userData.resume_url}
-          </Link>
-        </Typography>
-      )}
+            <strong>Resume:</strong>{" "}
+            <Link
+              underline="hover"
+              href={userData.resume_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Click to View
+            </Link>
+          </Typography>
+        )}
 
-      {userData?.transcript_url && (
-        <Typography
-          variant="body1"
-          component="p"
-          gutterBottom
-          className="text-center"
-        >
-          <strong>Transcript URL:</strong>{" "}
-          <Link
-            underline="hover"
-            href={userData.transcript_url}
-            target="_blank"
-            rel="noopener noreferrer"
+        {userData?.transcript_url && (
+          <Typography
+            variant="body1"
+            component="p"
+            gutterBottom
+            className="text-center"
           >
-            {userData.transcript_url}
-          </Link>
-        </Typography>
-      )}
+            <strong>Transcript:</strong>{" "}
+            <Link
+              underline="hover"
+              href={userData.transcript_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Click to View
+            </Link>
+          </Typography>
+        )}
 
-      {userData?.portrait_url && (
-        <Typography
-          variant="body1"
-          component="p"
-          gutterBottom
-          className="text-center"
-        >
-          <strong>Portrait URL:</strong>{" "}
-          <Link
-            underline="hover"
-            href={userData.portrait_url}
-            target="_blank"
-            rel="noopener noreferrer"
+        {userData?.portrait_url && (
+          <Typography
+            variant="body1"
+            component="p"
+            gutterBottom
+            className="text-center"
           >
-            {userData.portrait_url}
-          </Link>
-        </Typography>
-      )}
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        gap="1rem"
-        marginTop="1rem"
-      >
+            <strong>Portrait:</strong>{" "}
+            <Link
+              underline="hover"
+              href={userData.portrait_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Click to View
+            </Link>
+          </Typography>
+        )}
+      </Box>
+      <Box display="flex" alignItems="center" gap="1rem" marginTop="1rem">
         <Button
           type="submit"
           variant="contained"

@@ -17,7 +17,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <Navigation />
-          <div className="container" style={{ padding: "50px 0 500px 0" }}>
+          <div className="container" style={{ padding: "50px 0 50px 0" }}>
             {children}
           </div>
         </AuthProvider>

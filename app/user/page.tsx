@@ -31,7 +31,10 @@ export default function AccountPage() {
   }, [router]);
 
   return (
-    <Container maxWidth="sm">
+    <Container
+      maxWidth="sm"
+      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
       <UserList user={user} />
     </Container>
   );
