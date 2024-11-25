@@ -4,6 +4,7 @@ import { Button, Link, Box, Avatar, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { split } from "postcss/lib/list";
 
 interface IUserDocuments {
   portrait_url: string;
@@ -42,9 +43,24 @@ export default function DocumentsList({ user }: { user: User | null }) {
     fetcher();
   }, [user]);
 
+  const handleDelete = (url: string) => {
+    const splitURL = url.split("/");
+    const bucket = splitURL[splitURL.length - 2];
+    const encodedName = splitURL[splitURL.length - 1];
+    const decodedName = decodeURIComponent(encodedName);
+    console.log(decodedName);
+  };
+
   return (
     <Box display="flex" flexDirection="column">
-      <Box display="flex" alignItems="center" marginBottom="2rem">
+      <Box
+        display="grid"
+        gridTemplateColumns="24% 59% 14%"
+        gap="1%"
+        rowGap="2rem"
+        alignItems="center"
+        marginBottom="2rem"
+      >
         {documents.portrait_url ? (
           <>
             <Avatar
@@ -59,50 +75,101 @@ export default function DocumentsList({ user }: { user: User | null }) {
               target="_blank"
               rel="noopener"
             >
-              {name}&apos;s Profile Image Link
+              {name}&apos;s Profile Image
             </Link>
+            <Button
+              type="submit"
+              variant="contained"
+              color="error"
+              onClick={() => handleDelete(documents.portrait_url)}
+            >
+              Delete
+            </Button>
           </>
         ) : (
           <>
             <Avatar sx={{ width: 100, height: 100 }}>{name[0]}</Avatar>
             <Typography marginLeft="1rem">No profile image found</Typography>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={() => router.push("/user/documents/edit")}
+            >
+              Edit
+            </Button>
           </>
         )}
-      </Box>
-      <Box display="flex" alignItems="center" marginBottom="2rem">
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           Resume:
         </Typography>
         {documents.resume_url ? (
-          <Link
-            href={documents.resume_url}
-            underline="hover"
-            marginLeft="1rem"
-            target="_blank"
-            rel="noopener"
-          >
-            {name}&apos;s Resume PDF Link
-          </Link>
+          <>
+            <Link
+              href={documents.resume_url}
+              underline="hover"
+              marginLeft="1rem"
+              target="_blank"
+              rel="noopener"
+            >
+              {name}&apos;s Resume
+            </Link>
+            <Button
+              type="submit"
+              variant="contained"
+              color="error"
+              onClick={() => handleDelete(documents.resume_url)}
+            >
+              Delete
+            </Button>
+          </>
         ) : (
-          <Typography marginLeft="1rem">No resume file found</Typography>
+          <>
+            {" "}
+            <Typography marginLeft="1rem">No resume file found</Typography>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={() => router.push("/user/documents/edit")}
+            >
+              Edit
+            </Button>
+          </>
         )}
-      </Box>
-      <Box display="flex" alignItems="center" marginBottom="2rem">
+
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
           Transcript:
         </Typography>
         {documents.transcript_url ? (
-          <Link
-            href={documents.transcript_url}
-            underline="hover"
-            marginLeft="1rem"
-            target="_blank"
-            rel="noopener"
-          >
-            {name}&apos;s Transcript PDF Link
-          </Link>
+          <>
+            <Link
+              href={documents.transcript_url}
+              underline="hover"
+              marginLeft="1rem"
+              target="_blank"
+              rel="noopener"
+            >
+              {name}&apos;s Transcript
+            </Link>
+            <Button
+              type="submit"
+              variant="contained"
+              color="error"
+              onClick={() => handleDelete(documents.transcript_url)}
+            >
+              Delete
+            </Button>
+          </>
         ) : (
-          <Typography marginLeft="1rem">No transcript file found</Typography>
+          <>
+            <Typography marginLeft="1rem">No transcript file found</Typography>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={() => router.push("/user/documents/edit")}
+            >
+              Edit
+            </Button>
+          </>
         )}
       </Box>
       <Button

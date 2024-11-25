@@ -219,14 +219,6 @@ export default function UserList({ user }: { user: User | null }) {
         <Button
           type="submit"
           variant="contained"
-          color="secondary"
-          onClick={handleAddDocuments}
-        >
-          Documents
-        </Button>
-        <Button
-          type="submit"
-          variant="contained"
           color="error"
           onClick={handleDelete}
         >

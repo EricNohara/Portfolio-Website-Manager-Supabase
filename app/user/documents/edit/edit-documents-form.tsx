@@ -82,7 +82,7 @@ export default function EditDocumentsForm() {
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.message);
+          throw new Error(data.message.message);
         }
 
         let userData;
@@ -121,8 +121,8 @@ export default function EditDocumentsForm() {
 
         alert("Successfully uploaded file");
       } catch (err) {
-        console.error(err);
-        alert("Error uploading file!");
+        const error = err as Error;
+        alert("Error uploading file: " + error.message);
         success = false;
       }
     };

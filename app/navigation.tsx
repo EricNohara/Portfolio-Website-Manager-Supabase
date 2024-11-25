@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { AppBar, Toolbar, Typography, Button } from "@mui/material";
 import { useAuth } from "./context/AuthProvider";
 import { useRouter } from "next/navigation";
@@ -9,22 +8,21 @@ import { useRouter } from "next/navigation";
 export default function Navigation() {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn } = useAuth();
-  // const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
-  const supabase = createClient();
 
   // Fetch user when component mounts
   useEffect(() => {
     const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const res = await fetch("/api/auth/authenticated", { method: "GET" });
 
-      // Set login state based on user presence
-      setIsLoggedIn(!!user); // If user exists, set loggedIn to true, otherwise false
+      if (!res.ok) {
+        setIsLoggedIn(false);
+      }
+
+      setIsLoggedIn(true);
     };
 
     fetchUser();
-  }, [supabase, setIsLoggedIn]);
+  }, [setIsLoggedIn]);
 
   const handleSignOut = async () => {
     try {
@@ -41,18 +39,23 @@ export default function Navigation() {
     }
   };
 
-  const handleHome = () => {
-    router.push("/user");
-  };
-
   return isLoggedIn ? (
     <AppBar position="sticky">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Portfolio Editor
         </Typography>
-        <Button color="inherit" onClick={handleHome}>
+        <Button color="inherit" onClick={() => router.push("/user")}>
           Home
+        </Button>
+        <Button color="inherit" onClick={() => router.push("/user/documents")}>
+          Documents
+        </Button>
+        <Button color="inherit" onClick={() => router.push("/user/experience")}>
+          Experience
+        </Button>
+        <Button color="inherit" onClick={() => router.push("/user/education")}>
+          Education
         </Button>
         <Button color="inherit" onClick={handleSignOut}>
           Sign out
