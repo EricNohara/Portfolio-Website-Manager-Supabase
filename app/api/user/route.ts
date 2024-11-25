@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const userData = {
+    const userData: IUser = {
       email: data.email,
       name: data.name,
       phone_number: data.phone_number,

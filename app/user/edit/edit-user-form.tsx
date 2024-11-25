@@ -1,13 +1,12 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { type User } from "@supabase/supabase-js";
 import { Button, TextField, Link } from "@mui/material";
 import { useRouter } from "next/navigation";
 import IUser from "@/app/interfaces/IUser";
 
 export default function EditUserForm({ user }: { user: User | null }) {
-  const supabase = createClient();
   const router = useRouter();
   const [userData, setUserData] = useState<IUser>({
     email: "",
@@ -23,18 +22,11 @@ export default function EditUserForm({ user }: { user: User | null }) {
 
   useEffect(() => {
     const fetcher = async () => {
-      try {
-        const res = await fetch(`/api/user?id=${user?.id}`, { method: "GET" });
-        const data = await res.json();
+      const res = await fetch(`/api/user?id=${user?.id}`, { method: "GET" });
+      const data = await res.json();
 
-        if (!res.ok) {
-          throw new Error(data.message);
-        }
-
+      if (res.ok) {
         setUserData(data.userData);
-      } catch (err) {
-        console.error(err);
-        alert(err);
       }
     };
 
@@ -81,6 +73,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         margin="dense"
         size="small"
         value={userData.email}
+        required
       />
       <TextField
         label="Full Name"
@@ -90,6 +83,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         margin="dense"
         size="small"
         value={userData.name}
+        required
       />
       <TextField
         label="Phone number"
@@ -99,6 +93,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         margin="dense"
         size="small"
         value={userData.phone_number}
+        required
       />
       <TextField
         label="Address"
@@ -108,6 +103,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         margin="dense"
         size="small"
         value={userData.location}
+        required
       />
       <TextField
         label="GitHub URL"

@@ -1,10 +1,10 @@
 "use client";
 
-import { Input, Typography, Button } from "@mui/material";
+import { Input, Typography, Button, Link } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import imageCompression from "browser-image-compression";
-import { assertEachIs, PDFDocument } from "pdf-lib";
+import { PDFDocument } from "pdf-lib";
 
 export default function EditDocumentsForm() {
   const router = useRouter();
@@ -73,19 +73,57 @@ export default function EditDocumentsForm() {
       formData.append("file", file);
       formData.append("bucketName", bucketName);
 
-      const res = await fetch("/api/storage/upload", {
-        method: "POST",
-        body: formData,
-      });
+      try {
+        const res = await fetch("/api/storage", {
+          method: "POST",
+          body: formData,
+        });
 
-      if (!res.ok) {
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message);
+        }
+
+        let userData;
+
+        if (bucketName === "portraits") {
+          userData = { portrait_url: data.url };
+        } else if (bucketName === "resumes") {
+          userData = { resume_url: data.url };
+        } else {
+          userData = { transcript_url: data.url };
+        }
+
+        const updateRes = await fetch("/api/user", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        });
+
+        const updateData = await updateRes.json();
+
+        if (!updateRes.ok) {
+          // delete the file from storage
+          const deleteRes = await fetch(
+            `/api/storage?bucket=${bucketName}&filename=${file.name}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (!deleteRes.ok) {
+            throw new Error("Error deleting file from storage");
+          }
+
+          throw new Error(updateData.message);
+        }
+
+        alert("Successfully uploaded file");
+      } catch (err) {
+        console.error(err);
         alert("Error uploading file!");
         success = false;
-      } else {
-        alert("Successfully uploaded file");
-        const data = await res.json();
-        const url = data.url;
-        console.log(url);
       }
     };
 
@@ -152,6 +190,14 @@ export default function EditDocumentsForm() {
       >
         Save Changes
       </Button>
+      <Link
+        underline="hover"
+        href="/user/documents"
+        textAlign="center"
+        marginTop="1rem"
+      >
+        Return
+      </Link>
     </>
   );
 }

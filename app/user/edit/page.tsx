@@ -1,13 +1,34 @@
-import { createClient } from "@/utils/supabase/server";
+"use client";
+
 import { Typography, Container } from "@mui/material";
 import EditUserForm from "./edit-user-form";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 
-export default async function Account() {
-  const supabase = await createClient();
+export default function Account() {
+  const router = useRouter();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const authenticator = async () => {
+      try {
+        const res = await fetch("/api/auth/authenticated", { method: "GET" });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message);
+        }
+
+        setUser(data.user);
+      } catch (err) {
+        console.error(err);
+        router.push("/");
+      }
+    };
+
+    authenticator();
+  }, [router]);
 
   return (
     <Container maxWidth="sm">
@@ -17,7 +38,7 @@ export default async function Account() {
         gutterBottom
         className="text-center"
       >
-        New User Sign Up
+        Edit User Information
       </Typography>
       <EditUserForm user={user} />
     </Container>

@@ -56,3 +56,27 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ url: data.publicUrl }, { status: 200 });
 }
+
+export async function DELETE(req: NextRequest) {
+  const serviceRoleSupabase = createServiceRoleClient();
+
+  try {
+    const bucket: string | null = req.nextUrl.searchParams.get("bucket");
+    const filename: string | null = req.nextUrl.searchParams.get("filename");
+
+    if (!bucket || !filename) {
+      throw new Error("Bucket or filename required");
+    }
+
+    const { error } = await serviceRoleSupabase.storage
+      .from(bucket)
+      .remove([filename]);
+
+    if (error) throw error;
+
+    return NextResponse.json({ message: "Success" }, { status: 200 });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ message: err }, { status: 400 });
+  }
+}
