@@ -85,39 +85,6 @@ export default function EditDocumentsForm() {
           throw new Error(data.message.message);
         }
 
-        console.log(data.url);
-
-        let userData;
-
-        if (bucketName === "portraits") {
-          userData = { portrait_url: data.url };
-        } else if (bucketName === "resumes") {
-          userData = { resume_url: data.url };
-        } else {
-          userData = { transcript_url: data.url };
-        }
-
-        const updateRes = await fetch("/api/user", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(userData),
-        });
-
-        const updateData = await updateRes.json();
-
-        if (!updateRes.ok) {
-          // delete the file from storage
-          const deleteRes = await fetch(`/api/storage?publicURL=${data.url}`, {
-            method: "DELETE",
-          });
-
-          if (!deleteRes.ok) {
-            throw new Error("Error deleting file from storage");
-          }
-
-          throw new Error(updateData.message);
-        }
-
         alert("Successfully uploaded file");
       } catch (err) {
         const error = err as Error;
