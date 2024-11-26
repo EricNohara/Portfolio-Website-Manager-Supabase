@@ -4,7 +4,6 @@ import { Button, Link, Box, Avatar, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
-import { split } from "postcss/lib/list";
 
 interface IUserDocuments {
   portrait_url: string;
@@ -26,6 +25,7 @@ export default function DocumentsList({ user }: { user: User | null }) {
 
   useEffect(() => {
     const fetcher = async () => {
+      if (!user) return;
       const res = await fetch(`/api/user?id=${user?.id}`, { method: "GET" });
       const data = await res.json();
 
@@ -41,6 +41,10 @@ export default function DocumentsList({ user }: { user: User | null }) {
     };
 
     fetcher();
+
+    const interval = setInterval(fetcher, 5000);
+
+    return () => clearInterval(interval);
   }, [user]);
 
   const handleDelete = async (url: string) => {

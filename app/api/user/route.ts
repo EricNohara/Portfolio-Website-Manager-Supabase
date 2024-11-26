@@ -7,6 +7,10 @@ export async function GET(req: NextRequest) {
   const userID = req.nextUrl.searchParams.get("id"); // ?id=<user id>
 
   try {
+    if (!userID) {
+      throw new Error("No user provided");
+    }
+
     const supabase = await createClient();
 
     const { data, error, status } = await supabase
