@@ -85,7 +85,6 @@ export async function POST(req: NextRequest) {
     }
 
     const existingURL = Object.values(userData)[0] as string;
-    console.log(existingURL);
 
     // add it to the user's row
     const { error: updateError } = await supabase
@@ -118,28 +117,45 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const serviceRoleSupabase = createServiceRoleClient();
+  const publicURL: string | null = req.nextUrl.searchParams.get("publicURL");
 
   try {
-    let bucket;
-    let filename;
-    const publicURL: string | null = req.nextUrl.searchParams.get("publicURL");
+    if (!publicURL) {
+      throw new Error("Missing public url to delete");
+    }
 
-    if (publicURL) {
-      const { parsedBucket, parsedFilename } = parseURL(publicURL);
-      bucket = parsedBucket;
-      filename = parsedFilename;
-    } else {
-      bucket = req.nextUrl.searchParams.get("bucket");
-      filename = req.nextUrl.searchParams.get("filename");
+    const supabase = await createClient();
 
-      if (!bucket || !filename) {
-        throw new Error("Bucket and filename or public url required");
-      }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    const { parsedBucket, parsedFilename } = parseURL(publicURL);
+
+    // try to delete from DB
+    const userData =
+      parsedBucket === "portraits"
+        ? { portrait_url: "" }
+        : parsedBucket === "resumes"
+        ? { resume_url: "" }
+        : { transcript_url: "" };
+
+    const { error: updateError } = await supabase
+      .from("users")
+      .update(userData)
+      .eq("id", user?.id);
+
+    if (updateError) {
+      throw updateError;
     }
 
     const { error } = await serviceRoleSupabase.storage
-      .from(bucket)
-      .remove([filename]);
+      .from(parsedBucket)
+      .remove([parsedFilename]);
 
     if (error) throw error;
 

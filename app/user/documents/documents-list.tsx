@@ -55,26 +55,6 @@ export default function DocumentsList({ user }: { user: User | null }) {
         throw new Error(data.message);
       }
 
-      const splitURL = url.split("/");
-      const bucketName = splitURL[splitURL.length - 2];
-
-      const updataData =
-        bucketName === "portraits"
-          ? { portrait_url: "" }
-          : bucketName === "resumes"
-          ? { resume_url: "" }
-          : { transcript_url: "" };
-
-      const updateRes = await fetch("/api/user", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updataData),
-      });
-
-      if (!updateRes.ok) {
-        throw new Error("Error deleting document url from user");
-      }
-
       alert("Successfully deleted document");
     } catch (err) {
       console.error(err);
