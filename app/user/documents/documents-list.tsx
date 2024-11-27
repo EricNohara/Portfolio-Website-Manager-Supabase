@@ -4,6 +4,7 @@ import { Button, Link, Box, Avatar, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { useDynamicRouteParams } from "next/dist/server/app-render/dynamic-rendering";
 
 interface IUserDocuments {
   portrait_url: string;
@@ -41,10 +42,6 @@ export default function DocumentsList({ user }: { user: User | null }) {
     };
 
     fetcher();
-
-    const interval = setInterval(fetcher, 5000);
-
-    return () => clearInterval(interval);
   }, [user]);
 
   const handleDelete = async (url: string) => {
@@ -60,6 +57,20 @@ export default function DocumentsList({ user }: { user: User | null }) {
       }
 
       alert("Successfully deleted document");
+
+      // add code to change the state variables necessary
+      const documentValues = Object.values(documents);
+      const updatedDocuments = { ...documents };
+
+      if (documentValues[0] === url) {
+        updatedDocuments.portrait_url = "";
+      } else if (documentValues[0] === url) {
+        updatedDocuments.resume_url = "";
+      } else {
+        updatedDocuments.transcript_url = "";
+      }
+
+      setDocuments(updatedDocuments);
     } catch (err) {
       console.error(err);
       alert(err);

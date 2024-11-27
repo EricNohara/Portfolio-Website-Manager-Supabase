@@ -95,22 +95,18 @@ export default function EditDocumentsForm() {
 
     if (portrait) {
       const compressedPortrait = await compressImage(portrait);
-      uploadFile(compressedPortrait, "portraits");
+      await uploadFile(compressedPortrait, "portraits");
     }
     if (resume) {
       const compressedResume = await compressPDF(resume);
-      uploadFile(compressedResume, "resumes");
+      await uploadFile(compressedResume, "resumes");
     }
     if (transcript) {
       const compressedTranscript = await compressPDF(transcript);
-      uploadFile(compressedTranscript, "transcripts");
+      await uploadFile(compressedTranscript, "transcripts");
     }
 
     if (success) {
-      setPortrait(null);
-      setResume(null);
-      setTranscript(null);
-
       router.push("/user/documents");
     }
   };
