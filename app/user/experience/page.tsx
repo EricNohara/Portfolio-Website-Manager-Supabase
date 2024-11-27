@@ -2,6 +2,7 @@
 
 import { Typography, Button, Container } from "@mui/material";
 import { useRouter } from "next/navigation";
+import ExperienceList from "./experience-list";
 
 export default function WorkExperiencePage() {
   const router = useRouter();
@@ -16,11 +17,11 @@ export default function WorkExperiencePage() {
       >
         Work Experience
       </Typography>
+      <ExperienceList />
       <Button
         type="submit"
         variant="contained"
         color="primary"
-        sx={{ mt: 3 }}
         onClick={() => router.push("/user/experience/add")}
         fullWidth
       >

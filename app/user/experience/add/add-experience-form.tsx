@@ -6,7 +6,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 
-interface IExperience {
+interface INewExperience {
   company: string;
   job_title: string;
   date_start: string | null;
@@ -16,7 +16,7 @@ interface IExperience {
 
 export default function AddExperienceForm() {
   const [user, setUser] = useState(null);
-  const [experience, setExperience] = useState<IExperience>({
+  const [experience, setExperience] = useState<INewExperience>({
     company: "",
     job_title: "",
     date_start: null,
@@ -57,6 +57,7 @@ export default function AddExperienceForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     console.log(experience);
+    // add code to add to DB
   };
 
   return (
