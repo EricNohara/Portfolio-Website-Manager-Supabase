@@ -1,7 +1,7 @@
 import { Typography, Link, Container } from "@mui/material";
-import AddExperienceForm from "./add-experience-form";
+import EditExperienceForm from "./edit-experience-form";
 
-export default function AddExperiencePage() {
+export default function EditExperiencePage() {
   return (
     <Container
       maxWidth="sm"
@@ -13,9 +13,9 @@ export default function AddExperiencePage() {
         gutterBottom
         className="text-center"
       >
-        Add Work Experience
+        Edit Work Experience
       </Typography>
-      <AddExperienceForm />
+      <EditExperienceForm />
       <Link
         underline="hover"
         align="center"

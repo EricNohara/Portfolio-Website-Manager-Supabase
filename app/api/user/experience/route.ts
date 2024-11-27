@@ -40,15 +40,15 @@ export async function POST(req: NextRequest) {
       throw new Error("User not authenticated");
     }
 
-    const sentExperienceData: IExperience = await req.json();
+    const updatedExperience: IExperience = await req.json();
 
-    if (!sentExperienceData) throw new Error("No data provided");
+    if (!updatedExperience) throw new Error("No data provided");
 
-    if (!sentExperienceData.company || !sentExperienceData.job_title)
+    if (!updatedExperience.company || !updatedExperience.job_title)
       throw new Error("Invalid data");
 
     const experienceData: IUserExperience = {
-      ...sentExperienceData,
+      ...updatedExperience,
       user_id: user.id,
     };
 
@@ -99,6 +99,62 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Successfully deleted work experience" },
+      { status: 200 }
+    );
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ message: error.message }, { status: 400 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    const {
+      prevCompany,
+      prevJob,
+      updatedExperience,
+    }: {
+      prevCompany: string;
+      prevJob: string;
+      updatedExperience: IExperience;
+    } = await req.json();
+
+    if (!updatedExperience) throw new Error("Missing data");
+
+    if (
+      !prevCompany ||
+      !prevJob ||
+      !updatedExperience.company ||
+      !updatedExperience.job_title
+    )
+      throw new Error("Invalid data");
+
+    const experienceData: IUserExperience = {
+      ...updatedExperience,
+      user_id: user.id,
+    };
+
+    const { error } = await supabase
+      .from("work_experiences")
+      .update(experienceData)
+      .eq("company", prevCompany)
+      .eq("job_title", prevJob)
+      .eq("user_id", user.id);
+
+    if (error) throw error;
+
+    return NextResponse.json(
+      { message: "Successfully updated work experience" },
       { status: 200 }
     );
   } catch (err) {
