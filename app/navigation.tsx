@@ -57,6 +57,12 @@ export default function Navigation() {
         <Button color="inherit" onClick={() => router.push("/user/education")}>
           Education
         </Button>
+        <Button color="inherit" onClick={() => router.push("/user/skills")}>
+          Skills
+        </Button>
+        <Button color="inherit" onClick={() => router.push("/user/projects")}>
+          Projects
+        </Button>
         <Button color="inherit" onClick={handleSignOut}>
           Sign out
         </Button>

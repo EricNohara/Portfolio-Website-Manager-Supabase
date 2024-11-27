@@ -195,9 +195,6 @@ export default function DocumentsList({ user }: { user: User | null }) {
       >
         Edit
       </Button>
-      <Link underline="hover" href="/user" textAlign="center" marginTop="1rem">
-        Return
-      </Link>
     </Box>
   );
 }

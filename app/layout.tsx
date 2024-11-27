@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navigation from "./navigation";
 import { AuthProvider } from "./context/AuthProvider";
+import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
 
 export const metadata = {
   title: "Portfolio Website Editor",
@@ -16,10 +17,12 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <AuthProvider>
-          <Navigation />
-          <div className="container" style={{ padding: "50px 0 50px 0" }}>
-            {children}
-          </div>
+          <LocalizationProviderWrapper>
+            <Navigation />
+            <div className="container" style={{ padding: "50px 0 50px 0" }}>
+              {children}
+            </div>
+          </LocalizationProviderWrapper>
         </AuthProvider>
       </body>
     </html>
