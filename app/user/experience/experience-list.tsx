@@ -26,9 +26,32 @@ export default function ExperienceList() {
     fetcher();
   }, []);
 
+  const handleDelete = async (exp: IExperience) => {
+    try {
+      const res = await fetch(
+        `/api/user/experience?company=${exp.company}&job_title=${exp.job_title}`,
+        { method: "DELETE" }
+      );
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message);
+
+      alert(data.message);
+
+      const removedExperiences: IExperience[] = userExperiences.filter(
+        (e) => e.company !== exp.company || e.job_title != exp.job_title
+      );
+      setUserExperiences(removedExperiences);
+    } catch (err) {
+      const error = err as Error;
+      console.error(err);
+      alert(error);
+    }
+  };
+
   return (
     <Box display="flex" flexDirection="column-reverse">
-      {userExperiences.map((exp: IExperience) => (
+      {userExperiences.map((exp: IExperience, i: number) => (
         <Box
           display="flex"
           flexDirection="column"
@@ -36,6 +59,7 @@ export default function ExperienceList() {
           padding="1rem"
           marginBottom="1rem"
           sx={{ border: 1, borderRadius: "0.25rem", borderColor: "#a1a1a1" }}
+          key={i}
         >
           <Typography variant="body1" component="p" gutterBottom>
             <strong>Company: </strong>
@@ -72,7 +96,15 @@ export default function ExperienceList() {
             >
               Edit
             </Button>
-            <Button type="submit" variant="contained" color="error" fullWidth>
+            <Button
+              type="submit"
+              variant="contained"
+              color="error"
+              fullWidth
+              onClick={() => {
+                handleDelete(exp);
+              }}
+            >
               Delete
             </Button>
           </Box>

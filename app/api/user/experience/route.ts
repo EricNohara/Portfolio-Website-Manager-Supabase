@@ -67,3 +67,42 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  const company = req.nextUrl.searchParams.get("company");
+  const job_title = req.nextUrl.searchParams.get("job_title");
+
+  try {
+    if (!company || !job_title) throw new Error("Invalid inputs");
+
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { message: "User not signed in." },
+        { status: 404 }
+      );
+    }
+
+    const { error } = await supabase
+      .from("work_experiences")
+      .delete()
+      .eq("company", company)
+      .eq("job_title", job_title)
+      .eq("user_id", user.id);
+
+    if (error) throw error;
+
+    return NextResponse.json(
+      { message: "Successfully deleted work experience" },
+      { status: 200 }
+    );
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ message: error.message }, { status: 400 });
+  }
+}
