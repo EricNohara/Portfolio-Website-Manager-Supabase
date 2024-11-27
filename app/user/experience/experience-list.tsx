@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import IExperience from "@/app/interfaces/IExperience";
+import { IExperience } from "@/app/interfaces/IExperience";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 
@@ -27,7 +27,7 @@ export default function ExperienceList() {
   }, []);
 
   return (
-    <Box>
+    <Box display="flex" flexDirection="column-reverse">
       {userExperiences.map((exp: IExperience) => (
         <Box
           display="flex"

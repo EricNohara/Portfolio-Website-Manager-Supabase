@@ -1,43 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button, TextField, Box } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
-
-interface INewExperience {
-  company: string;
-  job_title: string;
-  date_start: string | null;
-  date_end: string | null;
-  job_description: string | null;
-}
+import { IExperience } from "@/app/interfaces/IExperience";
+import { useRouter } from "next/navigation";
 
 export default function AddExperienceForm() {
-  const [user, setUser] = useState(null);
-  const [experience, setExperience] = useState<INewExperience>({
+  const router = useRouter();
+  const [experience, setExperience] = useState<IExperience>({
     company: "",
     job_title: "",
     date_start: null,
     date_end: null,
     job_description: null,
   });
-
-  useEffect(() => {
-    const authenticator = async () => {
-      const res = await fetch("/api/auth/authenticated", { method: "GET" });
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message);
-      }
-
-      setUser(data.user);
-    };
-
-    authenticator();
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,9 +34,32 @@ export default function AddExperienceForm() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    console.log(experience);
-    // add code to add to DB
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!experience.company.trim() || !experience.job_title.trim()) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/user/experience", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(experience),
+      });
+      const data = await res.json();
+
+      console.log(data.message);
+
+      if (!res.ok) throw new Error(data.message);
+      alert(data.message);
+      router.push("/user/experience");
+    } catch (err) {
+      console.error(err);
+      const error = err as Error;
+      alert(error.message);
+    }
   };
 
   return (
@@ -100,7 +102,8 @@ export default function AddExperienceForm() {
         multiline
         label="Job Description"
         name="job_description"
-        value={experience.job_description}
+        onChange={handleChange}
+        value={experience.job_description ? experience.job_description : ""}
         fullWidth
         sx={{ marginTop: "0.75rem" }}
       ></TextField>

@@ -110,8 +110,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "Upload successful" }, { status: 200 });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    const error = err as Error;
+    return NextResponse.json({ message: error }, { status: 400 });
   }
 }
 
@@ -161,7 +161,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ message: "Success" }, { status: 200 });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    const error = err as Error;
+    return NextResponse.json({ message: error }, { status: 400 });
   }
 }
