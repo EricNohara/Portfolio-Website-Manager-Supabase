@@ -107,21 +107,11 @@ export default function ExperienceList() {
               variant="contained"
               color="secondary"
               fullWidth
-              //   onClick={() =>
-              //     router.push(
-              //       `/user/education/edit?company=${encodeURIComponent(
-              //         exp.company
-              //       )}&job_title=${encodeURIComponent(
-              //         exp.job_title
-              //       )}&date_start=${encodeURIComponent(
-              //         exp.date_start || ""
-              //       )}&date_end=${encodeURIComponent(
-              //         exp.date_end || ""
-              //       )}&job_description=${encodeURIComponent(
-              //         exp.job_description || ""
-              //       )}`
-              //     )
-              //   }
+              onClick={() =>
+                router.push(
+                  `/user/education/edit?id=${encodeURIComponent(edu.id)}`
+                )
+              }
             >
               Edit
             </Button>

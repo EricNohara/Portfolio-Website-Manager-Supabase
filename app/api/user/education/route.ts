@@ -14,14 +14,28 @@ export async function GET(req: NextRequest) {
       throw new Error("User not authenticated");
     }
 
-    const { data, error } = await supabase
-      .from("education")
-      .select()
-      .eq("user_id", user.id);
+    const id = req.nextUrl.searchParams.get("id");
 
-    if (error) throw error;
+    if (id) {
+      const { data, error } = await supabase
+        .from("education")
+        .select()
+        .eq("user_id", user.id)
+        .eq("id", id);
 
-    return NextResponse.json(data, { status: 200 });
+      if (error) throw error;
+
+      return NextResponse.json(data, { status: 200 });
+    } else {
+      const { data, error } = await supabase
+        .from("education")
+        .select()
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      return NextResponse.json(data, { status: 200 });
+    }
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: err }, { status: 400 });
@@ -99,6 +113,54 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Successfully deleted education" },
+      { status: 200 }
+    );
+  } catch (err) {
+    const error = err as Error;
+    return NextResponse.json({ message: error.message }, { status: 400 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    const {
+      id,
+      updatedEducation,
+    }: {
+      id: string;
+      updatedEducation: IEducationInput;
+    } = await req.json();
+
+    if (!updatedEducation) throw new Error("Missing data");
+
+    if (!id || !updatedEducation.institution || !updatedEducation.degree)
+      throw new Error("Invalid data");
+
+    const educationData = {
+      ...updatedEducation,
+      user_id: user.id,
+    };
+
+    const { error } = await supabase
+      .from("education")
+      .update(educationData)
+      .eq("id", id)
+      .eq("user_id", user.id);
+
+    if (error) throw error;
+
+    return NextResponse.json(
+      { message: "Successfully updated education" },
       { status: 200 }
     );
   } catch (err) {
