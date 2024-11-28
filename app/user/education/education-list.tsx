@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
-import IEducation from "@/app/interfaces/IEducation";
+import { IEducation } from "@/app/interfaces/IEducation";
 
 export default function ExperienceList() {
   const router = useRouter();
@@ -65,13 +65,13 @@ export default function ExperienceList() {
             <strong>Degree: </strong>
             {edu.degree}
           </Typography>
-          {edu.majors && (
+          {edu.majors.length > 0 && (
             <Typography variant="body1" component="p" gutterBottom>
               <strong>Majors: </strong>
               {edu.majors.join(", ")}
             </Typography>
           )}
-          {edu.minors && (
+          {edu.minors.length > 0 && (
             <Typography variant="body1" component="p" gutterBottom>
               <strong>Minors: </strong>
               {edu.minors.join(", ")}
@@ -95,9 +95,9 @@ export default function ExperienceList() {
               {edu.year_end}
             </Typography>
           )}
-          {edu.awards && (
+          {edu.awards.length > 0 && (
             <Typography variant="body1" component="p" gutterBottom>
-              <strong>GPA: </strong>
+              <strong>Awards: </strong>
               {edu.awards.join(",")}
             </Typography>
           )}

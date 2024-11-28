@@ -22,7 +22,7 @@ export default function WorkExperiencePage() {
         type="submit"
         variant="contained"
         color="primary"
-        onClick={() => router.push("/user/experience/add")}
+        onClick={() => router.push("/user/education/add")}
         fullWidth
       >
         Add Education

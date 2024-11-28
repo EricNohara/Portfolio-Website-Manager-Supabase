@@ -1,11 +1,15 @@
-export default interface IEducation {
-  id: number;
+export interface IEducationInput {
   degree: string;
-  majors: string[] | null;
-  minors: string[] | null;
+  majors: string[];
+  minors: string[];
   gpa: number | null;
   institution: string;
-  awards: string[] | null;
+  awards: string[];
   year_start: number | null;
   year_end: number | null;
+}
+
+export interface IEducation extends IEducationInput {
+  id: number;
+  user_id: string;
 }
