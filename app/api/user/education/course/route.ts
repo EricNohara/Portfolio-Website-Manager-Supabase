@@ -1,6 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { IEducation, IEducationInput } from "@/app/interfaces/IEducation";
+import { ICourse, ICourseInput } from "@/app/interfaces/ICourse";
+
+const letterGrades = [
+  "A",
+  "A-",
+  "B+",
+  "B",
+  "B-",
+  "C+",
+  "C",
+  "C-",
+  "D+",
+  "D",
+  "D-",
+  "F",
+];
+const otherGrades = ["P", "F"];
+const percentageGrades = Array.from({ length: 101 }, (_, i) => i.toString());
+
+const VALID_GRADES = [...letterGrades, ...otherGrades, ...percentageGrades];
 
 export async function GET(req: NextRequest) {
   try {
@@ -14,14 +33,14 @@ export async function GET(req: NextRequest) {
       throw new Error("User not authenticated");
     }
 
-    const id = req.nextUrl.searchParams.get("id");
+    const education_id = req.nextUrl.searchParams.get("education_id");
 
-    if (id) {
+    if (education_id) {
       const { data, error } = await supabase
-        .from("education")
+        .from("course")
         .select()
         .eq("user_id", user.id)
-        .eq("id", id);
+        .eq("education_id", education_id);
 
       if (error) throw error;
 
@@ -54,28 +73,29 @@ export async function POST(req: NextRequest) {
       throw new Error("User not authenticated");
     }
 
-    const sentEducation: IEducationInput = await req.json();
+    const sentData = await req.json();
+    const sentCourse: ICourseInput = sentData.course;
+    const sentEducationID = sentData.educationID;
 
-    if (!sentEducation) throw new Error("No data provided");
+    if (!sentCourse || !sentEducationID || !sentCourse.name)
+      throw new Error("Missing data");
 
-    if (sentEducation.gpa && sentEducation.gpa > 4) {
-      throw new Error("GPA cannot be greater than 4.000");
+    if (sentCourse.grade && !VALID_GRADES.includes(sentCourse.grade)) {
+      throw new Error("Invalid grade format");
     }
 
-    if (!sentEducation.institution || !sentEducation.degree)
-      throw new Error("Invalid data");
-
-    const educationData = {
-      ...sentEducation,
+    const courseData = {
+      ...sentCourse,
       user_id: user.id,
+      education_id: sentEducationID,
     };
 
-    const { error } = await supabase.from("education").insert(educationData);
+    const { error } = await supabase.from("course").insert(courseData);
 
     if (error) throw error;
 
     return NextResponse.json(
-      { message: "Successfully added education" },
+      { message: "Successfully added course" },
       { status: 200 }
     );
   } catch (err) {
@@ -85,10 +105,11 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const id = req.nextUrl.searchParams.get("id");
+  const educationID = req.nextUrl.searchParams.get("educationID");
+  const courseName = req.nextUrl.searchParams.get("courseName");
 
   try {
-    if (!id) throw new Error("Invalid inputs");
+    if (!educationID || !courseName) throw new Error("Invalid inputs");
 
     const supabase = await createClient();
 
@@ -104,15 +125,16 @@ export async function DELETE(req: NextRequest) {
     }
 
     const { error } = await supabase
-      .from("education")
+      .from("course")
       .delete()
-      .eq("id", id)
+      .eq("education_id", educationID)
+      .eq("name", courseName)
       .eq("user_id", user.id);
 
     if (error) throw error;
 
     return NextResponse.json(
-      { message: "Successfully deleted education" },
+      { message: "Successfully deleted course" },
       { status: 200 }
     );
   } catch (err) {
@@ -133,34 +155,36 @@ export async function PUT(req: NextRequest) {
       throw new Error("User not authenticated");
     }
 
-    const {
-      id,
-      updatedEducation,
-    }: {
-      id: string;
-      updatedEducation: IEducationInput;
-    } = await req.json();
+    const sentData = await req.json();
+    const educationID = sentData.educationID;
+    const courseName = sentData.courseName;
+    const updatedCourse: ICourseInput = sentData.course;
 
-    if (!updatedEducation) throw new Error("Missing data");
+    if (
+      !updatedCourse ||
+      !educationID ||
+      !updatedCourse.name ||
+      (updatedCourse.grade && !VALID_GRADES.includes(updatedCourse.grade))
+    )
+      throw new Error("Missing data");
 
-    if (!id || !updatedEducation.institution || !updatedEducation.degree)
-      throw new Error("Invalid data");
-
-    const educationData = {
-      ...updatedEducation,
+    const courseData = {
+      ...updatedCourse,
       user_id: user.id,
+      education_id: educationID,
     };
 
     const { error } = await supabase
-      .from("education")
-      .update(educationData)
-      .eq("id", id)
+      .from("course")
+      .update(courseData)
+      .eq("education_id", educationID)
+      .eq("name", courseName)
       .eq("user_id", user.id);
 
     if (error) throw error;
 
     return NextResponse.json(
-      { message: "Successfully updated education" },
+      { message: "Successfully updated course" },
       { status: 200 }
     );
   } catch (err) {

@@ -20,12 +20,9 @@ export default function RootLayout({
         <AuthProvider>
           <LocalizationProviderWrapper>
             <Navigation />
-            <Container sx={{padding: "5% 0 5% 0"
-            }}>
+            <Container sx={{padding: "5% 0 5% 0"}}>
               {children}
             </Container>
-            {/* <div className="container" style={{ padding: "50px 0 50px 0", display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }}> */}
-            {/* </div> */}
           </LocalizationProviderWrapper>
         </AuthProvider>
       </body>
