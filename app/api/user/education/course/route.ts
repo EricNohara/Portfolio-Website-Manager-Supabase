@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       throw new Error("User not authenticated");
     }
 
-    const education_id = req.nextUrl.searchParams.get("education_id");
+    const education_id = req.nextUrl.searchParams.get("educationID");
 
     if (education_id) {
       const { data, error } = await supabase
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(data, { status: 200 });
     } else {
       const { data, error } = await supabase
-        .from("education")
+        .from("course")
         .select()
         .eq("user_id", user.id);
 

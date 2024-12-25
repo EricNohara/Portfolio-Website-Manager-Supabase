@@ -118,6 +118,21 @@ export default function ExperienceList() {
             <Button
               type="submit"
               variant="contained"
+              color="info"
+              fullWidth
+              onClick={() => {
+                router.push(
+                  `/user/education/course?educationID=${encodeURIComponent(
+                    edu.id
+                  )}`
+                );
+              }}
+            >
+              Courses
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
               color="error"
               fullWidth
               onClick={() => {
