@@ -2,6 +2,7 @@ import "./globals.css";
 import Navigation from "./navigation";
 import { AuthProvider } from "./context/AuthProvider";
 import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
+import { Container } from "@mui/material";
 
 export const metadata = {
   title: "Portfolio Website Editor",
@@ -19,9 +20,12 @@ export default function RootLayout({
         <AuthProvider>
           <LocalizationProviderWrapper>
             <Navigation />
-            <div className="container" style={{ padding: "50px 0 50px 0" }}>
+            <Container sx={{padding: "5% 0 5% 0"
+            }}>
               {children}
-            </div>
+            </Container>
+            {/* <div className="container" style={{ padding: "50px 0 50px 0", display: "flex", alignItems: "center", justifyContent: "center", width: "100%" }}> */}
+            {/* </div> */}
           </LocalizationProviderWrapper>
         </AuthProvider>
       </body>
