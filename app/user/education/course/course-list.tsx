@@ -24,8 +24,6 @@ export default function ExperienceList() {
         );
         const data = await res.json();
 
-        console.log(data);
-
         if (!res.ok) throw new Error("Failed to retrieve course data");
 
         setCourses(data);
@@ -53,8 +51,6 @@ export default function ExperienceList() {
       const removedCourses: ICourse[] = courses.filter(
         (c) => c.name !== course.name
       );
-
-      console.log(removedCourses);
 
       setCourses(removedCourses);
       alert(data.message);

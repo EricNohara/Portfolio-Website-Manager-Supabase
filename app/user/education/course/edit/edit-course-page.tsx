@@ -1,18 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, TextField } from "@mui/material";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { ICourseInput } from "@/app/interfaces/ICourse";
 
-export default function AddCourseForm() {
+export default function EditCoursePage() {
   const searchParams = useSearchParams();
   const educationID = searchParams.get("educationID") as string;
+  const courseName = searchParams.get("courseName") as string;
+
+  const router = useRouter();
+
   const [course, setCourse] = useState<ICourseInput>({
     name: "",
     grade: "",
     description: "",
   });
+
+  useEffect(() => {
+    const fetcher = async () => {
+      try {
+        const res = await fetch(
+          `/api/user/education/course?educationID=${encodeURIComponent(
+            educationID
+          )}&courseName=${encodeURIComponent(courseName)}`
+        );
+        const data = await res.json();
+
+        if (!res.ok || data.length === 0) throw new Error(data.message);
+
+        const oldCourse = data[0];
+
+        setCourse({
+          name: oldCourse.name,
+          grade: oldCourse.grade,
+          description: oldCourse.description,
+        });
+      } catch (err) {
+        console.error(err);
+        const error = err as Error;
+        alert(error.message);
+      }
+    };
+
+    fetcher();
+  }, [educationID, courseName]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,11 +69,12 @@ export default function AddCourseForm() {
     const payload = {
       course: course,
       educationID: educationID,
+      courseName: courseName,
     };
 
     try {
       const res = await fetch("/api/user/education/course", {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -48,7 +82,7 @@ export default function AddCourseForm() {
 
       if (!res.ok) throw new Error(data.message);
 
-      setCourse({ name: "", grade: "", description: "" });
+      router.push(`/user/education/course?educationID=${educationID}`);
 
       alert(data.message);
     } catch (err) {
@@ -96,7 +130,7 @@ export default function AddCourseForm() {
         onClick={handleSubmit}
         fullWidth
       >
-        Add Course
+        Update Course
       </Button>
     </form>
   );

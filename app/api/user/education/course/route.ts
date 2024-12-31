@@ -34,17 +34,31 @@ export async function GET(req: NextRequest) {
     }
 
     const education_id = req.nextUrl.searchParams.get("educationID");
+    const courseName = req.nextUrl.searchParams.get("courseName");
 
     if (education_id) {
-      const { data, error } = await supabase
-        .from("course")
-        .select()
-        .eq("user_id", user.id)
-        .eq("education_id", education_id);
+      if (courseName) {
+        const { data, error } = await supabase
+          .from("course")
+          .select()
+          .eq("user_id", user.id)
+          .eq("name", courseName)
+          .eq("education_id", education_id);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      return NextResponse.json(data, { status: 200 });
+        return NextResponse.json(data, { status: 200 });
+      } else {
+        const { data, error } = await supabase
+          .from("course")
+          .select()
+          .eq("user_id", user.id)
+          .eq("education_id", education_id);
+
+        if (error) throw error;
+
+        return NextResponse.json(data, { status: 200 });
+      }
     } else {
       const { data, error } = await supabase
         .from("course")

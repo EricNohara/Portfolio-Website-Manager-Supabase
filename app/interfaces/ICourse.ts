@@ -1,7 +1,7 @@
 export interface ICourseInput {
   name: string;
-  grade: string | null;
-  description: string | null;
+  grade: string;
+  description: string;
 }
 
 export interface ICourse extends ICourseInput {
