@@ -1,7 +1,13 @@
+"use client";
+
 import { Typography, Link, Container } from "@mui/material";
-import AddExperienceForm from "./add-experience-form";
+import AddCourseForm from "./add-course-form";
+import { useSearchParams } from "next/navigation";
 
 export default function AddExperiencePage() {
+  const searchParams = useSearchParams();
+  const educationID = searchParams.get("educationID") as string;
+
   return (
     <Container
       maxWidth="sm"
@@ -13,14 +19,16 @@ export default function AddExperiencePage() {
         gutterBottom
         className="text-center"
       >
-        Add Work Experience
+        Add Course
       </Typography>
-      <AddExperienceForm />
+      <AddCourseForm />
       <Link
         underline="hover"
         align="center"
         marginTop="1rem"
-        href="/user/experience"
+        href={`/user/education/course?educationID=${encodeURIComponent(
+          educationID
+        )}`}
       >
         Return
       </Link>
