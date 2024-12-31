@@ -67,54 +67,76 @@ export default function ExperienceList() {
         courses.map((course: ICourse, i: number) => (
           <Box
             display="flex"
-            gap="0.5rem"
+            flexDirection="column"
             padding="1rem"
+            marginBottom="0.75rem"
+            borderRadius="0.5rem"
             key={i}
             alignItems="center"
-            justifyContent="space-between"
             width="100%"
+            gap="0.5rem"
+            sx={{ backgroundColor: "#f5f5f5" }}
           >
-            <Typography variant="h5" component="h1" gutterBottom>
-              {course.name}
-            </Typography>
-            {course.grade && (
-              <Typography variant="body1" component="p" gutterBottom>
-                {course.grade}
+            <Box
+              display="flex"
+              gap="0.5rem"
+              padding="0.5rem"
+              alignItems="center"
+              justifyContent="space-between"
+              width="100%"
+            >
+              <Typography
+                variant="h5"
+                component="h1"
+                gutterBottom
+                sx={{ fontWeight: "bold" }}
+              >
+                {course.name}
               </Typography>
-            )}
+              {course.grade && (
+                <Typography variant="body1" component="p" gutterBottom>
+                  {course.grade}
+                </Typography>
+              )}
+              <Box display="flex" gap="25%" paddingRight="1rem">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  fullWidth
+                  onClick={() =>
+                    router.push(
+                      `/user/education/course/edit?educationID=${encodeURIComponent(
+                        course.education_id
+                      )}&courseName=${encodeURIComponent(course.name)}`
+                    )
+                  }
+                >
+                  Edit
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="error"
+                  fullWidth
+                  onClick={() => {
+                    handleDelete(course);
+                  }}
+                >
+                  Delete
+                </Button>
+              </Box>
+            </Box>
             {course.description && (
-              <Typography variant="body1" component="p" gutterBottom>
+              <Typography
+                variant="body1"
+                component="p"
+                gutterBottom
+                sx={{ fontStyle: "italic" }}
+              >
                 {course.description}
               </Typography>
             )}
-            <Box display="flex" gap="25%">
-              <Button
-                type="submit"
-                variant="contained"
-                color="secondary"
-                fullWidth
-                onClick={() =>
-                  router.push(
-                    `/user/education/course/edit?educationID=${encodeURIComponent(
-                      course.education_id
-                    )}&courseName=${encodeURIComponent(course.name)}`
-                  )
-                }
-              >
-                Edit
-              </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                color="error"
-                fullWidth
-                onClick={() => {
-                  handleDelete(course);
-                }}
-              >
-                Delete
-              </Button>
-            </Box>
           </Box>
         ))}
     </Box>
