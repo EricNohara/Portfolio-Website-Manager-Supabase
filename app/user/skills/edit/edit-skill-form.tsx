@@ -1,15 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, TextField } from "@mui/material";
 import { ISkillsInput } from "@/app/interfaces/ISkills";
+import { useSearchParams, useRouter } from "next/navigation";
 
-export default function AddSkillsForm() {
+export default function EditSkillsForm() {
+  const router = useRouter();
   const [skill, setSkill] = useState<ISkillsInput>({
     name: "",
     proficiency: null,
     years_of_experience: null,
   });
+  const searchParams = useSearchParams();
+  const skillName: string = searchParams.get("skillName") as string;
+
+  useEffect(() => {
+    const fetcher = async () => {
+      try {
+        const res = await fetch(
+          `/api/user/skills?skillName=${encodeURIComponent(skillName)}`
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) throw new Error(data.message);
+
+        setSkill(data[0]);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetcher();
+  }, [skillName]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -39,9 +63,12 @@ export default function AddSkillsForm() {
 
     try {
       const res = await fetch("/api/user/skills", {
-        method: "POST",
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(skill),
+        body: JSON.stringify({
+          skillName: skillName,
+          updatedSkill: skill,
+        }),
       });
       const data = await res.json();
 
@@ -49,7 +76,7 @@ export default function AddSkillsForm() {
 
       if (!res.ok) throw new Error(data.message);
       alert(data.message);
-      setSkill({ name: "", proficiency: null, years_of_experience: null });
+      router.push("/user/skills");
     } catch (err) {
       console.error(err);
       const error = err as Error;
@@ -97,7 +124,7 @@ export default function AddSkillsForm() {
         onClick={handleSubmit}
         fullWidth
       >
-        Add Skill
+        Update Skill
       </Button>
     </form>
   );
