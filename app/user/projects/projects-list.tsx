@@ -5,7 +5,7 @@ import { ISkills } from "@/app/interfaces/ISkills";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 
-export default function SkillsList() {
+export default function ProjectsList() {
   const router = useRouter();
   const [skills, setSkills] = useState<ISkills[]>([]);
 
