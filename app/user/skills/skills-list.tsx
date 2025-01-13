@@ -71,12 +71,14 @@ export default function ExperienceList() {
             </Typography>
             {skill.proficiency && (
               <Typography variant="body1" component="p" gutterBottom>
-                {`Proficiency: ${skill.proficiency}/10`}
+                <b>Proficiency: </b>
+                {`${skill.proficiency}/10`}
               </Typography>
             )}
             {skill.years_of_experience && (
               <Typography variant="body1" component="p" gutterBottom>
-                {`Experience: ${skill.years_of_experience} years`}
+                <b>Experience: </b>
+                {`${skill.years_of_experience} years`}
               </Typography>
             )}
           </Box>

@@ -1,0 +1,17 @@
+export interface IProjectInput {
+  name: string;
+  date_start: string | null;
+  date_end: string | null;
+  languages_used: string[] | null;
+  frameworks_used: string[] | null;
+  technologies_used: string[] | null;
+  description: string;
+  github_url: string | null;
+  demo_url: string | null;
+  thumbnail_url: string | null;
+}
+
+export interface IProject extends IProjectInput {
+  id: number;
+  user_id: string;
+}
