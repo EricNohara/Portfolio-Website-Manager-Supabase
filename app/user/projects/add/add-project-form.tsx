@@ -15,8 +15,8 @@ export default function AddProjectForm() {
 
   const [project, setProject] = useState<IProjectInput>({
     name: "",
-    date_start: null,
-    date_end: null,
+    date_start: "",
+    date_end: "",
     languages_used: null,
     frameworks_used: null,
     technologies_used: null,
@@ -64,24 +64,33 @@ export default function AddProjectForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let publicURL = null;
-    const compressedThumbnail = await compressImage(thumbnail);
-    publicURL = (await uploadThumbnail(
-      compressedThumbnail,
-      "project_thumbnails"
-    )) as string;
-
-    if (publicURL === "") {
-      alert("Error uploading selected thumbnail file");
-    }
-
     if (!project.name.trim() || !project.description.trim()) {
       alert("Please fill out all required fields.");
       return;
     }
 
-    const projectData = { ...project };
-    projectData.thumbnail_url = publicURL;
+    if (!project.date_start || !project.date_end) {
+      alert("Please fill out the date start and date end fields.");
+      return;
+    }
+
+    let projectData = { ...project };
+
+    // save the project thumbnail if one is provided
+    if (thumbnail) {
+      let publicURL = null;
+      const compressedThumbnail = await compressImage(thumbnail);
+      publicURL = (await uploadThumbnail(
+        compressedThumbnail,
+        "project_thumbnails"
+      )) as string;
+
+      if (publicURL === "") {
+        alert("Error uploading selected thumbnail file");
+      }
+
+      projectData.thumbnail_url = publicURL;
+    }
 
     try {
       const res = await fetch("/api/user/projects", {

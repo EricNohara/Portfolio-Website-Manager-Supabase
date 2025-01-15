@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { IProject } from "@/app/interfaces/IProject";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, Link } from "@mui/material";
 import { useRouter } from "next/navigation";
+import formatDate from "@/utils/general/formatDate";
 
 export default function ProjectsList() {
   const router = useRouter();
@@ -32,7 +33,10 @@ export default function ProjectsList() {
 
       // delete project thumbnail from storage if it exists
       if (project.thumbnail_url) {
-        res = await fetch(`/api/storage?publicURL=${encodeURIComponent(project.thumbnail_url)}`, {method: "DELETE"});
+        res = await fetch(
+          `/api/storage?publicURL=${encodeURIComponent(project.thumbnail_url)}`,
+          { method: "DELETE" }
+        );
         data = await res.json();
         if (!res.ok) throw new Error(data.message);
       }
@@ -69,27 +73,62 @@ export default function ProjectsList() {
           sx={{ border: 1, borderRadius: "0.25rem", borderColor: "#a1a1a1" }}
           key={i}
         >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
+          <Typography
+            variant="h5"
+            component="h5"
+            sx={{ fontWeight: "bold", textAlign: "center" }}
           >
-            <Typography variant="body1" component="p" gutterBottom>
-              {project.name}
-            </Typography>
-            {/* {skill.proficiency && (
-              <Typography variant="body1" component="p" gutterBottom>
-                <b>Proficiency: </b>
-                {`${skill.proficiency}/10`}
-              </Typography>
-            )}
-            {skill.years_of_experience && (
-              <Typography variant="body1" component="p" gutterBottom>
-                <b>Experience: </b>
-                {`${skill.years_of_experience} years`}
-              </Typography> */}
-            )}
-          </Box>
+            {`${project.name}`}
+          </Typography>
+          <Typography component="i" sx={{ textAlign: "center" }}>
+            {`${formatDate(project.date_start)} - ${formatDate(
+              project.date_end
+            )}`}
+          </Typography>
+          {(project.github_url || project.demo_url) && (
+            <Box display="flex" justifyContent="center" gap="5%">
+              {project.github_url && (
+                <Link
+                  underline="hover"
+                  align="center"
+                  href={project.github_url}
+                  target="_blank"
+                >
+                  GitHub URL
+                </Link>
+              )}{" "}
+              {project.demo_url && (
+                <Link
+                  underline="hover"
+                  align="center"
+                  target="_blank"
+                  href={project.demo_url}
+                >
+                  Demo URL
+                </Link>
+              )}
+            </Box>
+          )}
+          <p>
+            <b>Description: </b>
+            {project.description}
+          </p>
+          {project.languages_used && (
+            <p>
+              <b>Languages Used:</b> {project.languages_used.join(", ")}
+            </p>
+          )}
+          {project.frameworks_used && (
+            <p>
+              <b>Frameworks Used:</b> {project.frameworks_used.join(", ")}
+            </p>
+          )}
+          {project.technologies_used && (
+            <p>
+              <b>Technologies Used:</b> {project.technologies_used.join(", ")}
+            </p>
+          )}
+          {project.thumbnail_url && <img src={project.thumbnail_url} />}
           <Box display="flex" gap="25%">
             <Button
               type="submit"

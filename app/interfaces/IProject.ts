@@ -1,7 +1,7 @@
 export interface IProjectInput {
   name: string;
-  date_start: string | null;
-  date_end: string | null;
+  date_start: string;
+  date_end: string;
   languages_used: string[] | null;
   frameworks_used: string[] | null;
   technologies_used: string[] | null;
