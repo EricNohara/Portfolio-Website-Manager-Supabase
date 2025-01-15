@@ -28,13 +28,21 @@ export default function ProjectsList() {
 
   const handleDelete = async (project: IProject) => {
     try {
-      const res = await fetch(`/api/user/projects?projectID=${project.id}`, {
+      let res, data;
+
+      // delete project thumbnail from storage if it exists
+      if (project.thumbnail_url) {
+        res = await fetch(`/api/storage?publicURL=${encodeURIComponent(project.thumbnail_url)}`, {method: "DELETE"});
+        data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+      }
+
+      res = await fetch(`/api/user/projects?projectID=${project.id}`, {
         method: "DELETE",
       });
-      const data = await res.json();
+      data = await res.json();
 
       if (!res.ok) throw new Error(data.message);
-
       alert(data.message);
 
       const removedProjects: IProject[] = projects.filter(
@@ -53,7 +61,6 @@ export default function ProjectsList() {
     <Box display="flex" flexDirection="column-reverse">
       {projects.map((project: IProject, i: number) => (
         <Box
-          // update information here
           display="flex"
           flexDirection="column"
           gap="0.5rem"
@@ -68,9 +75,9 @@ export default function ProjectsList() {
             alignItems="center"
           >
             <Typography variant="body1" component="p" gutterBottom>
-              {skill.name}
+              {project.name}
             </Typography>
-            {skill.proficiency && (
+            {/* {skill.proficiency && (
               <Typography variant="body1" component="p" gutterBottom>
                 <b>Proficiency: </b>
                 {`${skill.proficiency}/10`}
@@ -80,7 +87,7 @@ export default function ProjectsList() {
               <Typography variant="body1" component="p" gutterBottom>
                 <b>Experience: </b>
                 {`${skill.years_of_experience} years`}
-              </Typography>
+              </Typography> */}
             )}
           </Box>
           <Box display="flex" gap="25%">
@@ -92,7 +99,7 @@ export default function ProjectsList() {
               onClick={() =>
                 router.push(
                   `/user/skills/edit?skillName=${encodeURIComponent(
-                    skill.name
+                    project.name
                   )}`
                 )
               }
@@ -105,7 +112,7 @@ export default function ProjectsList() {
               color="error"
               fullWidth
               onClick={() => {
-                handleDelete(skill);
+                handleDelete(project);
               }}
             >
               Delete

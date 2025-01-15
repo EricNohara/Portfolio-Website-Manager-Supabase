@@ -4,7 +4,7 @@ import { Input, Typography, Button, Link } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { compressImage, compressPDF } from "@/utils/file-upload/compress";
-import uploadFile from "@/utils/file-upload/upload";
+import { uploadFile } from "@/utils/file-upload/upload";
 
 export default function EditDocumentsForm() {
   const router = useRouter();

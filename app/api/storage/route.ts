@@ -149,30 +149,41 @@ export async function DELETE(req: NextRequest) {
 
     const { parsedBucket, parsedFilename } = parseURL(publicURL);
 
-    // try to delete from DB
-    const userData =
-      parsedBucket === "portraits"
-        ? { portrait_url: "" }
-        : parsedBucket === "resumes"
-        ? { resume_url: "" }
-        : { transcript_url: "" };
+    if (parsedBucket === "project_thumbnails") {
+      // if deleting project thumbnail, just need to delete from storage
+      const { error } = await serviceRoleSupabase.storage
+        .from(parsedBucket)
+        .remove([parsedFilename]);
 
-    const { error: updateError } = await supabase
-      .from("users")
-      .update(userData)
-      .eq("id", user?.id);
+      if (error) throw error;
 
-    if (updateError) {
-      throw updateError;
+      return NextResponse.json({ message: "Success" }, { status: 200 });
+    } else {
+      // try to delete from DB
+      const userData =
+        parsedBucket === "portraits"
+          ? { portrait_url: "" }
+          : parsedBucket === "resumes"
+          ? { resume_url: "" }
+          : { transcript_url: "" };
+
+      const { error: updateError } = await supabase
+        .from("users")
+        .update(userData)
+        .eq("id", user?.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      const { error } = await serviceRoleSupabase.storage
+        .from(parsedBucket)
+        .remove([parsedFilename]);
+
+      if (error) throw error;
+
+      return NextResponse.json({ message: "Success" }, { status: 200 });
     }
-
-    const { error } = await serviceRoleSupabase.storage
-      .from(parsedBucket)
-      .remove([parsedFilename]);
-
-    if (error) throw error;
-
-    return NextResponse.json({ message: "Success" }, { status: 200 });
   } catch (err) {
     const error = err as Error;
     return NextResponse.json({ message: error }, { status: 400 });

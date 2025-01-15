@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, TextField, Box, Input } from "@mui/material";
+import { Button, TextField, Box, Input, Typography } from "@mui/material";
 import { IProjectInput } from "@/app/interfaces/IProject";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
@@ -141,6 +141,24 @@ export default function AddProjectForm() {
         value={project.description || ""}
       ></TextField>
       <TextField
+        label="Github URL"
+        name="github_url"
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+        size="medium"
+        value={project.github_url || ""}
+      ></TextField>
+      <TextField
+        label="Demo URL"
+        name="demo_url"
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+        size="medium"
+        value={project.demo_url || ""}
+      ></TextField>
+      <TextField
         label="Programming Languages Used (Separated by Comma)"
         name="languages_used"
         onChange={handleChange}
@@ -170,31 +188,30 @@ export default function AddProjectForm() {
         size="medium"
         value={project.technologies_used || ""}
       ></TextField>
-      <TextField
-        label="Github URL"
-        name="github_url"
-        onChange={handleChange}
-        fullWidth
-        margin="dense"
-        size="medium"
-        value={project.github_url || ""}
-      ></TextField>
-      <TextField
-        label="Demo URL"
-        name="demo_url"
-        onChange={handleChange}
-        fullWidth
-        margin="dense"
-        size="medium"
-        value={project.demo_url || ""}
-      ></TextField>
-      <Input
-        type="file"
-        name="thumbnail"
-        inputProps={{ accept: "image/*" }}
-        fullWidth
-        onChange={handleFileChange}
-      />
+      <Box
+        display="flex"
+        flexDirection="column"
+        gap="0.5rem"
+        padding="1rem"
+        marginTop="0.5rem"
+        sx={{
+          border: 1,
+          borderRadius: "0.25rem",
+          borderColor: "#bdbdbd",
+          "&:hover": { borderColor: "black" },
+        }}
+      >
+        <Typography variant="h6" sx={{ fontSize: "1rem", color: "#595959" }}>
+          Project Thumbnail Upload (Image Only)
+        </Typography>
+        <Input
+          type="file"
+          name="thumbnail"
+          inputProps={{ accept: "image/*" }}
+          fullWidth
+          onChange={handleFileChange}
+        />
+      </Box>
       <Button
         type="submit"
         variant="contained"
