@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Button, TextField, Box } from "@mui/material";
+import { Button, TextField, Box, Input } from "@mui/material";
 import { IProjectInput } from "@/app/interfaces/IProject";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { useRouter } from "next/navigation";
-import imageCompression from "browser-image-compression";
+import { compressImage } from "@/utils/file-upload/compress";
 
 export default function AddProjectForm() {
   const router = useRouter();
@@ -55,8 +55,59 @@ export default function AddProjectForm() {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile: File | null = e.target.files?.[0] || null;
+    setThumbnail(selectedFile);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    let success = true;
+
+    const uploadFile = async (file: File, bucketName: string) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("bucketName", bucketName);
+
+      try {
+        const res = await fetch("/api/storage", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message.message);
+        }
+
+        alert("Successfully uploaded file");
+      } catch (err) {
+        const error = err as Error;
+        alert("Error uploading file: " + error.message);
+        success = false;
+      }
+    };
+
+    if (portrait) {
+      const compressedPortrait = await compressImage(portrait);
+      await uploadFile(compressedPortrait, "portraits");
+    }
+    if (resume) {
+      const compressedResume = await compressPDF(resume);
+      await uploadFile(compressedResume, "resumes");
+    }
+    if (transcript) {
+      const compressedTranscript = await compressPDF(transcript);
+      await uploadFile(compressedTranscript, "transcripts");
+    }
+
+    if (success) {
+      router.push("/user/documents");
+    }
+
+    // end of upload
 
     if (!project.name.trim() || !project.description.trim()) {
       alert("Please fill out all required fields.");
@@ -167,6 +218,13 @@ export default function AddProjectForm() {
         size="medium"
         value={project.demo_url || ""}
       ></TextField>
+      <Input
+        type="file"
+        name="thumbnail"
+        inputProps={{ accept: "image/*" }}
+        fullWidth
+        onChange={handleFileChange}
+      />
       <Button
         type="submit"
         variant="contained"

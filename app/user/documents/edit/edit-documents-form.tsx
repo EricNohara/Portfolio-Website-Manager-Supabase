@@ -3,8 +3,8 @@
 import { Input, Typography, Button, Link } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import imageCompression from "browser-image-compression";
-import { PDFDocument } from "pdf-lib";
+import { compressImage, compressPDF } from "@/utils/file-upload/compress";
+import uploadFile from "@/utils/file-upload/upload";
 
 export default function EditDocumentsForm() {
   const router = useRouter();
@@ -25,85 +25,20 @@ export default function EditDocumentsForm() {
     }
   };
 
-  // image compression
-  const compressImage = async (file: File) => {
-    const options = {
-      maxSizeMB: 1, // Target size in MB
-      maxWidthOrHeight: 1080, // Max width/height
-      useWebWorker: true, // Use Web Worker for performance
-    };
-
-    try {
-      const compressedBlob = await imageCompression(file, options);
-
-      // Convert Blob back to File to preserve the original file name and type
-      const compressedFile = new File([compressedBlob], file.name, {
-        type: file.type,
-        lastModified: Date.now(),
-      });
-
-      return compressedFile;
-    } catch (error) {
-      console.error("Error compressing image:", error);
-      return file; // Return original file if compression fails
-    }
-  };
-
-  const compressPDF = async (file: File) => {
-    try {
-      const fileBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(fileBuffer);
-
-      // Optionally remove unnecessary information or reduce image quality
-      const compressedPdfBytes = await pdfDoc.save({ useObjectStreams: false });
-
-      return new File([compressedPdfBytes], file.name, {
-        type: "application/pdf",
-      });
-    } catch {
-      return file; // Return original if compression fails
-    }
-  };
-
   const handleSaveChanges = async () => {
-    let success = true;
-
-    const uploadFile = async (file: File, bucketName: string) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("bucketName", bucketName);
-
-      try {
-        const res = await fetch("/api/storage", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.message.message);
-        }
-
-        alert("Successfully uploaded file");
-      } catch (err) {
-        const error = err as Error;
-        alert("Error uploading file: " + error.message);
-        success = false;
-      }
-    };
+    let success;
 
     if (portrait) {
       const compressedPortrait = await compressImage(portrait);
-      await uploadFile(compressedPortrait, "portraits");
+      success = await uploadFile(compressedPortrait, "portraits");
     }
     if (resume) {
       const compressedResume = await compressPDF(resume);
-      await uploadFile(compressedResume, "resumes");
+      success = await uploadFile(compressedResume, "resumes");
     }
     if (transcript) {
       const compressedTranscript = await compressPDF(transcript);
-      await uploadFile(compressedTranscript, "transcripts");
+      success = await uploadFile(compressedTranscript, "transcripts");
     }
 
     if (success) {
