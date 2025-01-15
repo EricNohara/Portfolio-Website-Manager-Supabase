@@ -1,23 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ISkills } from "@/app/interfaces/ISkills";
+import { IProject } from "@/app/interfaces/IProject";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 export default function ProjectsList() {
   const router = useRouter();
-  const [skills, setSkills] = useState<ISkills[]>([]);
+  const [projects, setProjects] = useState<IProject[]>([]);
 
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch("/api/user/skills", { method: "GET" });
+        const res = await fetch("/api/user/projects", { method: "GET" });
         const data = await res.json();
 
-        if (!res.ok) throw new Error("Failed to retrieve skills data");
+        if (!res.ok) throw new Error("Failed to retrieve projects data");
 
-        setSkills(data);
+        setProjects(data);
       } catch (err) {
         alert(err);
       }
@@ -26,9 +26,9 @@ export default function ProjectsList() {
     fetcher();
   }, []);
 
-  const handleDelete = async (skill: ISkills) => {
+  const handleDelete = async (project: IProject) => {
     try {
-      const res = await fetch(`/api/user/skills?skillName=${skill.name}`, {
+      const res = await fetch(`/api/user/projects?projectID=${project.id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -37,11 +37,11 @@ export default function ProjectsList() {
 
       alert(data.message);
 
-      const removedSkills: ISkills[] = skills.filter(
-        (s) => s.name !== skill.name
+      const removedProjects: IProject[] = projects.filter(
+        (p) => p.id !== project.id
       );
 
-      setSkills(removedSkills);
+      setProjects(removedProjects);
     } catch (err) {
       const error = err as Error;
       console.error(err);
@@ -51,8 +51,9 @@ export default function ProjectsList() {
 
   return (
     <Box display="flex" flexDirection="column-reverse">
-      {skills.map((skill: ISkills, i: number) => (
+      {projects.map((project: IProject, i: number) => (
         <Box
+          // update information here
           display="flex"
           flexDirection="column"
           gap="0.5rem"
