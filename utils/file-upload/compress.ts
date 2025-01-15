@@ -2,7 +2,9 @@ import imageCompression from "browser-image-compression";
 import { PDFDocument } from "pdf-lib";
 
 // image compression
-const compressImage = async (file: File) => {
+const compressImage = async (file: File | null) => {
+  if (!file) return null;
+
   const options = {
     maxSizeMB: 1, // Target size in MB
     maxWidthOrHeight: 1080, // Max width/height

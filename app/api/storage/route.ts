@@ -42,7 +42,10 @@ export async function POST(req: NextRequest) {
     // upload to supabase
     const fileContent = await file.arrayBuffer();
     const buffer = Buffer.from(fileContent);
-    const filepath = `${user.id}-${file.name}`;
+    const filepath =
+      bucketName === "project_thumbnails"
+        ? `${user.id}-${Date.now()}-${file.name}`
+        : `${user.id}-${file.name}`;
 
     const { error: uploadError } = await serviceRoleSupabase.storage
       .from(bucketName)
@@ -59,56 +62,66 @@ export async function POST(req: NextRequest) {
       .from(bucketName)
       .getPublicUrl(filepath);
 
-    let documentField: string;
-    let updateData;
-    if (bucketName === "portraits") {
-      documentField = "portrait_url";
-      updateData = { portrait_url: publicURL.publicUrl };
-    } else if (bucketName === "resumes") {
-      documentField = "resume_url";
-      updateData = { resume_url: publicURL.publicUrl };
-    } else {
-      documentField = "transcript_url";
-      updateData = { transcript_url: publicURL.publicUrl };
-    }
+    if (bucketName !== "project_thumbnails") {
+      let documentField: string;
+      let updateData;
+      if (bucketName === "portraits") {
+        documentField = "portrait_url";
+        updateData = { portrait_url: publicURL.publicUrl };
+      } else if (bucketName === "resumes") {
+        documentField = "resume_url";
+        updateData = { resume_url: publicURL.publicUrl };
+      } else {
+        documentField = "transcript_url";
+        updateData = { transcript_url: publicURL.publicUrl };
+      }
 
-    // check if user already has a document - if so delete the document and its reference
-    const { data: userData, error: existsError } = await supabase
-      .from("users")
-      .select(documentField)
-      .eq("id", user.id);
+      // check if user already has a document - if so delete the document and its reference
+      const { data: userData, error: existsError } = await supabase
+        .from("users")
+        .select(documentField)
+        .eq("id", user.id);
 
-    if (existsError) {
-      // if error checking if url exists, delete from storage
-      await serviceRoleSupabase.storage.from(bucketName).remove([file.name]);
-      throw existsError;
-    }
+      if (existsError) {
+        // if error checking if url exists, delete from storage
+        await serviceRoleSupabase.storage.from(bucketName).remove([file.name]);
+        throw existsError;
+      }
 
-    const existingURL = Object.values(userData)[0] as string;
+      const existingURL = Object.values(userData)[0] as string;
 
-    // add it to the user's row
-    const { error: updateError } = await supabase
-      .from("users")
-      .update(updateData)
-      .eq("id", user?.id);
+      // add it to the user's row
+      const { error: updateError } = await supabase
+        .from("users")
+        .update(updateData)
+        .eq("id", user?.id);
 
-    if (updateError) {
-      await serviceRoleSupabase.storage.from(bucketName).remove([file.name]);
-      throw updateError;
-    }
+      if (updateError) {
+        await serviceRoleSupabase.storage.from(bucketName).remove([file.name]);
+        throw updateError;
+      }
 
-    // delete old document after the new doc successfully saves
-    if (existingURL !== "") {
-      // user already has a document so need to delete it
-      const { parsedBucket, parsedFilename } = parseURL(
-        Object.values(existingURL)[0]
+      // delete old document after the new doc successfully saves
+      if (existingURL !== "") {
+        // user already has a document so need to delete it
+        const { parsedBucket, parsedFilename } = parseURL(
+          Object.values(existingURL)[0]
+        );
+        await serviceRoleSupabase.storage
+          .from(parsedBucket)
+          .remove([parsedFilename]);
+      }
+
+      return NextResponse.json(
+        { message: "Upload successful" },
+        { status: 200 }
       );
-      await serviceRoleSupabase.storage
-        .from(parsedBucket)
-        .remove([parsedFilename]);
+    } else {
+      return NextResponse.json(
+        { publicURL: publicURL.publicUrl },
+        { status: 200 }
+      );
     }
-
-    return NextResponse.json({ message: "Upload successful" }, { status: 200 });
   } catch (err) {
     const error = err as Error;
     return NextResponse.json({ message: error }, { status: 400 });

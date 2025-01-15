@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 import { useRouter } from "next/navigation";
 import { compressImage } from "@/utils/file-upload/compress";
+import { uploadThumbnail } from "@/utils/file-upload/upload";
 
 export default function AddProjectForm() {
   const router = useRouter();
@@ -63,62 +64,30 @@ export default function AddProjectForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let success = true;
+    let publicURL = null;
+    const compressedThumbnail = await compressImage(thumbnail);
+    publicURL = (await uploadThumbnail(
+      compressedThumbnail,
+      "project_thumbnails"
+    )) as string;
 
-    const uploadFile = async (file: File, bucketName: string) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("bucketName", bucketName);
-
-      try {
-        const res = await fetch("/api/storage", {
-          method: "POST",
-          body: formData,
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.message.message);
-        }
-
-        alert("Successfully uploaded file");
-      } catch (err) {
-        const error = err as Error;
-        alert("Error uploading file: " + error.message);
-        success = false;
-      }
-    };
-
-    if (portrait) {
-      const compressedPortrait = await compressImage(portrait);
-      await uploadFile(compressedPortrait, "portraits");
+    if (publicURL === "") {
+      alert("Error uploading selected thumbnail file");
     }
-    if (resume) {
-      const compressedResume = await compressPDF(resume);
-      await uploadFile(compressedResume, "resumes");
-    }
-    if (transcript) {
-      const compressedTranscript = await compressPDF(transcript);
-      await uploadFile(compressedTranscript, "transcripts");
-    }
-
-    if (success) {
-      router.push("/user/documents");
-    }
-
-    // end of upload
 
     if (!project.name.trim() || !project.description.trim()) {
       alert("Please fill out all required fields.");
       return;
     }
 
+    const projectData = { ...project };
+    projectData.thumbnail_url = publicURL;
+
     try {
       const res = await fetch("/api/user/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(project),
+        body: JSON.stringify(projectData),
       });
       const data = await res.json();
 
@@ -166,6 +135,7 @@ export default function AddProjectForm() {
         onChange={handleChange}
         fullWidth
         multiline
+        required
         margin="dense"
         size="medium"
         value={project.description || ""}
@@ -182,7 +152,7 @@ export default function AddProjectForm() {
       ></TextField>
       <TextField
         label="Frameworks Used (Separated by Comma)"
-        name="framewords_used"
+        name="frameworks_used"
         onChange={handleChange}
         fullWidth
         multiline
