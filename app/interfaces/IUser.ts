@@ -1,11 +1,13 @@
 export default interface IUser {
   email: string;
   name: string;
-  phone_number: string;
-  location: string;
-  github_url: string;
-  linkedin_url: string;
-  portrait_url: string;
-  resume_url: string;
-  transcript_url: string;
+  phone_number: string | null;
+  location: string | null;
+  github_url: string | null;
+  linkedin_url: string | null;
+  portrait_url: string | null;
+  resume_url: string | null;
+  transcript_url: string | null;
+  facebook_url: string | null;
+  instagram_url: string | null;
 }

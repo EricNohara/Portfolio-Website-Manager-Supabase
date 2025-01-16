@@ -34,7 +34,7 @@ export default function Home() {
         gutterBottom
         sx={{ fontWeight: "bold" }}
       >
-        Online Portfolio Website Manager
+        PORTFOLIO WEBSITE MANAGER
       </Typography>
       <Typography
         variant="h5"
@@ -44,11 +44,21 @@ export default function Home() {
           color: "#616161",
           fontStyle: "italic",
           textAlign: "center",
+          marginBottom: "1rem",
         }}
       >
         Effortlessly manage portfolio websites with an all-in-one platform.
-        Update information in a single place. Automatically sync to connected
-        websites through a provided API. No need for manual code updates.
+        Update information in one place. Automatically synced to connected
+        websites through a provided API, eliminating manual updates.
+      </Typography>
+      <Typography
+        variant="h5"
+        component="h2"
+        sx={{
+          color: "#616161",
+          textAlign: "center",
+        }}
+      >
         Powered by Supabase and Next.js, keeping websites up-to-date is simple.
       </Typography>
       <Box display="flex" alignItems="center" gap="2rem">

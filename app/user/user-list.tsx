@@ -2,9 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { type User } from "@supabase/supabase-js";
+import IUser from "../interfaces/IUser";
 import { Typography, Link, Button, Box, Avatar } from "@mui/material";
 import { useAuth } from "../context/AuthProvider";
 import { useRouter } from "next/navigation";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import EmailIcon from "@mui/icons-material/Email";
 
 export default function UserList({ user }: { user: User | null }) {
   const router = useRouter();
@@ -13,16 +19,18 @@ export default function UserList({ user }: { user: User | null }) {
     if (user) setIsLoggedIn(true); // Only set the state inside useEffect
   }, [setIsLoggedIn, user]); // Make sure to list setIsLoggedIn as a dependency
 
-  const [userData, setUserData] = useState({
+  const [userData, setUserData] = useState<IUser>({
     email: "",
     name: "",
-    phone_number: "",
-    location: "",
-    github_url: "",
-    linkedin_url: "",
-    portrait_url: "",
-    resume_url: "",
-    transcript_url: "",
+    phone_number: null,
+    location: null,
+    github_url: null,
+    linkedin_url: null,
+    portrait_url: null,
+    resume_url: null,
+    transcript_url: null,
+    instagram_url: null,
+    facebook_url: null,
   });
 
   const getProfile = useCallback(async () => {
@@ -82,11 +90,17 @@ export default function UserList({ user }: { user: User | null }) {
           {userData?.name}
         </Typography>
         {userData.portrait_url && (
-          <Avatar
-            alt="avatar"
-            src={userData.portrait_url}
-            sx={{ width: 150, height: 150, marginBottom: "1rem" }}
-          />
+          <Link
+            href={userData.portrait_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Avatar
+              alt="avatar"
+              src={userData.portrait_url}
+              sx={{ width: 150, height: 150, marginBottom: "1rem" }}
+            />
+          </Link>
         )}
         <Typography
           variant="body1"
@@ -112,44 +126,52 @@ export default function UserList({ user }: { user: User | null }) {
         >
           {userData?.location}
         </Typography>
-        {userData?.github_url && (
-          <Typography
-            variant="body1"
-            component="p"
-            gutterBottom
-            className="text-center"
-          >
-            <strong>GitHub URL:</strong>{" "}
+
+        <Box display="flex" gap="1rem" margin="1rem">
+          {userData?.github_url && (
             <Link
-              underline="hover"
               href={userData.github_url}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {userData.github_url}
+              <GitHubIcon fontSize="large" sx={{ fontSize: "3rem" }} />
             </Link>
-          </Typography>
-        )}
-
-        {userData?.linkedin_url && (
-          <Typography
-            variant="body1"
-            component="p"
-            gutterBottom
-            className="text-center"
-          >
-            <strong>LinkedIn URL:</strong>{" "}
+          )}
+          {userData?.linkedin_url && (
             <Link
-              underline="hover"
               href={userData.linkedin_url}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {userData.linkedin_url}
+              <LinkedInIcon fontSize="large" sx={{ fontSize: "3rem" }} />
             </Link>
-          </Typography>
-        )}
-
+          )}
+          {userData?.facebook_url && (
+            <Link
+              href={userData.facebook_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FacebookIcon fontSize="large" sx={{ fontSize: "3rem" }} />
+            </Link>
+          )}
+          {userData?.instagram_url && (
+            <Link
+              href={userData.instagram_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <InstagramIcon fontSize="large" sx={{ fontSize: "3rem" }} />
+            </Link>
+          )}
+          <Link
+            href={`mailto:${userData.email}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <EmailIcon fontSize="large" sx={{ fontSize: "3rem" }} />
+          </Link>
+        </Box>
         {userData?.resume_url && (
           <Typography
             variant="body1"
@@ -180,25 +202,6 @@ export default function UserList({ user }: { user: User | null }) {
             <Link
               underline="hover"
               href={userData.transcript_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Click to View
-            </Link>
-          </Typography>
-        )}
-
-        {userData?.portrait_url && (
-          <Typography
-            variant="body1"
-            component="p"
-            gutterBottom
-            className="text-center"
-          >
-            <strong>Portrait:</strong>{" "}
-            <Link
-              underline="hover"
-              href={userData.portrait_url}
               target="_blank"
               rel="noopener noreferrer"
             >

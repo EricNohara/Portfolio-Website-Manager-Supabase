@@ -37,6 +37,8 @@ export async function GET(req: NextRequest) {
       portrait_url: data.portrait_url,
       resume_url: data.resume_url,
       transcript_url: data.transcript_url,
+      facebook_url: data.facebook_url,
+      instagram_url: data.instagram_url,
     };
 
     return NextResponse.json({ userData: userData }, { status: 200 });

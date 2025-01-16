@@ -11,13 +11,15 @@ export default function EditUserForm({ user }: { user: User | null }) {
   const [userData, setUserData] = useState<IUser>({
     email: "",
     name: "",
-    phone_number: "",
-    location: "",
-    github_url: "",
-    linkedin_url: "",
-    portrait_url: "",
-    resume_url: "",
-    transcript_url: "",
+    phone_number: null,
+    location: null,
+    github_url: null,
+    linkedin_url: null,
+    portrait_url: null,
+    resume_url: null,
+    transcript_url: null,
+    facebook_url: null,
+    instagram_url: null,
   });
 
   useEffect(() => {
@@ -55,6 +57,8 @@ export default function EditUserForm({ user }: { user: User | null }) {
       if (!res.ok) {
         throw new Error(data.message);
       }
+
+      alert(data.message);
 
       router.push("/user");
     } catch (error) {
@@ -120,9 +124,27 @@ export default function EditUserForm({ user }: { user: User | null }) {
         onChange={handleChange}
         fullWidth
         margin="dense"
-        className="mb-10"
         size="small"
         value={userData.linkedin_url}
+      />
+      <TextField
+        label="Facebook URL"
+        name="facebook_url"
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+        size="small"
+        value={userData.facebook_url}
+      />
+      <TextField
+        label="Instagram URL"
+        name="instagram_url"
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+        className="mb-10"
+        size="small"
+        value={userData.instagram_url}
       />
       <Button type="submit" variant="contained" color="primary">
         Save Changes
