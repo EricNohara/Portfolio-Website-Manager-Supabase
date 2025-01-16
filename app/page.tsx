@@ -23,7 +23,7 @@ export default function Home() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        padding: "2rem",
+        padding: "2.5rem",
         backgroundColor: "#f5f5f5",
         borderRadius: "1rem",
       }}
@@ -54,7 +54,7 @@ export default function Home() {
       <Box display="flex" alignItems="center" gap="2rem">
         <Image src="/images/clouds.png" alt="clouds" width={300} height={300} />
         <Image
-          src="/images/website.webp"
+          src="/images/website.png"
           alt="website"
           width={200}
           height={200}
