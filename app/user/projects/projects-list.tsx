@@ -137,8 +137,8 @@ export default function ProjectsList() {
               fullWidth
               onClick={() =>
                 router.push(
-                  `/user/skills/edit?skillName=${encodeURIComponent(
-                    project.name
+                  `/user/projects/edit?prevProjectID=${encodeURIComponent(
+                    project.id
                   )}`
                 )
               }

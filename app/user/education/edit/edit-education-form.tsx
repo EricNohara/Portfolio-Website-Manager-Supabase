@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Button, TextField, Box } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
-import type { Dayjs } from "dayjs";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import { IEducationInput } from "@/app/interfaces/IEducation";

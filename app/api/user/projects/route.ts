@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { IProject, IProjectInput } from "@/app/interfaces/IProject";
-import { useDateField } from "@mui/x-date-pickers/DateField/useDateField";
 
 export async function GET(req: NextRequest) {
   try {
@@ -150,16 +149,16 @@ export async function PUT(req: NextRequest) {
     }
 
     const {
-      prevProject,
+      prevProjectID,
       updatedProject,
     }: {
-      prevProject: string;
+      prevProjectID: string;
       updatedProject: IProjectInput;
     } = await req.json();
 
     if (
       !updatedProject ||
-      !prevProject ||
+      !prevProjectID ||
       !updatedProject.name ||
       !updatedProject.description
     )
@@ -173,7 +172,7 @@ export async function PUT(req: NextRequest) {
     const { error } = await supabase
       .from("projects")
       .update(projectData)
-      .eq("id", prevProject)
+      .eq("id", prevProjectID)
       .eq("user_id", user.id);
 
     if (error) throw error;
