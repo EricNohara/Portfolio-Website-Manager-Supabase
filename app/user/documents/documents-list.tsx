@@ -203,7 +203,7 @@ export default function DocumentsList({ user }: { user: User | null }) {
         color="primary"
         onClick={() => router.push("/user/documents/edit")}
       >
-        Edit
+        Edit All
       </Button>
     </Box>
   );

@@ -1,16 +1,19 @@
+"use client";
+
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
+import { useRouter } from "next/navigation";
+import { useAuth } from "./context/AuthProvider";
+import { useEffect } from "react";
 
-export default async function Home() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default function Home() {
+  const { isLoggedIn } = useAuth();
+  const router = useRouter();
 
-  if (user) {
-    redirect("/user");
-  }
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push("/user");
+    }
+  }, [isLoggedIn, router]);
 
   return (
     <div className="row">

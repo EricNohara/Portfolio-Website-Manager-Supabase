@@ -38,7 +38,7 @@ export default function LoginForm() {
       router.push("/user");
     } catch (err) {
       alert(err);
-      router.push("/error");
+      setCredentials({ email: "", password: "" });
     }
   };
 
@@ -51,6 +51,7 @@ export default function LoginForm() {
         fullWidth
         onChange={handleChange}
         margin="normal"
+        value={credentials.email}
       />
       <TextField
         label="password"
@@ -60,6 +61,7 @@ export default function LoginForm() {
         onChange={handleChange}
         margin="normal"
         type="password"
+        value={credentials.password}
       />
       <Button type="submit" variant="contained" color="primary" sx={{ mt: 3 }}>
         Sign In
