@@ -39,34 +39,62 @@ export default function Navigation() {
     }
   };
 
-  return isLoggedIn ? (
+  return (
     <AppBar position="sticky">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Portfolio Editor
         </Typography>
-        <Button color="inherit" onClick={() => router.push("/user")}>
+        <Button
+          color="inherit"
+          onClick={() => router.push(`/${isLoggedIn ? "user" : ""}`)}
+        >
           Home
         </Button>
-        <Button color="inherit" onClick={() => router.push("/user/documents")}>
-          Documents
-        </Button>
-        <Button color="inherit" onClick={() => router.push("/user/experience")}>
-          Experience
-        </Button>
-        <Button color="inherit" onClick={() => router.push("/user/education")}>
-          Education
-        </Button>
-        <Button color="inherit" onClick={() => router.push("/user/skills")}>
-          Skills
-        </Button>
-        <Button color="inherit" onClick={() => router.push("/user/projects")}>
-          Projects
-        </Button>
-        <Button color="inherit" onClick={handleSignOut}>
-          Sign out
-        </Button>
+        {isLoggedIn ? (
+          <>
+            <Button
+              color="inherit"
+              onClick={() => router.push("/user/documents")}
+            >
+              Documents
+            </Button>
+            <Button
+              color="inherit"
+              onClick={() => router.push("/user/experience")}
+            >
+              Experience
+            </Button>
+            <Button
+              color="inherit"
+              onClick={() => router.push("/user/education")}
+            >
+              Education
+            </Button>
+            <Button color="inherit" onClick={() => router.push("/user/skills")}>
+              Skills
+            </Button>
+            <Button
+              color="inherit"
+              onClick={() => router.push("/user/projects")}
+            >
+              Projects
+            </Button>
+            <Button color="inherit" onClick={handleSignOut}>
+              Sign out
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button color="inherit" onClick={() => router.push("/user/login")}>
+              Log In
+            </Button>
+            <Button color="inherit" onClick={() => router.push("/user/create")}>
+              Sign Up
+            </Button>
+          </>
+        )}
       </Toolbar>
     </AppBar>
-  ) : null; // Return null if the user is not logged in
+  );
 }

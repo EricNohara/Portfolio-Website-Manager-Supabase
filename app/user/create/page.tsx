@@ -1,6 +1,5 @@
 import CreateUserForm from "./create-user-form";
-import { createClient } from "@/utils/supabase/server";
-import { Typography, Container } from "@mui/material";
+import { Typography, Container, Link } from "@mui/material";
 
 export default async function CreateUserPage() {
   return (
