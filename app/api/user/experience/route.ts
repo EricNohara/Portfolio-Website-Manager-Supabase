@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
       throw new Error("User not authenticated");
     }
 
+    const count = req.nextUrl.searchParams.get("count");
+
     const { data, error } = await supabase
       .from("work_experiences")
       .select()
@@ -21,7 +23,11 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(data, { status: 200 });
+    if (count) {
+      return NextResponse.json({ count: data.length }, { status: 200 });
+    } else {
+      return NextResponse.json(data, { status: 200 });
+    }
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: err }, { status: 400 });

@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
 
     const limit = req.nextUrl.searchParams.get("limit");
     const projectID = req.nextUrl.searchParams.get("projectID");
+    const count = req.nextUrl.searchParams.get("count");
 
     if (limit && projectID)
       throw new Error("Limit and projectID cannot both be specified");
@@ -56,7 +57,11 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(data, { status: 200 });
+    if (count) {
+      return NextResponse.json({ count: data.length }, { status: 200 });
+    } else {
+      return NextResponse.json(data, { status: 200 });
+    }
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: err }, { status: 400 });

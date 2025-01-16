@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { IExperience } from "@/app/interfaces/IExperience";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
+import formatDate from "@/utils/general/formatDate";
 
 export default function ExperienceList() {
   const router = useRouter();
@@ -72,13 +73,13 @@ export default function ExperienceList() {
           {exp.date_start && (
             <Typography variant="body1" component="p" gutterBottom>
               <strong>Start Date: </strong>
-              {exp.date_start}
+              {formatDate(exp.date_start)}
             </Typography>
           )}
           {exp.date_end && (
             <Typography variant="body1" component="p" gutterBottom>
               <strong>End Date: </strong>
-              {exp.date_end}
+              {formatDate(exp.date_end)}
             </Typography>
           )}
           {exp.job_description && (

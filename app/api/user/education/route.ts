@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
     }
 
     const id = req.nextUrl.searchParams.get("id");
+    const count = req.nextUrl.searchParams.get("count");
 
     if (id) {
       const { data, error } = await supabase
@@ -34,7 +35,11 @@ export async function GET(req: NextRequest) {
 
       if (error) throw error;
 
-      return NextResponse.json(data, { status: 200 });
+      if (count) {
+        return NextResponse.json({ count: data.length }, { status: 200 });
+      } else {
+        return NextResponse.json(data, { status: 200 });
+      }
     }
   } catch (err) {
     console.error(err);

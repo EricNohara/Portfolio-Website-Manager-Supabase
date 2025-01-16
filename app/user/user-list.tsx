@@ -33,16 +33,49 @@ export default function UserList({ user }: { user: User | null }) {
     facebook_url: null,
   });
 
+  const [userMetadata, setUserMetadata] = useState({
+    num_experience: 0,
+    num_education: 0,
+    num_skills: 0,
+    num_projects: 0,
+  });
+
   const getProfile = useCallback(async () => {
     try {
-      const res = await fetch(`/api/user?id=${user?.id}`, { method: "GET" });
-      const data = await res.json();
+      let res, data;
+      res = await fetch(`/api/user?id=${user?.id}`, { method: "GET" });
+      data = await res.json();
 
       if (!res.ok) {
         throw new Error(data.message);
       }
 
       setUserData(data.userData);
+
+      let metadata = {
+        num_experience: 0,
+        num_education: 0,
+        num_skills: 0,
+        num_projects: 0,
+      };
+
+      res = await fetch("/api/user/education?count=true");
+      data = await res.json();
+      metadata.num_education = data.count;
+
+      res = await fetch("/api/user/experience?count=true");
+      data = await res.json();
+      metadata.num_experience = data.count;
+
+      res = await fetch("/api/user/skills?count=true");
+      data = await res.json();
+      metadata.num_skills = data.count;
+
+      res = await fetch("/api/user/projects?count=true");
+      data = await res.json();
+      metadata.num_projects = data.count;
+
+      setUserMetadata(metadata);
     } catch (error) {
       alert("Error loading user data!");
       console.error(error);
@@ -126,52 +159,6 @@ export default function UserList({ user }: { user: User | null }) {
         >
           {userData?.location}
         </Typography>
-
-        <Box display="flex" gap="1rem" margin="1rem">
-          {userData?.github_url && (
-            <Link
-              href={userData.github_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <GitHubIcon fontSize="large" sx={{ fontSize: "3rem" }} />
-            </Link>
-          )}
-          {userData?.linkedin_url && (
-            <Link
-              href={userData.linkedin_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <LinkedInIcon fontSize="large" sx={{ fontSize: "3rem" }} />
-            </Link>
-          )}
-          {userData?.facebook_url && (
-            <Link
-              href={userData.facebook_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FacebookIcon fontSize="large" sx={{ fontSize: "3rem" }} />
-            </Link>
-          )}
-          {userData?.instagram_url && (
-            <Link
-              href={userData.instagram_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <InstagramIcon fontSize="large" sx={{ fontSize: "3rem" }} />
-            </Link>
-          )}
-          <Link
-            href={`mailto:${userData.email}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <EmailIcon fontSize="large" sx={{ fontSize: "3rem" }} />
-          </Link>
-        </Box>
         {userData?.resume_url && (
           <Typography
             variant="body1"
@@ -209,6 +196,51 @@ export default function UserList({ user }: { user: User | null }) {
             </Link>
           </Typography>
         )}
+      </Box>
+      <Box display="flex" gap="1rem" margin="1rem">
+        {userData?.github_url && (
+          <Link
+            href={userData.github_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <GitHubIcon fontSize="large" sx={{ fontSize: "3rem" }} />
+          </Link>
+        )}
+        {userData?.linkedin_url && (
+          <Link
+            href={userData.linkedin_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <LinkedInIcon fontSize="large" sx={{ fontSize: "3rem" }} />
+          </Link>
+        )}
+        {userData?.facebook_url && (
+          <Link
+            href={userData.facebook_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FacebookIcon fontSize="large" sx={{ fontSize: "3rem" }} />
+          </Link>
+        )}
+        {userData?.instagram_url && (
+          <Link
+            href={userData.instagram_url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <InstagramIcon fontSize="large" sx={{ fontSize: "3rem" }} />
+          </Link>
+        )}
+        <Link
+          href={`mailto:${userData.email}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <EmailIcon fontSize="large" sx={{ fontSize: "3rem" }} />
+        </Link>
       </Box>
       <Box display="flex" alignItems="center" gap="1rem" marginTop="1rem">
         <Button
