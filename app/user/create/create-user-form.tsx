@@ -74,7 +74,6 @@ export default function CreateUserForm() {
         required
         fullWidth
         margin="dense"
-        size="small"
       />
       <TextField
         label="Password"
@@ -83,7 +82,6 @@ export default function CreateUserForm() {
         required
         fullWidth
         margin="dense"
-        size="small"
         type="password"
       />
       <TextField
@@ -93,7 +91,6 @@ export default function CreateUserForm() {
         required
         fullWidth
         margin="dense"
-        size="small"
       />
       <TextField
         label="Phone number"
@@ -101,7 +98,6 @@ export default function CreateUserForm() {
         onChange={handleChange}
         fullWidth
         margin="dense"
-        size="small"
       />
       <TextField
         label="Address"
@@ -109,7 +105,6 @@ export default function CreateUserForm() {
         onChange={handleChange}
         fullWidth
         margin="dense"
-        size="small"
       />
       <TextField
         label="GitHub URL"
@@ -117,7 +112,6 @@ export default function CreateUserForm() {
         onChange={handleChange}
         fullWidth
         margin="dense"
-        size="small"
       />
       <TextField
         label="LinkedIn URL"
@@ -126,7 +120,6 @@ export default function CreateUserForm() {
         fullWidth
         margin="dense"
         className="mb-10"
-        size="small"
       />
       <Button type="submit" variant="contained" color="primary">
         Create
