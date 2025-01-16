@@ -4,7 +4,6 @@ import { Button, Link, Box, Avatar, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
-import { useDynamicRouteParams } from "next/dist/server/app-render/dynamic-rendering";
 
 interface IUserDocuments {
   portrait_url: string;
@@ -119,7 +118,7 @@ export default function DocumentsList({ user }: { user: User | null }) {
             <Button
               type="submit"
               variant="contained"
-              onClick={() => router.push("/user/documents/edit")}
+              onClick={() => router.push("/user/documents/edit/portrait")}
             >
               Edit
             </Button>
@@ -155,7 +154,7 @@ export default function DocumentsList({ user }: { user: User | null }) {
             <Button
               type="submit"
               variant="contained"
-              onClick={() => router.push("/user/documents/edit")}
+              onClick={() => router.push("/user/documents/edit/resume")}
             >
               Edit
             </Button>
@@ -191,7 +190,7 @@ export default function DocumentsList({ user }: { user: User | null }) {
             <Button
               type="submit"
               variant="contained"
-              onClick={() => router.push("/user/documents/edit")}
+              onClick={() => router.push("/user/documents/edit/transcript")}
             >
               Edit
             </Button>
