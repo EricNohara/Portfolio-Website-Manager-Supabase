@@ -10,10 +10,11 @@ export default function WorkExperiencePage() {
   return (
     <Container maxWidth="sm">
       <Typography
-        variant="h4"
+        variant="h3"
         component="h2"
-        gutterBottom
         className="text-center"
+        fontWeight="bold"
+        marginBottom="5%"
       >
         Skills
       </Typography>

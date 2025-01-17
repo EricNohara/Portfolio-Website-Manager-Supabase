@@ -109,7 +109,13 @@ export default function UserList({ user }: { user: User | null }) {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
-      <Typography variant="h3" component="h2" gutterBottom fontWeight="bold">
+      <Typography
+        variant="h3"
+        component="h2"
+        className="text-center"
+        fontWeight="bold"
+        marginBottom="5%"
+      >
         {userData?.name}
       </Typography>
       {userData.portrait_url && (

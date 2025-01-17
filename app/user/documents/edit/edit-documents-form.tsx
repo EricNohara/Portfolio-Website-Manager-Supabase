@@ -48,9 +48,7 @@ export default function EditDocumentsForm() {
 
   return (
     <>
-      <Typography variant="h6" marginTop="2rem">
-        Portrait Image Upload
-      </Typography>
+      <Typography variant="h6">Portrait Image Upload</Typography>
       <Input
         type="file"
         name="portrait"

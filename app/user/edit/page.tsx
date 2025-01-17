@@ -33,10 +33,11 @@ export default function Account() {
   return (
     <Container maxWidth="sm">
       <Typography
-        variant="h4"
+        variant="h3"
         component="h2"
         gutterBottom
         className="text-center"
+        fontWeight="bold"
       >
         Edit User Information
       </Typography>

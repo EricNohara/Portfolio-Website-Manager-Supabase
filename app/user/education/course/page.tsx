@@ -16,10 +16,11 @@ export default function WorkExperiencePage() {
       sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
       <Typography
-        variant="h4"
+        variant="h3"
         component="h2"
-        gutterBottom
         className="text-center"
+        fontWeight="bold"
+        marginBottom="5%"
       >
         Courses
       </Typography>

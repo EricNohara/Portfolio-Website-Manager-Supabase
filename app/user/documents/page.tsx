@@ -33,12 +33,13 @@ export default function DocumentsPage() {
   return (
     <Container maxWidth="sm">
       <Typography
-        variant="h4"
+        variant="h3"
         component="h2"
-        gutterBottom
         className="text-center"
+        fontWeight="bold"
+        marginBottom="5%"
       >
-        Edit User Information
+        User Documents
       </Typography>
       <DocumentsList user={user} />
     </Container>

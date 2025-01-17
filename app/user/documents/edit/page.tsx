@@ -7,10 +7,11 @@ export default function LoginUserPage() {
     <Container maxWidth="sm">
       <Box display="flex" flexDirection="column">
         <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          className="mt-10 text-center"
+          variant="h3"
+          component="h2"
+          className="text-center"
+          fontWeight="bold"
+          marginBottom="5%"
         >
           Edit Documents
         </Typography>
