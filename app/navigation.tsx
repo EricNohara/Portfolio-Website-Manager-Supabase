@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
-import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import { useEffect, useState } from "react";
+import { AppBar, Toolbar, Typography, Button, Drawer } from "@mui/material";
 import { useAuth } from "./context/AuthProvider";
 import { useRouter } from "next/navigation";
+import { useMediaQuery } from "@mui/material";
+import { Menu } from "@mui/icons-material";
 
 export default function Navigation() {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn } = useAuth();
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const isSmallScreen = useMediaQuery("(max-width: 850px)"); // make sure that the screen is not too small
 
   // Fetch user when component mounts
   useEffect(() => {
@@ -39,51 +43,101 @@ export default function Navigation() {
     }
   };
 
+  const toggleDrawer = (open: boolean) => {
+    setDrawerOpen(open);
+  };
+
+  const navItems = [
+    { label: "home", path: "/user/" },
+    { label: "documents", path: "/user/" },
+    { label: "experience", path: "/user/experience" },
+    { label: "education", path: "/user/education" },
+    { label: "skills", path: "/user/skills" },
+    { label: "projects", path: "/user/projects" },
+    { label: "", action: handleSignOut },
+  ];
+
   return (
     <AppBar position="sticky">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Portfolio Editor
         </Typography>
-        <Button
-          color="inherit"
-          onClick={() => router.push(`/${isLoggedIn ? "user" : ""}`)}
-        >
-          Home
-        </Button>
+        {!isSmallScreen && (
+          <Button
+            color="inherit"
+            onClick={() => router.push(`/${isLoggedIn ? "user" : ""}`)}
+          >
+            Home
+          </Button>
+        )}
         {isLoggedIn ? (
-          <>
-            <Button
-              color="inherit"
-              onClick={() => router.push("/user/documents")}
-            >
-              Documents
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => router.push("/user/experience")}
-            >
-              Experience
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => router.push("/user/education")}
-            >
-              Education
-            </Button>
-            <Button color="inherit" onClick={() => router.push("/user/skills")}>
-              Skills
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => router.push("/user/projects")}
-            >
-              Projects
-            </Button>
-            <Button color="inherit" onClick={handleSignOut}>
-              Sign out
-            </Button>
-          </>
+          isSmallScreen ? (
+            <>
+              <Button
+                color="inherit"
+                onClick={() => {
+                  toggleDrawer(true);
+                }}
+              >
+                <Menu />
+              </Button>
+              <Drawer
+                anchor="right"
+                open={drawerOpen}
+                onClose={() => toggleDrawer(false)}
+              >
+                {navItems.map((item, index) => (
+                  <Button
+                    key={index}
+                    color="inherit"
+                    onClick={() => {
+                      if (item.path) router.push(item.path);
+                      else if (item.action) item.action();
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                ))}
+              </Drawer>
+            </>
+          ) : (
+            <>
+              <Button
+                color="inherit"
+                onClick={() => router.push("/user/documents")}
+              >
+                Documents
+              </Button>
+              <Button
+                color="inherit"
+                onClick={() => router.push("/user/experience")}
+              >
+                Experience
+              </Button>
+              <Button
+                color="inherit"
+                onClick={() => router.push("/user/education")}
+              >
+                Education
+              </Button>
+              <Button
+                color="inherit"
+                onClick={() => router.push("/user/skills")}
+              >
+                Skills
+              </Button>
+              <Button
+                color="inherit"
+                onClick={() => router.push("/user/projects")}
+              >
+                Projects
+              </Button>
+              <Button color="inherit" onClick={handleSignOut}>
+                Sign out
+              </Button>
+            </>
+          )
         ) : (
           <>
             <Button color="inherit" onClick={() => router.push("/user/login")}>
