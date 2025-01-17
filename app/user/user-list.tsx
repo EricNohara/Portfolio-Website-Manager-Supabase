@@ -107,95 +107,84 @@ export default function UserList({ user }: { user: User | null }) {
     }
   };
 
-  const handleAddDocuments = () => {
-    router.push("/user/documents");
-  };
-
   return (
-    <>
-      <Box display="flex" flexDirection="column" alignItems="center">
-        <Typography
-          variant="h4"
-          component="h2"
-          gutterBottom
-          className="text-center"
+    <Box display="flex" flexDirection="column" alignItems="center">
+      <Typography variant="h3" component="h2" gutterBottom fontWeight="bold">
+        {userData?.name}
+      </Typography>
+      {userData.portrait_url && (
+        <Link
+          href={userData.portrait_url}
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          {userData?.name}
-        </Typography>
-        {userData.portrait_url && (
+          <Avatar
+            alt="avatar"
+            src={userData.portrait_url}
+            sx={{ width: 150, height: 150 }}
+          />
+        </Link>
+      )}
+      <Box
+        display="flex"
+        flexDirection="column"
+        margin="1rem"
+        fontStyle="italic"
+        alignItems="center"
+      >
+        <Typography>{userData?.location}</Typography>
+        <Typography>{userData?.email}</Typography>
+        <Typography>{userData?.phone_number}</Typography>
+      </Box>
+      {userData?.resume_url && (
+        <Box display="flex" gap="0.5rem">
+          <b>Resume:</b>
           <Link
-            href={userData.portrait_url}
+            underline="hover"
+            href={userData.resume_url}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Avatar
-              alt="avatar"
-              src={userData.portrait_url}
-              sx={{ width: 150, height: 150, marginBottom: "1rem" }}
-            />
+            Click to View
           </Link>
-        )}
-        <Typography
-          variant="body1"
-          component="p"
-          gutterBottom
-          className="text-center"
-        >
-          {userData?.email}
-        </Typography>
-        <Typography
-          variant="body1"
-          component="p"
-          gutterBottom
-          className="text-center"
-        >
-          {userData?.phone_number}
-        </Typography>
-        <Typography
-          variant="body1"
-          component="p"
-          gutterBottom
-          className="text-center"
-        >
-          {userData?.location}
-        </Typography>
-        {userData?.resume_url && (
-          <Typography
-            variant="body1"
-            component="p"
-            gutterBottom
-            className="text-center"
+        </Box>
+      )}
+      {userData?.transcript_url && (
+        <Box display="flex" gap="0.5rem">
+          <b>Transcript:</b>
+          <Link
+            underline="hover"
+            href={userData.transcript_url}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            <strong>Resume:</strong>{" "}
-            <Link
-              underline="hover"
-              href={userData.resume_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Click to View
-            </Link>
-          </Typography>
-        )}
-
-        {userData?.transcript_url && (
-          <Typography
-            variant="body1"
-            component="p"
-            gutterBottom
-            className="text-center"
-          >
-            <strong>Transcript:</strong>{" "}
-            <Link
-              underline="hover"
-              href={userData.transcript_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Click to View
-            </Link>
-          </Typography>
-        )}
+            Click to View
+          </Link>
+        </Box>
+      )}
+      <Box display="flex" gap="0.5rem">
+        <b>{userMetadata.num_education} Educations: </b>
+        <Link href="/user/education" underline="hover">
+          Click to View
+        </Link>
+      </Box>
+      <Box display="flex" gap="0.5rem">
+        <b>{userMetadata.num_experience} Experiences: </b>
+        <Link href="/user/experiences" underline="hover">
+          Click to View
+        </Link>
+      </Box>
+      <Box display="flex" gap="0.5rem">
+        <b>{userMetadata.num_projects} Projects: </b>
+        <Link href="/user/projects" underline="hover">
+          Click to View
+        </Link>
+      </Box>
+      <Box display="flex" gap="0.5rem">
+        <b>{userMetadata.num_skills} Skills: </b>
+        <Link href="/user/skills" underline="hover">
+          Click to View
+        </Link>
       </Box>
       <Box display="flex" gap="1rem" margin="1rem">
         {userData?.github_url && (
@@ -260,6 +249,6 @@ export default function UserList({ user }: { user: User | null }) {
           Delete
         </Button>
       </Box>
-    </>
+    </Box>
   );
 }

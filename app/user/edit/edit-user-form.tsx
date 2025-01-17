@@ -97,7 +97,6 @@ export default function EditUserForm({ user }: { user: User | null }) {
         margin="dense"
         size="small"
         value={userData.phone_number}
-        required
       />
       <TextField
         label="Address"
@@ -107,7 +106,6 @@ export default function EditUserForm({ user }: { user: User | null }) {
         margin="dense"
         size="small"
         value={userData.location}
-        required
       />
       <TextField
         label="GitHub URL"

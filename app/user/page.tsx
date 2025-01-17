@@ -32,7 +32,6 @@ export default function AccountPage() {
 
   return (
     <Container
-      maxWidth="sm"
       sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
       <UserList user={user} />
