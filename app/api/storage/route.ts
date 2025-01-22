@@ -1,20 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { createServiceRoleClient } from "@/utils/supabase/server";
+import parseURL from "@/utils/general/parseURL";
 
 export const config = {
   api: {
     bodyParser: false, // Disable the default body parser to handle multipart form data manually
   },
 };
-
-function parseURL(url: string) {
-  const splitURL = url.split("/");
-  const parsedBucket = splitURL[splitURL.length - 2];
-  const encodedName = splitURL[splitURL.length - 1];
-  const parsedFilename = decodeURIComponent(encodedName);
-  return { parsedBucket, parsedFilename };
-}
 
 export async function POST(req: NextRequest) {
   const serviceRoleSupabase = createServiceRoleClient();
@@ -53,9 +46,7 @@ export async function POST(req: NextRequest) {
         contentType: file.type,
       });
 
-    if (uploadError) {
-      throw uploadError;
-    }
+    if (uploadError) throw uploadError;
 
     // get the public URL
     const { data: publicURL } = await supabase.storage
@@ -88,7 +79,8 @@ export async function POST(req: NextRequest) {
         throw existsError;
       }
 
-      const existingURL = Object.values(userData)[0] as string;
+      const existingURLObject = userData[0];
+      const existingURL = Object.values(existingURLObject)[0] as string;
 
       // add it to the user's row
       const { error: updateError } = await supabase
@@ -102,11 +94,10 @@ export async function POST(req: NextRequest) {
       }
 
       // delete old document after the new doc successfully saves
-      if (existingURL !== "") {
+      if (existingURL !== "" && existingURL) {
         // user already has a document so need to delete it
-        const { parsedBucket, parsedFilename } = parseURL(
-          Object.values(existingURL)[0]
-        );
+        const { parsedBucket, parsedFilename } = parseURL(existingURL);
+
         await serviceRoleSupabase.storage
           .from(parsedBucket)
           .remove([parsedFilename]);
@@ -123,6 +114,7 @@ export async function POST(req: NextRequest) {
       );
     }
   } catch (err) {
+    console.error(err);
     const error = err as Error;
     return NextResponse.json({ message: error }, { status: 400 });
   }
@@ -162,10 +154,10 @@ export async function DELETE(req: NextRequest) {
       // try to delete from DB
       const userData =
         parsedBucket === "portraits"
-          ? { portrait_url: "" }
+          ? { portrait_url: null }
           : parsedBucket === "resumes"
-          ? { resume_url: "" }
-          : { transcript_url: "" };
+          ? { resume_url: null }
+          : { transcript_url: null };
 
       const { error: updateError } = await supabase
         .from("users")

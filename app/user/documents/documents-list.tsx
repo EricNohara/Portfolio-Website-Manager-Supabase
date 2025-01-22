@@ -63,7 +63,7 @@ export default function DocumentsList({ user }: { user: User | null }) {
 
       if (documentValues[0] === url) {
         updatedDocuments.portrait_url = "";
-      } else if (documentValues[0] === url) {
+      } else if (documentValues[1] === url) {
         updatedDocuments.resume_url = "";
       } else {
         updatedDocuments.transcript_url = "";

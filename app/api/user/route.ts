@@ -1,7 +1,8 @@
 import { createClient, createServiceRoleClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
 import IUser from "@/app/interfaces/IUser";
+import { IProject } from "@/app/interfaces/IProject";
+import parseURL from "@/utils/general/parseURL";
 
 export async function GET(req: NextRequest) {
   const userID = req.nextUrl.searchParams.get("id"); // ?id=<user id>
@@ -121,18 +122,63 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
+    // delete all items in storage associated with the user
+    let publicURLs = [];
+
+    const { data: projectData, error: projectError } = await supabase
+      .from("projects")
+      .select()
+      .eq("user_id", user.id);
+
+    console.log(projectError);
+
+    if (projectError) throw new Error(projectError.message);
+
+    projectData?.forEach((project: IProject) => {
+      if (project.thumbnail_url && project.thumbnail_url !== "") {
+        publicURLs.push(project.thumbnail_url);
+      }
+    });
+
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select()
+      .eq("id", user.id)
+      .single();
+
+    if (userError) throw new Error(userError.message);
+
+    if (userData.portrait_url && userData.portrait_url !== null)
+      publicURLs.push(userData.portrait_url);
+    if (userData.resume_url && userData.resume_url !== null)
+      publicURLs.push(userData.resume_url);
+    if (userData.transcript_url && userData.transcript_url !== null)
+      publicURLs.push(userData.transcript_url);
+
+    publicURLs.forEach(async (url: string) => {
+      if (!url || url === "") return;
+
+      const { parsedBucket, parsedFilename } = parseURL(url);
+
+      const { error } = await serviceRoleSupabase.storage
+        .from(parsedBucket)
+        .remove([parsedFilename]);
+
+      if (error) throw error;
+    });
+
+    // delete the user from the auth table - this will cause cascading deletions from all other tables
     const { error } = await serviceRoleSupabase.auth.admin.deleteUser(user.id);
 
-    if (error) {
-      throw new Error(error.message);
-    } else {
-      revalidatePath("/", "layout");
-      return NextResponse.redirect(new URL("/user/login", req.url), {
-        status: 302,
-      });
-    }
+    if (error) throw new Error(error.message);
+
+    return NextResponse.json(
+      { message: "User successfully deleted" },
+      { status: 200 }
+    );
   } catch (err) {
+    const error = err as Error;
     console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }

@@ -1,6 +1,6 @@
 export default interface IUser {
   email: string;
-  name: string;
+  name: string | null;
   phone_number: string | null;
   location: string | null;
   github_url: string | null;

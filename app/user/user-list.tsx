@@ -96,14 +96,15 @@ export default function UserList({ user }: { user: User | null }) {
     try {
       const res = await fetch("/api/user", { method: "DELETE" });
 
-      if (!res.ok) {
-        alert("Failed to delete user");
-      } else {
-        setIsLoggedIn(false);
-        router.push("/user/login");
-      }
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message);
+
+      setIsLoggedIn(false);
+      router.push("/user/login");
     } catch (err) {
-      console.error(err);
+      const error = err as Error;
+      alert(error.message);
     }
   };
 
@@ -118,7 +119,7 @@ export default function UserList({ user }: { user: User | null }) {
       >
         {userData?.name}
       </Typography>
-      {userData.portrait_url && (
+      {userData.portrait_url ? (
         <Link
           href={userData.portrait_url}
           target="_blank"
@@ -130,6 +131,10 @@ export default function UserList({ user }: { user: User | null }) {
             sx={{ width: 150, height: 150 }}
           />
         </Link>
+      ) : (
+        <Avatar sx={{ width: 150, height: 150 }}>
+          {userData.name && userData.name[0]}
+        </Avatar>
       )}
       <Box
         display="flex"
@@ -171,25 +176,25 @@ export default function UserList({ user }: { user: User | null }) {
       <Box display="flex" gap="0.5rem">
         <b>{userMetadata.num_education} Educations: </b>
         <Link href="/user/education" underline="hover">
-          Click to View
+          {userMetadata.num_education > 0 ? "Click to View" : "Click to Add"}
         </Link>
       </Box>
       <Box display="flex" gap="0.5rem">
         <b>{userMetadata.num_experience} Experiences: </b>
         <Link href="/user/experiences" underline="hover">
-          Click to View
+          {userMetadata.num_experience > 0 ? "Click to View" : "Click to Add"}
         </Link>
       </Box>
       <Box display="flex" gap="0.5rem">
         <b>{userMetadata.num_projects} Projects: </b>
         <Link href="/user/projects" underline="hover">
-          Click to View
+          {userMetadata.num_projects > 0 ? "Click to View" : "Click to Add"}
         </Link>
       </Box>
       <Box display="flex" gap="0.5rem">
         <b>{userMetadata.num_skills} Skills: </b>
         <Link href="/user/skills" underline="hover">
-          Click to View
+          {userMetadata.num_skills > 0 ? "Click to View" : "Click to Add"}
         </Link>
       </Box>
       <Box display="flex" gap="1rem" margin="1rem">
