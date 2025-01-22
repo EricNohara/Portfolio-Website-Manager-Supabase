@@ -11,7 +11,7 @@ export default function Navigation() {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-  const isSmallScreen = useMediaQuery("(max-width: 850px)"); // make sure that the screen is not too small
+  const isSmallScreen = useMediaQuery("(max-width: 950px)"); // make sure that the screen is not too small
 
   // Fetch user when component mounts
   useEffect(() => {
@@ -48,13 +48,14 @@ export default function Navigation() {
   };
 
   const navItems = [
-    { label: "home", path: "/user/" },
-    { label: "documents", path: "/user/" },
+    { label: "home", path: "/user" },
+    { label: "documents", path: "/user/documents" },
     { label: "experience", path: "/user/experience" },
     { label: "education", path: "/user/education" },
-    { label: "skills", path: "/user/skills" },
     { label: "projects", path: "/user/projects" },
-    { label: "", action: handleSignOut },
+    { label: "skills", path: "/user/skills" },
+    { label: "connect", path: "'/user/connect" },
+    { label: "Sign Out", action: handleSignOut },
   ];
 
   return (
@@ -63,14 +64,6 @@ export default function Navigation() {
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Portfolio Editor
         </Typography>
-        {!isSmallScreen && (
-          <Button
-            color="inherit"
-            onClick={() => router.push(`/${isLoggedIn ? "user" : ""}`)}
-          >
-            Home
-          </Button>
-        )}
         {isLoggedIn ? (
           isSmallScreen ? (
             <>
@@ -102,44 +95,24 @@ export default function Navigation() {
               </Drawer>
             </>
           ) : (
-            <>
+            navItems.map((item, index) => (
               <Button
+                key={index}
                 color="inherit"
-                onClick={() => router.push("/user/documents")}
+                onClick={() => {
+                  if (item.path) router.push(item.path);
+                  else if (item.action) item.action();
+                }}
               >
-                Documents
+                {item.label}
               </Button>
-              <Button
-                color="inherit"
-                onClick={() => router.push("/user/experience")}
-              >
-                Experience
-              </Button>
-              <Button
-                color="inherit"
-                onClick={() => router.push("/user/education")}
-              >
-                Education
-              </Button>
-              <Button
-                color="inherit"
-                onClick={() => router.push("/user/skills")}
-              >
-                Skills
-              </Button>
-              <Button
-                color="inherit"
-                onClick={() => router.push("/user/projects")}
-              >
-                Projects
-              </Button>
-              <Button color="inherit" onClick={handleSignOut}>
-                Sign out
-              </Button>
-            </>
+            ))
           )
         ) : (
           <>
+            <Button color="inherit" onClick={() => router.push("/")}>
+              Home
+            </Button>
             <Button color="inherit" onClick={() => router.push("/user/login")}>
               Log In
             </Button>
