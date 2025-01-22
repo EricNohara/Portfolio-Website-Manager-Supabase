@@ -101,6 +101,9 @@ export default function UserList({ user }: { user: User | null }) {
       if (!res.ok) throw new Error(data.message);
 
       setIsLoggedIn(false);
+
+      alert(data.message);
+
       router.push("/user/login");
     } catch (err) {
       const error = err as Error;

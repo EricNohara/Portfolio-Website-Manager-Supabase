@@ -1,6 +1,22 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import IApiKey from "@/app/interfaces/IApiKey";
+import bcrypt from "bcrypt";
+import { encrypt, decrypt } from "@/utils/auth/encrypt";
 
+const saltRounds = 10;
+
+async function generateAPIKey(
+  user_id: string,
+  email: string,
+  password: string
+) {
+  const key = `${user_id}-${Date.now()}-${email}-${password}`;
+  const hash = await bcrypt.hash(key, saltRounds);
+  return hash;
+}
+
+// route to add user to the auth table and generate, encrypt, and store a private API key for the user
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -22,6 +38,31 @@ export async function POST(req: NextRequest) {
     if (error) {
       throw error;
     }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error(
+        "Error generating user private API key - user not signed in"
+      );
+    }
+
+    // generate and store private API key
+    const api_key = await generateAPIKey(user.id, email, password);
+    const encrypted_api_key = encrypt(api_key);
+
+    const api_key_data: IApiKey = {
+      user_id: user.id,
+      key: encrypted_api_key,
+    };
+
+    const { error: keyError } = await supabase
+      .from("api_keys")
+      .insert(api_key_data);
+
+    if (keyError) throw new Error("Error generating user private API key");
 
     return NextResponse.json(
       { message: "Sign up successful" },

@@ -44,8 +44,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ userData: userData }, { status: 200 });
   } catch (err) {
+    const error = err as Error;
     console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
 
@@ -72,8 +73,9 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (err) {
+    const error = err as Error;
     console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
 
