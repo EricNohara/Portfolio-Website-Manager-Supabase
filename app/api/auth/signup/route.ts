@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import IApiKey from "@/app/interfaces/IApiKey";
 import bcrypt from "bcrypt";
-import { encrypt, decrypt } from "@/utils/auth/encrypt";
+import { encrypt } from "@/utils/auth/encrypt";
 
 const saltRounds = 10;
 
@@ -12,6 +12,11 @@ async function generateAPIKey(
   password: string
 ) {
   const key = `${user_id}-${Date.now()}-${email}-${password}`;
+  const hash = await bcrypt.hash(key, saltRounds);
+  return hash;
+}
+
+async function hashKey(key: string) {
   const hash = await bcrypt.hash(key, saltRounds);
   return hash;
 }
@@ -50,12 +55,14 @@ export async function POST(req: NextRequest) {
     }
 
     // generate and store private API key
-    const api_key = await generateAPIKey(user.id, email, password);
-    const encrypted_api_key = encrypt(api_key);
+    const api_key: string = await generateAPIKey(user.id, email, password);
+    const hashed_api_key: string = await hashKey(api_key);
+    const encrypted_api_key: string = encrypt(api_key);
 
     const api_key_data: IApiKey = {
       user_id: user.id,
-      key: encrypted_api_key,
+      hashed_key: hashed_api_key,
+      encrypted_key: encrypted_api_key,
     };
 
     const { error: keyError } = await supabase

@@ -54,7 +54,7 @@ export default function Navigation() {
     { label: "education", path: "/user/education" },
     { label: "projects", path: "/user/projects" },
     { label: "skills", path: "/user/skills" },
-    { label: "connect", path: "'/user/connect" },
+    { label: "connect", path: "/user/connect" },
     { label: "Sign Out", action: handleSignOut },
   ];
 
