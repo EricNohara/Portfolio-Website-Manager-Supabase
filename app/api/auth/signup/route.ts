@@ -1,25 +1,8 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import IApiKey from "@/app/interfaces/IApiKey";
-import bcrypt from "bcrypt";
 import { encrypt } from "@/utils/auth/encrypt";
-
-const saltRounds = 10;
-
-async function generateAPIKey(
-  user_id: string,
-  email: string,
-  password: string
-) {
-  const key = `${user_id}-${Date.now()}-${email}-${password}`;
-  const hash = await bcrypt.hash(key, saltRounds);
-  return hash;
-}
-
-async function hashKey(key: string) {
-  const hash = await bcrypt.hash(key, saltRounds);
-  return hash;
-}
+import { generateAPIKey, hashKey } from "@/utils/auth/hash";
 
 // route to add user to the auth table and generate, encrypt, and store a private API key for the user
 export async function POST(req: NextRequest) {
@@ -55,19 +38,19 @@ export async function POST(req: NextRequest) {
     }
 
     // generate and store private API key
-    const api_key: string = await generateAPIKey(user.id, email, password);
-    const hashed_api_key: string = await hashKey(api_key);
-    const encrypted_api_key: string = encrypt(api_key);
+    const apiKey: string = await generateAPIKey(user.id, email);
+    const hashedKey: string = await hashKey(apiKey);
+    const encryptedKey: string = encrypt(apiKey);
 
-    const api_key_data: IApiKey = {
+    const apiKeyData: IApiKey = {
       user_id: user.id,
-      hashed_key: hashed_api_key,
-      encrypted_key: encrypted_api_key,
+      hashed_key: hashedKey,
+      encrypted_key: encryptedKey,
     };
 
     const { error: keyError } = await supabase
       .from("api_keys")
-      .insert(api_key_data);
+      .insert(apiKeyData);
 
     if (keyError) throw new Error("Error generating user private API key");
 
