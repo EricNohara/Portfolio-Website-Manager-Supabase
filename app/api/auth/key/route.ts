@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateAPIKey, hashKey } from "@/utils/auth/hash";
 import { encrypt } from "@/utils/auth/encrypt";
 import IApiKey from "@/app/interfaces/IApiKey";
+import bcrypt from "bcrypt";
 
 export async function GET(req: NextRequest) {
   try {
@@ -53,11 +54,20 @@ export async function POST(req: NextRequest) {
     const email = data[0].email;
 
     const apiKey = await generateAPIKey(user.id, email);
-    const hashedKey = await hashKey(apiKey);
-    const encryptedKey = encrypt(apiKey);
+
+    const hashedKey: string | null = await hashKey(apiKey);
+    if (!hashedKey) throw new Error("Error hashing api key");
+
+    const valid = await bcrypt.compare(apiKey, hashedKey);
+
+    console.log(`Key: ${apiKey}, hashedKey1: ${valid}`);
+
+    const encryptedKey: string | null = encrypt(apiKey);
+    if (!encryptedKey) throw new Error("Error encrypting api key");
 
     const keyData: IApiKey = {
       user_id: user.id,
+      user_email: email,
       hashed_key: hashedKey,
       encrypted_key: encryptedKey,
     };

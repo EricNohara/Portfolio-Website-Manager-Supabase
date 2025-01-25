@@ -1,7 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Snackbar, Button, Box, TextField } from "@mui/material";
+import {
+  Snackbar,
+  Button,
+  Box,
+  TextField,
+  Divider,
+  Typography,
+} from "@mui/material";
 import * as React from "react";
 import { SnackbarCloseReason } from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
@@ -95,43 +102,59 @@ export default function ConnectList() {
     >
       <Box
         display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        gap="2%"
+        flexDirection="column"
+        justifyContent="center"
+        gap="2rem"
+        border="1px solid lightgrey"
+        padding="2rem"
+        borderRadius="0.5rem"
       >
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ height: "100%" }}
-          onClick={toggleHidden}
+        <Box display="flex" justifyContent="space-between">
+          <Typography fontWeight="bold" variant="h5">
+            Private API Key
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleGenerateNewAPIKey}
+          >
+            Generate New Key
+          </Button>
+        </Box>
+
+        <Divider />
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          gap="2%"
         >
-          {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-        </Button>
-        <TextField
-          label="API Key"
-          onChange={() => {}}
-          value={isVisible ? apiKey : setStars(apiKey)}
-          fullWidth
-        ></TextField>
-        <Button variant="contained" color="primary" onClick={handleClick}>
-          <ContentCopyIcon />
-        </Button>
-        <Snackbar
-          open={open}
-          autoHideDuration={5000}
-          onClose={handleClose}
-          message="Copied to Clipboard"
-          action={action}
-        />
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ height: "100%" }}
+            onClick={toggleHidden}
+          >
+            {isVisible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+          </Button>
+          <TextField
+            label="API Key"
+            onChange={() => {}}
+            value={isVisible ? apiKey : setStars(apiKey)}
+            fullWidth
+          ></TextField>
+          <Button variant="contained" color="primary" onClick={handleClick}>
+            <ContentCopyIcon />
+          </Button>
+          <Snackbar
+            open={open}
+            autoHideDuration={5000}
+            onClose={handleClose}
+            message="Copied to Clipboard"
+            action={action}
+          />
+        </Box>
       </Box>
-      <Button
-        variant="contained"
-        color="primary"
-        fullWidth
-        onClick={handleGenerateNewAPIKey}
-      >
-        Generate New API Key
-      </Button>
     </Box>
   );
 }

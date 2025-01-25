@@ -39,11 +39,15 @@ export async function POST(req: NextRequest) {
 
     // generate and store private API key
     const apiKey: string = await generateAPIKey(user.id, email);
-    const hashedKey: string = await hashKey(apiKey);
-    const encryptedKey: string = encrypt(apiKey);
+    const hashedKey: string | null = await hashKey(apiKey);
+    if (!hashedKey) throw new Error("Error generating private API key");
+
+    const encryptedKey: string | null = encrypt(apiKey);
+    if (!encryptedKey) throw new Error("Error encrypting private API key");
 
     const apiKeyData: IApiKey = {
       user_id: user.id,
+      user_email: email,
       hashed_key: hashedKey,
       encrypted_key: encryptedKey,
     };

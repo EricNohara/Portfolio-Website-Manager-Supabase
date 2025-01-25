@@ -13,7 +13,7 @@ export default function Page() {
         fontWeight="bold"
         marginBottom="5%"
       >
-        Connect to API
+        Connect to the API
       </Typography>
       <ConnectList />
     </Container>
