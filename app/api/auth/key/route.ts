@@ -15,6 +15,20 @@ export async function GET(req: NextRequest) {
 
     if (!user) throw new Error("User not authenticated");
 
+    const getUserEmail: boolean =
+      req.nextUrl.searchParams.get("getUserEmail") === "true" ? true : false;
+
+    if (getUserEmail) {
+      const { data, error } = await supabase
+        .from("api_keys")
+        .select("encrypted_key, user_email")
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      return NextResponse.json(data, { status: 200 });
+    }
+
     const { data, error } = await supabase
       .from("api_keys")
       .select("encrypted_key")

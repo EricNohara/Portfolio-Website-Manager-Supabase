@@ -16,22 +16,26 @@ import CloseIcon from "@mui/icons-material/Close";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { CopyBlock, dracula } from "react-code-blocks";
 
 export default function ConnectList() {
   const [open, setOpen] = React.useState(false);
   const [apiKey, setApiKey] = useState<string>("");
+  const [userEmail, setUserEmail] = useState<string>("");
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch("/api/auth/key");
+        const res = await fetch("/api/auth/key?getUserEmail=true");
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message);
 
         const key = data[0].encrypted_key;
+        const userEmail = data[0].user_email;
         setApiKey(key);
+        setUserEmail(userEmail);
       } catch (error) {
         console.error(error);
       }
@@ -92,6 +96,11 @@ export default function ConnectList() {
       console.error(error);
     }
   };
+
+  function generateCodeBlock() {
+    const codeBlock = `PORTFOLIO_PRIVATE_API_KEY="${apiKey}"\nUSER_EMAIL="${userEmail}"`;
+    return codeBlock;
+  }
 
   return (
     <Box
@@ -154,6 +163,13 @@ export default function ConnectList() {
             action={action}
           />
         </Box>
+      </Box>
+      <Box sx={{ overflow: "hidden" }}>
+        <CopyBlock
+          text={generateCodeBlock()}
+          language="typescript"
+          theme={dracula}
+        />
       </Box>
     </Box>
   );
