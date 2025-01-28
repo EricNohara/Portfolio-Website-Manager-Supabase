@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { decrypt } from "@/utils/auth/encrypt";
 import { validateKey } from "@/utils/auth/hash";
+import { IEducation } from "@/app/interfaces/IEducation";
+import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
 
 export async function GET(req: NextRequest) {
   try {
@@ -36,10 +38,103 @@ export async function GET(req: NextRequest) {
 
     if (!isValid) throw new Error("Invalid private API key");
 
-    return NextResponse.json(
-      { message: `User validated: ${data[0].user_id}` },
-      { status: 200 }
+    const userId = data[0].user_id;
+
+    if (!userId) throw new Error("Error retrieiving user ID");
+
+    // get and clean information to add to the userInfo super object that is returned to the user
+    const { data: userData, error: userDataError } = await supabase
+      .from("users")
+      .select()
+      .eq("id", userId);
+
+    if (userDataError) throw userDataError;
+
+    const cleanedUserData = userData.map(({ id, ...rest }) => rest)[0];
+
+    const { data: userSkills, error: userSkillsError } = await supabase
+      .from("skills")
+      .select()
+      .eq("user_id", userId);
+
+    if (userSkillsError) throw userSkillsError;
+
+    const cleanedUserSkills = userSkills.map(({ user_id, ...rest }) => rest);
+
+    const { data: userExperience, error: userExperienceError } = await supabase
+      .from("work_experiences")
+      .select()
+      .eq("user_id", userId);
+
+    if (userExperienceError) throw userExperienceError;
+
+    const cleanedUserExperience = userExperience.map(
+      ({ user_id, ...rest }) => rest
     );
+
+    const { data: userProject, error: userProjectError } = await supabase
+      .from("projects")
+      .select()
+      .eq("user_id", userId);
+
+    if (userProjectError) throw userProjectError;
+
+    const cleanedUserProjects = userProject.map(
+      ({ id, user_id, ...rest }) => rest
+    );
+
+    const { data: userEducation, error: userEducationError } = await supabase
+      .from("education")
+      .select()
+      .eq("user_id", userId);
+
+    if (userEducationError) throw userEducationError;
+
+    let userEducationWithCourses: IUserEducation[] = [];
+
+    for (const education of userEducation) {
+      const { data: educationCourses, error: educationCoursesError } =
+        await supabase
+          .from("course")
+          .select()
+          .eq("user_id", userId)
+          .eq("education_id", education.id);
+
+      if (educationCoursesError) throw educationCoursesError;
+
+      const cleanedEducationCourses = educationCourses.map(
+        ({ education_id, user_id, ...rest }) => rest
+      );
+
+      const cleanedEducation = {
+        degree: education.degree,
+        majors: education.majors,
+        minors: education.minors,
+        gpa: education.gpa,
+        institution: education.institution,
+        awards: education.awards,
+        year_start: education.year_start,
+        year_end: education.year_end,
+      };
+
+      const educationWithCourses = {
+        ...cleanedEducation,
+        courses: cleanedEducationCourses,
+      };
+
+      userEducationWithCourses.push(educationWithCourses);
+    }
+
+    // construct the super object
+    const userInfo: IUserInfo = {
+      ...cleanedUserData,
+      skills: cleanedUserSkills,
+      experiences: cleanedUserExperience,
+      projects: cleanedUserProjects,
+      education: userEducationWithCourses,
+    };
+
+    return NextResponse.json({ userInfo }, { status: 200 });
   } catch (err) {
     const error = err as Error;
     return NextResponse.json({ message: error.message }, { status: 400 });
