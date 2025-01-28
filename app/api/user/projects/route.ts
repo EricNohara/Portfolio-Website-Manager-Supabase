@@ -63,8 +63,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(data, { status: 200 });
     }
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    const error = err as Error;
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
 
@@ -105,11 +105,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const projectID = req.nextUrl.searchParams.get("projectID");
-
   try {
-    if (!projectID) throw new Error("Invalid input");
-
     const supabase = await createClient();
 
     const {
@@ -122,6 +118,9 @@ export async function DELETE(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    const projectID = req.nextUrl.searchParams.get("projectID");
+    if (!projectID) throw new Error("Invalid input");
 
     const { error } = await supabase
       .from("projects")

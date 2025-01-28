@@ -5,19 +5,21 @@ import { IProject } from "@/app/interfaces/IProject";
 import parseURL from "@/utils/general/parseURL";
 
 export async function GET(req: NextRequest) {
-  const userID = req.nextUrl.searchParams.get("id"); // ?id=<user id>
-
   try {
-    if (!userID) {
-      throw new Error("No user provided");
-    }
-
     const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
 
     const { data, error, status } = await supabase
       .from("users")
       .select()
-      .eq("id", userID)
+      .eq("id", user.id)
       .single();
 
     if (error && status !== 406) {
@@ -45,7 +47,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ userData: userData }, { status: 200 });
   } catch (err) {
     const error = err as Error;
-    console.error(err);
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }

@@ -42,8 +42,8 @@ export async function GET(req: NextRequest) {
       }
     }
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    const error = err as Error;
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
 
@@ -90,11 +90,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const id = req.nextUrl.searchParams.get("id");
-
   try {
-    if (!id) throw new Error("Invalid inputs");
-
     const supabase = await createClient();
 
     const {
@@ -107,6 +103,9 @@ export async function DELETE(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    const id = req.nextUrl.searchParams.get("id");
+    if (!id) throw new Error("Invalid inputs");
 
     const { error } = await supabase
       .from("education")

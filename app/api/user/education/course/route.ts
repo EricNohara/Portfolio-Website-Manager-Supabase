@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { ICourse, ICourseInput } from "@/app/interfaces/ICourse";
+import { ICourseInput } from "@/app/interfaces/ICourse";
 
 const letterGrades = [
   "A",
@@ -70,8 +70,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(data, { status: 200 });
     }
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    const error = err as Error;
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
 
@@ -119,12 +119,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const educationID = req.nextUrl.searchParams.get("educationID");
-  const courseName = req.nextUrl.searchParams.get("courseName");
-
   try {
-    if (!educationID || !courseName) throw new Error("Invalid inputs");
-
     const supabase = await createClient();
 
     const {
@@ -137,6 +132,10 @@ export async function DELETE(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    const educationID = req.nextUrl.searchParams.get("educationID");
+    const courseName = req.nextUrl.searchParams.get("courseName");
+    if (!educationID || !courseName) throw new Error("Invalid inputs");
 
     const { error } = await supabase
       .from("course")

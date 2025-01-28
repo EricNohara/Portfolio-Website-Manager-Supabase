@@ -43,7 +43,7 @@ export default function UserList({ user }: { user: User | null }) {
   const getProfile = useCallback(async () => {
     try {
       let res, data;
-      res = await fetch(`/api/user?id=${user?.id}`, { method: "GET" });
+      res = await fetch("/api/user");
       data = await res.json();
 
       if (!res.ok) {

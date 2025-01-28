@@ -29,8 +29,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(data, { status: 200 });
     }
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    const error = err as Error;
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
 
@@ -75,12 +75,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const company = req.nextUrl.searchParams.get("company");
-  const job_title = req.nextUrl.searchParams.get("job_title");
-
   try {
-    if (!company || !job_title) throw new Error("Invalid inputs");
-
     const supabase = await createClient();
 
     const {
@@ -93,6 +88,10 @@ export async function DELETE(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    const company = req.nextUrl.searchParams.get("company");
+    const job_title = req.nextUrl.searchParams.get("job_title");
+    if (!company || !job_title) throw new Error("Invalid inputs");
 
     const { error } = await supabase
       .from("work_experiences")

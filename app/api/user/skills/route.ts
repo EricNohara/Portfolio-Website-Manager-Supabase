@@ -42,8 +42,8 @@ export async function GET(req: NextRequest) {
       }
     }
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: err }, { status: 400 });
+    const error = err as Error;
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
 
