@@ -5,7 +5,7 @@ import ConnectList from "./connect-list";
 
 export default function Page() {
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md">
       <Typography
         variant="h3"
         component="h2"

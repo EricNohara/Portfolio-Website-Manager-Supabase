@@ -13,6 +13,7 @@ import * as React from "react";
 import { SnackbarCloseReason } from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
@@ -98,8 +99,7 @@ export default function ConnectList() {
   };
 
   function generateCodeBlock() {
-    const codeBlock = `PORTFOLIO_PRIVATE_API_KEY="${apiKey}"\nUSER_EMAIL="${userEmail}"`;
-    return codeBlock;
+    return `NEXT_PUBLIC_PORTFOLIO_API_URL="${window.location.origin}/api/public/getUserData"\nPORTFOLIO_PRIVATE_API_KEY="${apiKey}"\nUSER_EMAIL="${userEmail}"`;
   }
 
   return (
@@ -164,11 +164,38 @@ export default function ConnectList() {
           />
         </Box>
       </Box>
-      <Box sx={{ overflow: "hidden" }}>
+      <Box
+        sx={{
+          overflow: "hidden",
+          border: "1px solid lightgrey",
+          padding: "2rem",
+          borderRadius: "0.5rem",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            gap: "1rem",
+            marginBottom: "1rem",
+            alignItems: "center",
+          }}
+        >
+          <InsertDriveFileIcon />
+          <Typography fontWeight="bold" variant="h5">
+            .env.local
+          </Typography>
+          <Typography variant="h6" color="#202020">
+            Add File to Project Root Directory
+          </Typography>
+        </Box>
+
+        <Divider sx={{ marginBottom: "2rem" }} />
+
         <CopyBlock
           text={generateCodeBlock()}
           language="typescript"
           theme={dracula}
+          customStyle={{ overflow: "hidden" }}
         />
       </Box>
     </Box>
