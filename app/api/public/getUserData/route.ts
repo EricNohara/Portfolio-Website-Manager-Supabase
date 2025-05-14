@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { createServiceRoleClient } from "@/utils/supabase/server";
 import { decrypt } from "@/utils/auth/encrypt";
 import { validateKey } from "@/utils/auth/hash";
 import { IEducation } from "@/app/interfaces/IEducation";
@@ -7,7 +7,7 @@ import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
 
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    const supabase = await createServiceRoleClient();
 
     // get the api key from the authorization header
     const apiKey = req.headers.get("Authorization")?.split(" ")[1];

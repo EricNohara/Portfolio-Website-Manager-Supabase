@@ -1,24 +1,27 @@
 # Portfolio Website Manager
 
-Effortlessly manage portfolio websites with an all-in-one platform. Update information in one place, and let our API automatically sync changes to connected websites, eliminating the need for manual updates.
+### Contributors: Eric Nohara-LeClair
 
-## Features
+---
 
-- **Centralized Management**: Update portfolio information in a single place.
-- **Automatic Syncing**: Changes are seamlessly pushed to connected websites via a robust API.
-- **Powered by Modern Technologies**: Built with **Supabase** and **Next.js** for scalability and performance.
+## Project Description
+
+- All in one platform for managing software engineer/general portfolio websites
+- Allows updating user information in a single place without having to interface with portfolio website's source code
+- Provides an easy to navigate user interface for updating, adding, or deleting user information
+- Provides an easy to use API to access all user's information, all in one place
+- Easy integration into user's preexisting portfolios, with the ability to get all user data with one fetch
+- Eliminate any need for manual updates to the source code of portfolio websites
+- Changes made on this application are seamlessly pushed to connected websites via the API
+- Built with **Supabase** and **Next.js** for scalability, performance, security, and ease of development
 
 ## Tech Stack
 
-- **Frontend**: [Next.js](https://nextjs.org/) - React framework for building fast, user-friendly web applications.
-- **Backend**: [Supabase](https://supabase.com/) - Open-source alternative to Firebase for authentication and database management.
-- **Hosting**: Optimized for modern deployment platforms like Vercel.
+- **Frontend**: [Next.js](https://nextjs.org/) - Used for building a fast, responsive, user-friendly interface
+- **Backend**: [Supabase](https://supabase.com/) + [Next.js](https://nextjs.org) - Open-source alternative to Firebase for authentication, hosted database management, and file storage
+- **Hosting**: [Vercel](https://vercel.com/) - Optimized to be hosted on vercel for cheap and easy deployment
 
-## Getting Started
-
-Follow these steps to set up the project locally:
-
-### Prerequisites
+## Prerequisites
 
 Ensure you have the following installed:
 
@@ -26,10 +29,43 @@ Ensure you have the following installed:
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 - [Supabase CLI](https://supabase.com/docs/guides/cli)
 
-### Installation
+## How to Set Up Supabase Backend
 
-<!-- 1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/portfolio-manager.git
-   cd portfolio-manager
-   ``` -->
+1. Follow [these steps](https://supabase.com/docs/guides/getting-started) to sign into supabase and create a new project
+2. Add database tables with the schemas provided
+3. Follow [these steps](https://supabase.com/docs/guides/database/postgres/row-level-security) to add RLS policies to every table, only allowing users to access and mutate their own data when they are signed in
+4. Set a minimum password length in the auth dashboard
+5. Copy the following information for .env.local file:
+   - The public url of the project
+   - The ANON key for the project
+   - The service role key for the project
+
+## How to Install and Run
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/portfolio-manager.git
+```
+
+2. Enter root directory
+
+```bash
+cd portfolio-manager
+```
+
+3. Create a valid .env.local file in the root of the project
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=""
+NEXT_PUBLIC_SUPABASE_ANON_KEY=""
+NEXT_SUPABASE_SERVICE_ROLE_KEY=""
+API_ENCRYPTION_KEY="64 character key"
+MIN_PASSWORD_LEN=6
+```
+
+4. Run the application
+
+```bash
+npm run dev
+```
