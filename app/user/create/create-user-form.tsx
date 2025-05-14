@@ -21,6 +21,8 @@ export default function CreateUserForm() {
   });
   const [password, setPassword] = useState("");
 
+  const minPasswordLen: number = parseInt(process.env.MIN_PASSWORD_LEN || "6");
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserData((prevData) => ({
@@ -31,6 +33,11 @@ export default function CreateUserForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (password.length < minPasswordLen) {
+      alert("Password must be at least 6 characters long!");
+      return;
+    }
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
