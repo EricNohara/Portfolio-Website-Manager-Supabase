@@ -4,6 +4,15 @@
 
 ---
 
+## Table of Contents
+
+- [Project Description](#project-description)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Supabase Backend Setup](#supabase-backend-setup)
+- [How to Install and Run](#how-to-install-and-run)
+- [Known Issues](#known-issues)
+
 ## Project Description
 
 - All in one platform for managing software engineer/general portfolio websites
@@ -29,13 +38,14 @@ Ensure you have the following installed:
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 - [Supabase CLI](https://supabase.com/docs/guides/cli)
 
-## How to Set Up Supabase Backend
+## Supabase Backend Setup
 
 1. Follow [these steps](https://supabase.com/docs/guides/getting-started) to sign into supabase and create a new project
-2. Add database tables with the schemas provided
-3. Follow [these steps](https://supabase.com/docs/guides/database/postgres/row-level-security) to add RLS policies to every table, only allowing users to access and mutate their own data when they are signed in
-4. Set a minimum password length in the auth dashboard
-5. Copy the following information for .env.local file:
+2. Add database tables with the [schema](./doc/assets/schema.pdf) provided
+3. Create storage buckets for portraits, resumes, transcripts, and project thumbnails
+4. Follow [these steps](https://supabase.com/docs/guides/database/postgres/row-level-security) to add RLS policies to every table, only allowing users to access and mutate their own data when they are signed in
+5. Set a minimum password length in the auth dashboard
+6. Copy the following information for .env.local file:
    - The public url of the project
    - The ANON key for the project
    - The service role key for the project
@@ -69,3 +79,7 @@ MIN_PASSWORD_LEN=6
 ```bash
 npm run dev
 ```
+
+## Known Issues
+
+No known issues.

@@ -1,0 +1,92 @@
+Project portfolio_creater {
+  database_type: 'sqlite'
+  Note: 'project which holds user information and dynamically creates a portfolio site for them'
+}
+
+Table users {
+  id uuid [primary key]
+  name text
+  phone_number text
+  email text
+  location text
+  github_url text
+  linkedin_url text
+  portrait_url text
+  resume_url text
+  transcript_url text
+  instagram_url text
+  facebook_url text
+}
+
+Table projects {
+  id int pk
+  name text
+  date_start date
+  date_end date
+  languages_used _text
+  frameworks_used _text
+  technologies_used _text
+  description text
+  github_url text
+  demo_url text
+  thumbnail_url text
+  user_id int [ref: > users.id]
+}
+
+Table education {
+  id int pk
+  degree text
+  majors _text
+  minors _text
+  gpa text
+  institution text
+  awards _text
+  year_start int
+  year_end int
+  user_id int [ref: > users.id]
+}
+
+Table course {
+  name text
+  grade text
+  education_id int [ref: > education.id]
+  user_id int [ref: > users.id]
+  description text
+
+  indexes {
+    (name, education_id, user_id) [pk]
+  }
+}
+
+Table api_keys {
+  hashed_key text
+  user_id int [ref: > users.id]
+  created_at timestamp
+  encrypted_key text
+  user_email text
+
+  indexes {
+    (hashed_key, user_id, created_at) [pk]
+  }
+}
+
+Table work_experiences {
+  company text
+  job_title text
+  date_start text
+  date_end text
+  job_description text
+  user_id uuid [ref: > users.id]
+
+  indexes {
+    (company, job_title, user_id) [pk] // composite primary key for uniqueness
+  }
+}
+
+Table skills {
+  name text
+  proficiency integer
+  years_of_experience integer
+  user_id uuid [ref: > users.id]
+}
+
