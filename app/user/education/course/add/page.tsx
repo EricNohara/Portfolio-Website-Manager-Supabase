@@ -3,11 +3,28 @@
 import { Typography, Link, Container } from "@mui/material";
 import AddCourseForm from "./add-course-form";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function AddExperiencePage() {
+function AddCoursePageWrapper() {
   const searchParams = useSearchParams();
   const educationID = searchParams.get("educationID") as string;
 
+  return (<>
+    <AddCourseForm />
+    <Link
+      underline="hover"
+      align="center"
+      marginTop="1rem"
+      href={`/user/education/course?educationID=${encodeURIComponent(
+        educationID
+      )}`}
+    >
+      Return
+    </Link>
+  </>);
+}
+
+export default function AddCoursePage() {
   return (
     <Container
       maxWidth="sm"
@@ -22,17 +39,9 @@ export default function AddExperiencePage() {
       >
         Add Course
       </Typography>
-      <AddCourseForm />
-      <Link
-        underline="hover"
-        align="center"
-        marginTop="1rem"
-        href={`/user/education/course?educationID=${encodeURIComponent(
-          educationID
-        )}`}
-      >
-        Return
-      </Link>
+      <Suspense fallback={<div>Loading...</div>}>
+        <AddCoursePageWrapper />
+      </Suspense>
     </Container>
   );
 }

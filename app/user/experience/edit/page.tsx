@@ -1,5 +1,6 @@
 import { Typography, Link, Container } from "@mui/material";
 import EditExperienceForm from "./edit-experience-form";
+import { Suspense } from "react";
 
 export default function EditExperiencePage() {
   return (
@@ -16,7 +17,9 @@ export default function EditExperiencePage() {
       >
         Edit Work Experience
       </Typography>
-      <EditExperienceForm />
+      <Suspense fallback={<div>Loading...</div>}>
+        <EditExperienceForm />
+      </Suspense>
       <Link
         underline="hover"
         align="center"
