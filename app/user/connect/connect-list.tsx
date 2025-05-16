@@ -24,6 +24,8 @@ export default function ConnectList() {
   const [apiKey, setApiKey] = useState<string>("");
   const [userEmail, setUserEmail] = useState<string>("");
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [apiUrl, setApiUrl] = useState('');
+
 
   useEffect(() => {
     const fetcher = async () => {
@@ -44,6 +46,10 @@ export default function ConnectList() {
 
     fetcher();
   });
+
+  useEffect(() => {
+    setApiUrl(`${window.location.origin}/api/public/getUserData`);
+  }, []);
 
   const handleClick = () => {
     // copy key and show snackbar
@@ -97,10 +103,6 @@ export default function ConnectList() {
       console.error(error);
     }
   };
-
-  function generateCodeBlock() {
-    return `NEXT_PUBLIC_PORTFOLIO_API_URL="${window.location.origin}/api/public/getUserData"\nPORTFOLIO_PRIVATE_API_KEY="${apiKey}"\nUSER_EMAIL="${userEmail}"`;
-  }
 
   return (
     <Box
@@ -192,7 +194,7 @@ export default function ConnectList() {
         <Divider sx={{ marginBottom: "2rem" }} />
 
         <CopyBlock
-          text={generateCodeBlock()}
+          text={apiUrl}
           language="typescript"
           theme={dracula}
           customStyle={{ overflow: "hidden" }}
