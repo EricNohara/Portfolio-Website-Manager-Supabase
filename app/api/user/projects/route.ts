@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { IProject, IProjectInput } from "@/app/interfaces/IProject";
+import { IProjectInput } from "@/app/interfaces/IProject";
 
 export async function GET(req: NextRequest) {
   try {

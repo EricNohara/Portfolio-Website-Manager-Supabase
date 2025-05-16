@@ -51,7 +51,7 @@ export default function EditProjectsForm() {
     };
 
     fetcher();
-  }, [params]);
+  }, [params, router]);
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
 
@@ -101,7 +101,7 @@ export default function EditProjectsForm() {
       return;
     }
 
-    let projectData = { ...project };
+    const projectData = { ...project };
     let res, data;
 
     // save the project thumbnail if one is provided

@@ -1,6 +1,6 @@
 "use client";
 
-import { Typography, Button, Container } from "@mui/material";
+import { Typography, Container } from "@mui/material";
 import ConnectList from "./connect-list";
 
 export default function Page() {

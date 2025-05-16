@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { IEducation, IEducationInput } from "@/app/interfaces/IEducation";
+import { IEducationInput } from "@/app/interfaces/IEducation";
 
 export async function GET(req: NextRequest) {
   try {

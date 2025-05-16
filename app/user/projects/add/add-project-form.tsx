@@ -74,7 +74,7 @@ export default function AddProjectForm() {
       return;
     }
 
-    let projectData = { ...project };
+    const projectData = { ...project };
 
     // save the project thumbnail if one is provided
     if (thumbnail) {

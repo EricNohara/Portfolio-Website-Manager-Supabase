@@ -45,7 +45,7 @@ export default function EditCoursePage() {
     };
 
     fetcher();
-  }, [educationID, courseName]);
+  }, [educationID, courseName, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

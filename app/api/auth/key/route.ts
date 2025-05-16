@@ -1,4 +1,4 @@
-import { createClient, createServiceRoleClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { generateAPIKey, hashKey } from "@/utils/auth/hash";
 import { encrypt } from "@/utils/auth/encrypt";
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const supabase = await createClient();
 

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceRoleClient } from "@/utils/supabase/server";
 import { decrypt } from "@/utils/auth/encrypt";
 import { validateKey } from "@/utils/auth/hash";
-import { IEducation } from "@/app/interfaces/IEducation";
 import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
 
 export async function GET(req: NextRequest) {
@@ -50,7 +49,7 @@ export async function GET(req: NextRequest) {
 
     if (userDataError) throw userDataError;
 
-    const cleanedUserData = userData.map(({ id, ...rest }) => rest)[0];
+    const cleanedUserData = userData.map(({ _id, ...rest }) => rest)[0];
 
     const { data: userSkills, error: userSkillsError } = await supabase
       .from("skills")
@@ -59,7 +58,7 @@ export async function GET(req: NextRequest) {
 
     if (userSkillsError) throw userSkillsError;
 
-    const cleanedUserSkills = userSkills.map(({ user_id, ...rest }) => rest);
+    const cleanedUserSkills = userSkills.map(({ _user_id, ...rest }) => rest);
 
     const { data: userExperience, error: userExperienceError } = await supabase
       .from("work_experiences")
@@ -69,7 +68,7 @@ export async function GET(req: NextRequest) {
     if (userExperienceError) throw userExperienceError;
 
     const cleanedUserExperience = userExperience.map(
-      ({ user_id, ...rest }) => rest
+      ({ _user_id, ...rest }) => rest
     );
 
     const { data: userProject, error: userProjectError } = await supabase
@@ -80,7 +79,7 @@ export async function GET(req: NextRequest) {
     if (userProjectError) throw userProjectError;
 
     const cleanedUserProjects = userProject.map(
-      ({ id, user_id, ...rest }) => rest
+      ({ _id, _user_id, ...rest }) => rest
     );
 
     const { data: userEducation, error: userEducationError } = await supabase
@@ -90,7 +89,7 @@ export async function GET(req: NextRequest) {
 
     if (userEducationError) throw userEducationError;
 
-    let userEducationWithCourses: IUserEducation[] = [];
+    const userEducationWithCourses: IUserEducation[] = [];
 
     for (const education of userEducation) {
       const { data: educationCourses, error: educationCoursesError } =
@@ -103,7 +102,7 @@ export async function GET(req: NextRequest) {
       if (educationCoursesError) throw educationCoursesError;
 
       const cleanedEducationCourses = educationCourses.map(
-        ({ education_id, user_id, ...rest }) => rest
+        ({ _education_id, _user_id, ...rest }) => rest
       );
 
       const cleanedEducation = {

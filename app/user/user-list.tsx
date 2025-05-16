@@ -52,7 +52,7 @@ export default function UserList({ user }: { user: User | null }) {
 
       setUserData(data.userData);
 
-      let metadata = {
+      const metadata = {
         num_experience: 0,
         num_education: 0,
         num_skills: 0,
@@ -80,7 +80,7 @@ export default function UserList({ user }: { user: User | null }) {
       alert("Error loading user data!");
       console.error(error);
     }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     if (user?.id) getProfile();

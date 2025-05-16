@@ -43,7 +43,7 @@ export default function EditEducationForm() {
     };
 
     fetcher();
-  }, [params]);
+  }, [params, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

@@ -128,7 +128,7 @@ export default function ProjectsList() {
               <b>Technologies Used:</b> {project.technologies_used.join(", ")}
             </p>
           )}
-          {project.thumbnail_url && <img src={project.thumbnail_url} />}
+          {project.thumbnail_url && <img alt="Project Thumbnail" src={project.thumbnail_url} />}
           <Box display="flex" gap="25%">
             <Button
               type="submit"

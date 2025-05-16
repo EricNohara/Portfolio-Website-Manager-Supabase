@@ -33,7 +33,7 @@ export default function ExperienceList() {
     };
 
     fetcher();
-  }, []);
+  }, [educationID]);
 
   const handleDelete = async (course: ICourse) => {
     try {

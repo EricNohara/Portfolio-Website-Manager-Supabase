@@ -4,7 +4,7 @@ import IUser from "@/app/interfaces/IUser";
 import { IProject } from "@/app/interfaces/IProject";
 import parseURL from "@/utils/general/parseURL";
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const supabase = await createClient();
 
@@ -107,7 +107,7 @@ export async function PUT(req: NextRequest) {
 }
 
 // user only able to delete its own account and only if it is logged in
-export async function DELETE(req: NextRequest) {
+export async function DELETE(_req: NextRequest) {
   const serviceRoleSupabase = createServiceRoleClient();
 
   try {
@@ -126,7 +126,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     // delete all items in storage associated with the user
-    let publicURLs = [];
+    const publicURLs = [];
 
     const { data: projectData, error: projectError } = await supabase
       .from("projects")
