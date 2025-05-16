@@ -104,6 +104,10 @@ export default function ConnectList() {
     }
   };
 
+  function generateCodeBlock() {
+    return `NEXT_PUBLIC_PORTFOLIO_API_URL="${apiUrl}"\nPORTFOLIO_PRIVATE_API_KEY="${apiKey}"\nUSER_EMAIL="${userEmail}"`;
+  }
+
   return (
     <Box
       display="flex"
@@ -194,7 +198,7 @@ export default function ConnectList() {
         <Divider sx={{ marginBottom: "2rem" }} />
 
         <CopyBlock
-          text={apiUrl}
+          text={generateCodeBlock()}
           language="typescript"
           theme={dracula}
           customStyle={{ overflow: "hidden" }}
