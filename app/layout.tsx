@@ -3,6 +3,7 @@ import Navigation from "./navigation";
 import { AuthProvider } from "./context/AuthProvider";
 import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
 import { Container } from "@mui/material";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata = {
   title: "Portfolio Website Editor",
@@ -22,6 +23,7 @@ export default function RootLayout({
             <Navigation />
             <Container sx={{ padding: "5% 0 5% 0" }}>
               {children}
+              <SpeedInsights />
             </Container>
           </LocalizationProviderWrapper>
         </AuthProvider>
