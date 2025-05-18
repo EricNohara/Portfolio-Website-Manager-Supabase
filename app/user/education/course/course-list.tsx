@@ -82,8 +82,8 @@ export default function ExperienceList() {
                 <TableCell component="th" scope="row" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
                   {row.name}
                 </TableCell>
-                <TableCell align="left">{row.grade}</TableCell>
-                <TableCell align="left">{row.description}</TableCell>
+                <TableCell align="left">{row.grade.length > 0 ? row.grade : "-"}</TableCell>
+                <TableCell align="left">{row.description.length > 0 ? row.description : "-"}</TableCell>
                 <TableCell align="left">
                   <Button
                     type="submit"
