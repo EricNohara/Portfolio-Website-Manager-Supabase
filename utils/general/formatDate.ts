@@ -13,7 +13,7 @@ const months = [
   "December",
 ];
 
-export function formatDate(date: string) {
+export default function formatDate(date: string) {
   const [year, month, day] = date.split("-");
   return `${months[parseInt(month) - 1]} ${day} ${year}`;
 }
