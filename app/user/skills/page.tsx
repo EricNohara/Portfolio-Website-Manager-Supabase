@@ -8,7 +8,7 @@ export default function WorkExperiencePage() {
   const router = useRouter();
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md">
       <Typography
         variant="h3"
         component="h2"

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Table, TableContainer, TableHead, TableRow, Paper, TableCell, TableBody } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { IEducation } from "@/app/interfaces/IEducation";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function ExperienceList() {
   const router = useRouter();
@@ -47,103 +49,83 @@ export default function ExperienceList() {
 
   return (
     <Box display="flex" flexDirection="column-reverse">
-      {userEducation.map((edu: IEducation, i: number) => (
-        <Box
-          display="flex"
-          flexDirection="column"
-          gap="0.5rem"
-          padding="1rem"
-          marginBottom="1rem"
-          sx={{ border: 1, borderRadius: "0.25rem", borderColor: "#a1a1a1" }}
-          key={i}
-        >
-          <Typography variant="body1" component="p" gutterBottom>
-            <strong>Institution: </strong>
-            {edu.institution}
-          </Typography>
-          <Typography variant="body1" component="p" gutterBottom>
-            <strong>Degree: </strong>
-            {edu.degree}
-          </Typography>
-          {edu.majors.length > 0 && (
-            <Typography variant="body1" component="p" gutterBottom>
-              <strong>Majors: </strong>
-              {edu.majors.join(", ")}
-            </Typography>
-          )}
-          {edu.minors.length > 0 && (
-            <Typography variant="body1" component="p" gutterBottom>
-              <strong>Minors: </strong>
-              {edu.minors.join(", ")}
-            </Typography>
-          )}
-          {edu.gpa && (
-            <Typography variant="body1" component="p" gutterBottom>
-              <strong>GPA: </strong>
-              {edu.gpa}
-            </Typography>
-          )}
-          {edu.year_start && (
-            <Typography variant="body1" component="p" gutterBottom>
-              <strong>Year Start: </strong>
-              {edu.year_start}
-            </Typography>
-          )}
-          {edu.year_end && (
-            <Typography variant="body1" component="p" gutterBottom>
-              <strong>Year End: </strong>
-              {edu.year_end}
-            </Typography>
-          )}
-          {edu.awards.length > 0 && (
-            <Typography variant="body1" component="p" gutterBottom>
-              <strong>Awards: </strong>
-              {edu.awards.join(",")}
-            </Typography>
-          )}
-          <Box display="flex" gap="25%">
-            <Button
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
-              onClick={() =>
-                router.push(
-                  `/user/education/edit?id=${encodeURIComponent(edu.id)}`
-                )
-              }
-            >
-              Edit
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="info"
-              fullWidth
-              onClick={() => {
-                router.push(
-                  `/user/education/course?educationID=${encodeURIComponent(
-                    edu.id
-                  )}`
-                );
-              }}
-            >
-              Courses
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="error"
-              fullWidth
-              onClick={() => {
-                handleDelete(edu);
-              }}
-            >
-              Delete
-            </Button>
-          </Box>
-        </Box>
-      ))}
+      <TableContainer component={Paper} sx={{ marginBottom: "1rem" }}>
+        <Table size="small" aria-label="Education Table">
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>Institution</strong></TableCell>
+              <TableCell><strong>Degree</strong></TableCell>
+              <TableCell><strong>Majors</strong></TableCell>
+              <TableCell><strong>Minors</strong></TableCell>
+              <TableCell><strong>GPA</strong></TableCell>
+              <TableCell><strong>Start</strong></TableCell>
+              <TableCell><strong>End</strong></TableCell>
+              <TableCell><strong>Awards</strong></TableCell>
+              <TableCell><strong>Courses</strong></TableCell>
+              <TableCell><strong>Edit</strong></TableCell>
+              <TableCell><strong>Delete</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {userEducation.map((row, i) => (
+              <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell component="th" scope="row" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
+                  {row.institution}
+                </TableCell>
+                <TableCell align="left">{row.degree}</TableCell>
+                <TableCell align="left">{row.majors.length > 0 ? row.majors.join(", ") : "-"}</TableCell>
+                <TableCell align="left">{row.minors.length > 0 ? row.minors.join(", ") : "-"}</TableCell>
+                <TableCell align="left">{row.gpa ? row.gpa : "-"}</TableCell>
+                <TableCell align="left">{row.year_start ? row.year_start : "-"}</TableCell>
+                <TableCell align="left">{row.year_end ? row.year_end : "-"}</TableCell>
+                <TableCell align="left">{row.awards.length > 0 ? row.awards.join(", ") : "-"}</TableCell>
+                <TableCell align="left">
+                  <Button
+                    type="submit"
+                    variant="text"
+                    color="info"
+                    onClick={() => {
+                      router.push(
+                        `/user/education/course?educationID=${encodeURIComponent(
+                          row.id
+                        )}`
+                      );
+                    }}
+                  >
+                    View
+                  </Button>
+                </TableCell>
+                <TableCell align="left">
+                  <Button
+                    type="submit"
+                    variant="text"
+                    color="secondary"
+                    onClick={() =>
+                      router.push(
+                        `/user/education/edit?id=${encodeURIComponent(row.id)}`
+                      )
+                    }
+                  >
+                    <EditIcon />
+                  </Button>
+                </TableCell>
+                <TableCell align="left">
+                  <Button
+                    type="submit"
+                    variant="text"
+                    color="error"
+                    onClick={() => {
+                      handleDelete(row);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 }

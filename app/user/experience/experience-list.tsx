@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { IExperience } from "@/app/interfaces/IExperience";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Table, TableContainer, TableHead, TableRow, Paper, TableCell, TableBody } from "@mui/material";
 import { useRouter } from "next/navigation";
-import formatDate from "@/utils/general/formatDate";
+import { formatSimpleDate } from "@/utils/general/formatDate";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function ExperienceList() {
   const router = useRouter();
@@ -52,80 +54,70 @@ export default function ExperienceList() {
 
   return (
     <Box display="flex" flexDirection="column-reverse">
-      {userExperiences.map((exp: IExperience, i: number) => (
-        <Box
-          display="flex"
-          flexDirection="column"
-          gap="0.5rem"
-          padding="1rem"
-          marginBottom="1rem"
-          sx={{ border: 1, borderRadius: "0.25rem", borderColor: "#a1a1a1" }}
-          key={i}
-        >
-          <Typography variant="body1" component="p" gutterBottom>
-            <strong>Company: </strong>
-            {exp.company}
-          </Typography>
-          <Typography variant="body1" component="p" gutterBottom>
-            <strong>Job Title: </strong>
-            {exp.job_title}
-          </Typography>
-          {exp.date_start && (
-            <Typography variant="body1" component="p" gutterBottom>
-              <strong>Start Date: </strong>
-              {formatDate(exp.date_start)}
-            </Typography>
-          )}
-          {exp.date_end && (
-            <Typography variant="body1" component="p" gutterBottom>
-              <strong>End Date: </strong>
-              {formatDate(exp.date_end)}
-            </Typography>
-          )}
-          {exp.job_description && (
-            <Typography variant="body1" component="p" gutterBottom>
-              <strong>Job Description: </strong>
-              {exp.job_description}
-            </Typography>
-          )}
-          <Box display="flex" gap="25%">
-            <Button
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
-              onClick={() =>
-                router.push(
-                  `/user/experience/edit?company=${encodeURIComponent(
-                    exp.company
-                  )}&job_title=${encodeURIComponent(
-                    exp.job_title
-                  )}&date_start=${encodeURIComponent(
-                    exp.date_start || ""
-                  )}&date_end=${encodeURIComponent(
-                    exp.date_end || ""
-                  )}&job_description=${encodeURIComponent(
-                    exp.job_description || ""
-                  )}`
-                )
-              }
-            >
-              Edit
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="error"
-              fullWidth
-              onClick={() => {
-                handleDelete(exp);
-              }}
-            >
-              Delete
-            </Button>
-          </Box>
-        </Box>
-      ))}
+      <TableContainer component={Paper} sx={{ marginBottom: "1rem" }}>
+        <Table size="small" aria-label="Course Table">
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>Company</strong></TableCell>
+              <TableCell><strong>Title</strong></TableCell>
+              <TableCell><strong>Start</strong></TableCell>
+              <TableCell><strong>End</strong></TableCell>
+              <TableCell><strong>Description</strong></TableCell>
+              <TableCell><strong>Edit</strong></TableCell>
+              <TableCell><strong>Delete</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {userExperiences.map((row, i) => (
+              <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell component="th" scope="row" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
+                  {row.company}
+                </TableCell>
+                <TableCell align="left" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>{row.job_title}</TableCell>
+                <TableCell align="left">{row.date_start ? formatSimpleDate(row.date_start) : "-"}</TableCell>
+                <TableCell align="left">{row.date_end ? formatSimpleDate(row.date_end) : "-"}</TableCell>
+                <TableCell align="left">{row.job_description ? row.job_description : "-"}</TableCell>
+                <TableCell align="left">
+                  <Button
+                    type="submit"
+                    variant="text"
+                    color="secondary"
+                    onClick={() =>
+                      router.push(
+                        `/user/experience/edit?company=${encodeURIComponent(
+                          row.company
+                        )}&job_title=${encodeURIComponent(
+                          row.job_title
+                        )}&date_start=${encodeURIComponent(
+                          row.date_start || ""
+                        )}&date_end=${encodeURIComponent(
+                          row.date_end || ""
+                        )}&job_description=${encodeURIComponent(
+                          row.job_description || ""
+                        )}`
+                      )
+                    }
+                  >
+                    <EditIcon />
+                  </Button>
+                </TableCell>
+                <TableCell align="left">
+                  <Button
+                    type="submit"
+                    variant="text"
+                    color="error"
+                    onClick={() => {
+                      handleDelete(row);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 }

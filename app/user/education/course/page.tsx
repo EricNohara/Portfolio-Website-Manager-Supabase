@@ -31,7 +31,7 @@ function CoursePageWrapper() {
 export default function CoursePage() {
   return (
     <Container
-      maxWidth="sm"
+      maxWidth="lg"
       sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
       <Typography

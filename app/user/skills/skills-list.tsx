@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { ISkills } from "@/app/interfaces/ISkills";
-import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { Box, Button, Table, TableContainer, TableHead, TableRow, Paper, TableCell, TableBody } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function SkillsList() {
   const router = useRouter();
@@ -51,67 +53,60 @@ export default function SkillsList() {
 
   return (
     <Box display="flex" flexDirection="column-reverse">
-      {skills.map((skill: ISkills, i: number) => (
-        <Box
-          display="flex"
-          flexDirection="column"
-          gap="0.5rem"
-          padding="1rem"
-          marginBottom="1rem"
-          sx={{ border: 1, borderRadius: "0.25rem", borderColor: "#a1a1a1" }}
-          key={i}
-        >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="body1" component="p" gutterBottom>
-              {skill.name}
-            </Typography>
-            {skill.proficiency && (
-              <Typography variant="body1" component="p" gutterBottom>
-                <b>Proficiency: </b>
-                {`${skill.proficiency}/10`}
-              </Typography>
-            )}
-            {skill.years_of_experience && (
-              <Typography variant="body1" component="p" gutterBottom>
-                <b>Experience: </b>
-                {`${skill.years_of_experience} years`}
-              </Typography>
-            )}
-          </Box>
-          <Box display="flex" gap="25%">
-            <Button
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
-              onClick={() =>
-                router.push(
-                  `/user/skills/edit?skillName=${encodeURIComponent(
-                    skill.name
-                  )}`
-                )
-              }
-            >
-              Edit
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="error"
-              fullWidth
-              onClick={() => {
-                handleDelete(skill);
-              }}
-            >
-              Delete
-            </Button>
-          </Box>
-        </Box>
-      ))}
+      <TableContainer component={Paper} sx={{ marginBottom: "1rem" }}>
+        <Table size="small" aria-label="Course Table">
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>Name</strong></TableCell>
+              <TableCell><strong>Proficiency</strong></TableCell>
+              <TableCell><strong>Years of Experience</strong></TableCell>
+              <TableCell><strong>Edit</strong></TableCell>
+              <TableCell><strong>Delete</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {skills.map((row, i) => (
+              <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell component="th" scope="row" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
+                  {row.name}
+                </TableCell>
+                <TableCell align="left">{row.proficiency ? row.proficiency : "-"}</TableCell>
+                <TableCell align="left">{row.years_of_experience ? row.years_of_experience : "-"}</TableCell>
+                <TableCell align="left">
+                  <Button
+                    type="submit"
+                    variant="text"
+                    color="secondary"
+                    fullWidth
+                    onClick={() =>
+                      router.push(
+                        `/user/skills/edit?skillName=${encodeURIComponent(
+                          row.name
+                        )}`
+                      )
+                    }
+                  >
+                    <EditIcon />
+                  </Button>
+                </TableCell>
+                <TableCell align="left">
+                  <Button
+                    type="submit"
+                    variant="text"
+                    color="error"
+                    fullWidth
+                    onClick={() => {
+                      handleDelete(row);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 }
