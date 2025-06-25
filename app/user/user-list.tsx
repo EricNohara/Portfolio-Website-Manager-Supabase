@@ -31,6 +31,7 @@ export default function UserList({ user }: { user: User | null }) {
     transcript_url: null,
     instagram_url: null,
     facebook_url: null,
+    bio: null,
   });
 
   const [userMetadata, setUserMetadata] = useState({
@@ -149,6 +150,7 @@ export default function UserList({ user }: { user: User | null }) {
         <Typography>{userData?.location}</Typography>
         <Typography>{userData?.email}</Typography>
         <Typography>{userData?.phone_number}</Typography>
+        <Typography>{userData?.bio}</Typography>
       </Box>
       {userData?.resume_url && (
         <Box display="flex" gap="0.5rem">
