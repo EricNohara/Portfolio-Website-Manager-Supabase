@@ -20,6 +20,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
     transcript_url: null,
     facebook_url: null,
     instagram_url: null,
+    bio: null,
   });
 
   useEffect(() => {
@@ -140,9 +141,18 @@ export default function EditUserForm({ user }: { user: User | null }) {
         onChange={handleChange}
         fullWidth
         margin="dense"
-        className="mb-10"
         size="small"
         value={userData.instagram_url}
+      />
+      <TextField
+        label="Bio"
+        name="bio"
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+        className="mb-10"
+        size="small"
+        value={userData.bio}
       />
       <Button type="submit" variant="contained" color="primary">
         Save Changes

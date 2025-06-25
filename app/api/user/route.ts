@@ -42,6 +42,7 @@ export async function GET(_req: NextRequest) {
       transcript_url: data.transcript_url,
       facebook_url: data.facebook_url,
       instagram_url: data.instagram_url,
+      bio: data.bio,
     };
 
     return NextResponse.json({ userData: userData }, { status: 200 });

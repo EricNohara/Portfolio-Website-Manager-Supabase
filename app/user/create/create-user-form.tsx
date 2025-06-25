@@ -18,6 +18,7 @@ export default function CreateUserForm() {
     transcript_url: null,
     facebook_url: null,
     instagram_url: null,
+    bio: null,
   });
   const [password, setPassword] = useState("");
 
@@ -147,6 +148,14 @@ export default function CreateUserForm() {
       <TextField
         label="Instagram URL"
         name="instagram_url"
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+        size="small"
+      />
+      <TextField
+        label="Bio"
+        name="bio"
         onChange={handleChange}
         fullWidth
         margin="dense"

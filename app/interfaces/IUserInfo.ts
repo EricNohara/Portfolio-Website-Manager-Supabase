@@ -15,6 +15,7 @@ export interface IUserInfo {
   transcript_url: string | null;
   instagram_url: string | null;
   facebook_url: string | null;
+  bio: string | null;
   skills: ISkillsInput[];
   experiences: IExperience[];
   projects: IProjectInput[];
