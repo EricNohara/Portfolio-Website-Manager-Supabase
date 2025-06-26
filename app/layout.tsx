@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthProvider";
 import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
 import { Container } from "@mui/material";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata = {
   title: "Portfolio Manager",
@@ -44,6 +45,7 @@ export default function RootLayout({
             <Container sx={{ padding: "5% 0 5% 0" }}>
               {children}
               <SpeedInsights />
+              <Analytics />
             </Container>
           </LocalizationProviderWrapper>
         </AuthProvider>
