@@ -1,6 +1,6 @@
 # Portfolio Website Manager
 
-### Contributors: Eric Nohara-LeClair
+### Author: Eric Nohara-LeClair
 
 ---
 
@@ -11,6 +11,7 @@
 - [Prerequisites](#prerequisites)
 - [Supabase Backend Setup](#supabase-backend-setup)
 - [How to Install and Run](#how-to-install-and-run)
+- [AWS Lambda Function Supabase Uptime Trigger](#aws-lambda-function-supabase-uptime-trigger)
 - [Known Issues](#known-issues)
 
 ## Project Description
@@ -23,12 +24,21 @@
 - Eliminate any need for manual updates to the source code of portfolio websites
 - Changes made on this application are seamlessly pushed to connected websites via the API
 - Built with **Supabase** and **Next.js** for scalability, performance, security, and ease of development
+- Utilize custom build AWS Lambda Function to periodically call the public API to ensure the Supabase project stays active (needed since I am using the free tier)
 
 ## Tech Stack
 
-- **Frontend**: [Next.js](https://nextjs.org/) - Used for building a fast, responsive, user-friendly interface
-- **Backend**: [Supabase](https://supabase.com/) + [Next.js](https://nextjs.org) - Open-source alternative to Firebase for authentication, hosted database management, and file storage
-- **Hosting**: [Vercel](https://vercel.com/) - Optimized to be hosted on vercel for cheap and easy deployment
+- **Frontend**:
+  - [Next.js](https://nextjs.org/) - Fullstack framework used for building a fast, responsive, user-friendly interface
+  - [MUI](https://mui.com/) - Used for simple and easy components
+  - [Tailwind](https://tailwindcss.com/) - Used for efficient styling
+- **Backend**:
+  - [Supabase](https://supabase.com/) - Open-source alternative to Firebase for authentication, hosted database management, and file storage
+  - [Next.js](https://nextjs.org)
+  - [Python](https://www.python.org/) - Used for AWS Lambda Function which periodically calls the API to keep the Supabase project active
+- **Hosting**:
+  - [Vercel](https://vercel.com/) - Optimized to be hosted on vercel for cheap and easy deployment
+  - [AWS Lambda Function](https://aws.amazon.com/lambda/) - Simple and cheap way to schedule periodic API calls to keep the Supabase project active
 
 ## Prerequisites
 
@@ -79,6 +89,12 @@ MIN_PASSWORD_LEN=6
 ```bash
 npm run dev
 ```
+
+## AWS Lambda Function Supabase Uptime Trigger
+
+The free tier of Supabase automatically freezes a project after a period of inactivity. This is problematic since any connected portfolio website would stop working if this occurs. To fix this, I wrote a simple AWS Lambda Function in Python to make periodic calls to the public API. This ensures that the project will never be frozen.
+
+[GitHub Link to Supabase Uptime Trigger](https://github.com/EricNohara/Portfolio-Manager-Supabase-Trigger)
 
 ## Known Issues
 
