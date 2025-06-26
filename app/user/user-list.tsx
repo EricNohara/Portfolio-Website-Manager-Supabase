@@ -161,9 +161,6 @@ export default function UserList({ user }: { user: User | null }) {
         {userData?.bio && (
           <Card sx={{ minWidth: 275, maxWidth: 400, mt: 2, boxShadow: 3 }}>
             <CardContent>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                Bio
-              </Typography>
               <Typography
                 variant="body2"
                 color="text.secondary"
