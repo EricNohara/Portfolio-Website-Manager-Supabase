@@ -3,7 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { type User } from "@supabase/supabase-js";
 import IUser from "../interfaces/IUser";
-import { Typography, Link, Button, Box, Avatar } from "@mui/material";
+import {
+  Typography,
+  Link,
+  Button,
+  Box,
+  Avatar,
+  Card,
+  CardContent,
+} from "@mui/material";
 import { useAuth } from "../context/AuthProvider";
 import { useRouter } from "next/navigation";
 import GitHubIcon from "@mui/icons-material/GitHub";
@@ -150,7 +158,22 @@ export default function UserList({ user }: { user: User | null }) {
         <Typography>{userData?.location}</Typography>
         <Typography>{userData?.email}</Typography>
         <Typography>{userData?.phone_number}</Typography>
-        <Typography>{userData?.bio}</Typography>
+        {userData?.bio && (
+          <Card sx={{ minWidth: 275, maxWidth: 400, mt: 2, boxShadow: 3 }}>
+            <CardContent>
+              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                Bio
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ whiteSpace: "pre-line" }}
+              >
+                {userData.bio}
+              </Typography>
+            </CardContent>
+          </Card>
+        )}
       </Box>
       {userData?.resume_url && (
         <Box display="flex" gap="0.5rem">
