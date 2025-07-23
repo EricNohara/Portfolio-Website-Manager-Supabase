@@ -153,9 +153,11 @@ export default function ProjectsList() {
                     src={project.thumbnail_url}
                     style={{
                       maxHeight: "250px",
-                      width: "100%",
+                      maxWidth: "100%",
                       height: "auto",
+                      width: "auto",
                       display: "block",
+                      margin: "0 auto",
                     }}
                   />
                 )}
