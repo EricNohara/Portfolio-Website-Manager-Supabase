@@ -69,6 +69,7 @@ export default function ProjectsList() {
           sx={{
             marginBottom: "1rem",
             border: 1,
+            padding: "5%",
             borderRadius: "0.25rem",
             borderColor: "#a1a1a1",
             cursor: "pointer",
@@ -101,8 +102,29 @@ export default function ProjectsList() {
                     project.date_end
                   )}`}
                 </Typography>
+                {project.languages_used && (
+                  <p>
+                    <b>Languages Used:</b> {project.languages_used.join(", ")}
+                  </p>
+                )}
+                {project.frameworks_used && (
+                  <p>
+                    <b>Frameworks Used:</b> {project.frameworks_used.join(", ")}
+                  </p>
+                )}
+                {project.technologies_used && (
+                  <p>
+                    <b>Technologies Used:</b>{" "}
+                    {project.technologies_used.join(", ")}
+                  </p>
+                )}
                 {(project.github_url || project.demo_url) && (
-                  <Box display="flex" justifyContent="center" gap="5%">
+                  <Box
+                    display="flex"
+                    width="100%"
+                    justifyContent="center"
+                    gap="5%"
+                  >
                     {project.github_url && (
                       <Link
                         underline="hover"
@@ -129,29 +151,13 @@ export default function ProjectsList() {
                   <img
                     alt="Project Thumbnail"
                     src={project.thumbnail_url}
-                    style={{ height: "200px" }}
+                    style={{ height: "250px" }}
                   />
                 )}
                 <p>
                   <b>Description: </b>
                   {project.description}
                 </p>
-                {project.languages_used && (
-                  <p>
-                    <b>Languages Used:</b> {project.languages_used.join(", ")}
-                  </p>
-                )}
-                {project.frameworks_used && (
-                  <p>
-                    <b>Frameworks Used:</b> {project.frameworks_used.join(", ")}
-                  </p>
-                )}
-                {project.technologies_used && (
-                  <p>
-                    <b>Technologies Used:</b>{" "}
-                    {project.technologies_used.join(", ")}
-                  </p>
-                )}
                 <Box display="flex" gap="25%">
                   <Button
                     type="submit"
