@@ -69,7 +69,7 @@ export default function ProjectsList() {
           sx={{
             marginBottom: "1rem",
             border: 1,
-            padding: "5%",
+            padding: "2% 5%",
             borderRadius: "0.25rem",
             borderColor: "#a1a1a1",
             cursor: "pointer",
