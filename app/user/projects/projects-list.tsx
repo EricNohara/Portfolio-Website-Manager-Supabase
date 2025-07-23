@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { IProject } from "@/app/interfaces/IProject";
-import { Box, Button, Typography, Link } from "@mui/material";
+import { Box, Button, Typography, Link, Collapse, Paper } from "@mui/material";
 import { useRouter } from "next/navigation";
 import formatDate from "@/utils/general/formatDate";
 
 export default function ProjectsList() {
   const router = useRouter();
   const [projects, setProjects] = useState<IProject[]>([]);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const fetcher = async () => {
@@ -23,7 +24,6 @@ export default function ProjectsList() {
         alert(err);
       }
     };
-
     fetcher();
   }, []);
 
@@ -64,100 +64,115 @@ export default function ProjectsList() {
   return (
     <Box display="flex" flexDirection="column-reverse">
       {projects.map((project: IProject, i: number) => (
-        <Box
-          display="flex"
-          flexDirection="column"
-          gap="0.5rem"
-          padding="1rem"
-          marginBottom="1rem"
-          sx={{ border: 1, borderRadius: "0.25rem", borderColor: "#a1a1a1" }}
+        <Paper
           key={i}
+          sx={{
+            marginBottom: "1rem",
+            border: 1,
+            borderRadius: "0.25rem",
+            borderColor: "#a1a1a1",
+            cursor: "pointer",
+            transition: "box-shadow 0.2s",
+            boxShadow: expandedIndex === i ? 3 : 1,
+          }}
+          onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
         >
-          <Typography
-            variant="h5"
-            component="h5"
-            sx={{ fontWeight: "bold", textAlign: "center" }}
-          >
-            {`${project.name}`}
-          </Typography>
-          <Typography component="i" sx={{ textAlign: "center" }}>
-            {`${formatDate(project.date_start)} - ${formatDate(
-              project.date_end
-            )}`}
-          </Typography>
-          {(project.github_url || project.demo_url) && (
-            <Box display="flex" justifyContent="center" gap="5%">
-              {project.github_url && (
-                <Link
-                  underline="hover"
-                  align="center"
-                  href={project.github_url}
-                  target="_blank"
-                >
-                  GitHub URL
-                </Link>
-              )}{" "}
-              {project.demo_url && (
-                <Link
-                  underline="hover"
-                  align="center"
-                  target="_blank"
-                  href={project.demo_url}
-                >
-                  Demo URL
-                </Link>
+          <Box padding="1rem">
+            <Typography
+              variant="h5"
+              component="h5"
+              sx={{ fontWeight: "bold", textAlign: "center" }}
+            >
+              {`${project.name}`}
+            </Typography>
+            <Collapse in={expandedIndex === i}>
+              <Typography component="i" sx={{ textAlign: "center" }}>
+                {`${formatDate(project.date_start)} - ${formatDate(
+                  project.date_end
+                )}`}
+              </Typography>
+              {(project.github_url || project.demo_url) && (
+                <Box display="flex" justifyContent="center" gap="5%">
+                  {project.github_url && (
+                    <Link
+                      underline="hover"
+                      align="center"
+                      href={project.github_url}
+                      target="_blank"
+                    >
+                      GitHub URL
+                    </Link>
+                  )}{" "}
+                  {project.demo_url && (
+                    <Link
+                      underline="hover"
+                      align="center"
+                      target="_blank"
+                      href={project.demo_url}
+                    >
+                      Demo URL
+                    </Link>
+                  )}
+                </Box>
               )}
-            </Box>
-          )}
-          <p>
-            <b>Description: </b>
-            {project.description}
-          </p>
-          {project.languages_used && (
-            <p>
-              <b>Languages Used:</b> {project.languages_used.join(", ")}
-            </p>
-          )}
-          {project.frameworks_used && (
-            <p>
-              <b>Frameworks Used:</b> {project.frameworks_used.join(", ")}
-            </p>
-          )}
-          {project.technologies_used && (
-            <p>
-              <b>Technologies Used:</b> {project.technologies_used.join(", ")}
-            </p>
-          )}
-          {project.thumbnail_url && <img alt="Project Thumbnail" src={project.thumbnail_url} />}
-          <Box display="flex" gap="25%">
-            <Button
-              type="submit"
-              variant="contained"
-              color="secondary"
-              fullWidth
-              onClick={() =>
-                router.push(
-                  `/user/projects/edit?prevProjectID=${encodeURIComponent(
-                    project.id
-                  )}`
-                )
-              }
-            >
-              Edit
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="error"
-              fullWidth
-              onClick={() => {
-                handleDelete(project);
-              }}
-            >
-              Delete
-            </Button>
+              {project.thumbnail_url && (
+                <img
+                  alt="Project Thumbnail"
+                  src={project.thumbnail_url}
+                  style={{ height: "200px" }}
+                />
+              )}
+              <p>
+                <b>Description: </b>
+                {project.description}
+              </p>
+              {project.languages_used && (
+                <p>
+                  <b>Languages Used:</b> {project.languages_used.join(", ")}
+                </p>
+              )}
+              {project.frameworks_used && (
+                <p>
+                  <b>Frameworks Used:</b> {project.frameworks_used.join(", ")}
+                </p>
+              )}
+              {project.technologies_used && (
+                <p>
+                  <b>Technologies Used:</b>{" "}
+                  {project.technologies_used.join(", ")}
+                </p>
+              )}
+              <Box display="flex" gap="25%">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="secondary"
+                  fullWidth
+                  onClick={() =>
+                    router.push(
+                      `/user/projects/edit?prevProjectID=${encodeURIComponent(
+                        project.id
+                      )}`
+                    )
+                  }
+                >
+                  Edit
+                </Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="error"
+                  fullWidth
+                  onClick={() => {
+                    handleDelete(project);
+                  }}
+                >
+                  Delete
+                </Button>
+              </Box>
+            </Collapse>
           </Box>
-        </Box>
+        </Paper>
       ))}
     </Box>
   );
