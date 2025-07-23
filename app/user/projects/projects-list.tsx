@@ -86,7 +86,16 @@ export default function ProjectsList() {
               {`${project.name}`}
             </Typography>
             <Collapse in={expandedIndex === i}>
-              <Box mt={2}>
+              <Box
+                mt={2}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "1rem",
+                }}
+              >
                 <Typography component="i" sx={{ textAlign: "center" }}>
                   {`${formatDate(project.date_start)} - ${formatDate(
                     project.date_end
