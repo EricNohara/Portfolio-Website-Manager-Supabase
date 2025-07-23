@@ -180,6 +180,7 @@ export default function UserList({ user }: { user: User | null }) {
             href={userData.resume_url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`View ${userData.name}'s Resume`}
           >
             Click to View
           </Link>
@@ -193,6 +194,7 @@ export default function UserList({ user }: { user: User | null }) {
             href={userData.transcript_url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`View ${userData.name}'s Transcript`}
           >
             Click to View
           </Link>
@@ -200,25 +202,41 @@ export default function UserList({ user }: { user: User | null }) {
       )}
       <Box display="flex" gap="0.5rem">
         <b>{userMetadata.num_education} Educations: </b>
-        <Link href="/user/education" underline="hover">
+        <Link
+          href="/user/education"
+          underline="hover"
+          aria-label={`Navigate to education page`}
+        >
           {userMetadata.num_education > 0 ? "Click to View" : "Click to Add"}
         </Link>
       </Box>
       <Box display="flex" gap="0.5rem">
         <b>{userMetadata.num_experience} Experiences: </b>
-        <Link href="/user/experiences" underline="hover">
+        <Link
+          href="/user/experiences"
+          underline="hover"
+          aria-label={`Navigate to experiences page`}
+        >
           {userMetadata.num_experience > 0 ? "Click to View" : "Click to Add"}
         </Link>
       </Box>
       <Box display="flex" gap="0.5rem">
         <b>{userMetadata.num_projects} Projects: </b>
-        <Link href="/user/projects" underline="hover">
+        <Link
+          href="/user/projects"
+          underline="hover"
+          aria-label={`Navigate to projects page`}
+        >
           {userMetadata.num_projects > 0 ? "Click to View" : "Click to Add"}
         </Link>
       </Box>
       <Box display="flex" gap="0.5rem">
         <b>{userMetadata.num_skills} Skills: </b>
-        <Link href="/user/skills" underline="hover">
+        <Link
+          href="/user/skills"
+          underline="hover"
+          aria-label={`Navigate to skills page`}
+        >
           {userMetadata.num_skills > 0 ? "Click to View" : "Click to Add"}
         </Link>
       </Box>
@@ -228,6 +246,7 @@ export default function UserList({ user }: { user: User | null }) {
             href={userData.github_url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`${userData.name}'s GitHub URL`}
           >
             <GitHubIcon fontSize="large" sx={{ fontSize: "3rem" }} />
           </Link>
@@ -237,6 +256,7 @@ export default function UserList({ user }: { user: User | null }) {
             href={userData.linkedin_url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`${userData.name}'s LinkedIn URL`}
           >
             <LinkedInIcon fontSize="large" sx={{ fontSize: "3rem" }} />
           </Link>
@@ -246,6 +266,7 @@ export default function UserList({ user }: { user: User | null }) {
             href={userData.facebook_url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`${userData.name}'s Facebook URL`}
           >
             <FacebookIcon fontSize="large" sx={{ fontSize: "3rem" }} />
           </Link>
@@ -255,6 +276,7 @@ export default function UserList({ user }: { user: User | null }) {
             href={userData.instagram_url}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={`${userData.name}'s Instagram URL`}
           >
             <InstagramIcon fontSize="large" sx={{ fontSize: "3rem" }} />
           </Link>
@@ -263,6 +285,7 @@ export default function UserList({ user }: { user: User | null }) {
           href={`mailto:${userData.email}`}
           target="_blank"
           rel="noopener noreferrer"
+          aria-label={`${userData.name}'s Email`}
         >
           <EmailIcon fontSize="large" sx={{ fontSize: "3rem" }} />
         </Link>
@@ -273,6 +296,7 @@ export default function UserList({ user }: { user: User | null }) {
           variant="contained"
           color="primary"
           onClick={handleEdit}
+          aria-label={`Edit User Information`}
         >
           Edit
         </Button>
@@ -281,6 +305,7 @@ export default function UserList({ user }: { user: User | null }) {
           variant="contained"
           color="error"
           onClick={handleDelete}
+          aria-label={`Delete User Information`}
         >
           Delete
         </Button>

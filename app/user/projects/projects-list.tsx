@@ -131,6 +131,7 @@ export default function ProjectsList() {
                         align="center"
                         href={project.github_url}
                         target="_blank"
+                        aria-label={`View ${project.name} on GitHub`}
                       >
                         GitHub URL
                       </Link>
@@ -141,6 +142,7 @@ export default function ProjectsList() {
                         align="center"
                         target="_blank"
                         href={project.demo_url}
+                        aria-label={`View ${project.name} Project Demo`}
                       >
                         Demo URL
                       </Link>
@@ -171,6 +173,7 @@ export default function ProjectsList() {
                     variant="contained"
                     color="secondary"
                     fullWidth
+                    aria-label={`Edit project ${project.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(
@@ -187,6 +190,7 @@ export default function ProjectsList() {
                     variant="contained"
                     color="error"
                     fullWidth
+                    aria-label={`Delete project ${project.name}`}
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(project);
