@@ -86,89 +86,93 @@ export default function ProjectsList() {
               {`${project.name}`}
             </Typography>
             <Collapse in={expandedIndex === i}>
-              <Typography component="i" sx={{ textAlign: "center" }}>
-                {`${formatDate(project.date_start)} - ${formatDate(
-                  project.date_end
-                )}`}
-              </Typography>
-              {(project.github_url || project.demo_url) && (
-                <Box display="flex" justifyContent="center" gap="5%">
-                  {project.github_url && (
-                    <Link
-                      underline="hover"
-                      align="center"
-                      href={project.github_url}
-                      target="_blank"
-                    >
-                      GitHub URL
-                    </Link>
-                  )}{" "}
-                  {project.demo_url && (
-                    <Link
-                      underline="hover"
-                      align="center"
-                      target="_blank"
-                      href={project.demo_url}
-                    >
-                      Demo URL
-                    </Link>
-                  )}
+              <Box mt={2}>
+                <Typography component="i" sx={{ textAlign: "center" }}>
+                  {`${formatDate(project.date_start)} - ${formatDate(
+                    project.date_end
+                  )}`}
+                </Typography>
+                {(project.github_url || project.demo_url) && (
+                  <Box display="flex" justifyContent="center" gap="5%">
+                    {project.github_url && (
+                      <Link
+                        underline="hover"
+                        align="center"
+                        href={project.github_url}
+                        target="_blank"
+                      >
+                        GitHub URL
+                      </Link>
+                    )}{" "}
+                    {project.demo_url && (
+                      <Link
+                        underline="hover"
+                        align="center"
+                        target="_blank"
+                        href={project.demo_url}
+                      >
+                        Demo URL
+                      </Link>
+                    )}
+                  </Box>
+                )}
+                {project.thumbnail_url && (
+                  <img
+                    alt="Project Thumbnail"
+                    src={project.thumbnail_url}
+                    style={{ height: "200px" }}
+                  />
+                )}
+                <p>
+                  <b>Description: </b>
+                  {project.description}
+                </p>
+                {project.languages_used && (
+                  <p>
+                    <b>Languages Used:</b> {project.languages_used.join(", ")}
+                  </p>
+                )}
+                {project.frameworks_used && (
+                  <p>
+                    <b>Frameworks Used:</b> {project.frameworks_used.join(", ")}
+                  </p>
+                )}
+                {project.technologies_used && (
+                  <p>
+                    <b>Technologies Used:</b>{" "}
+                    {project.technologies_used.join(", ")}
+                  </p>
+                )}
+                <Box display="flex" gap="25%">
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="secondary"
+                    fullWidth
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(
+                        `/user/projects/edit?prevProjectID=${encodeURIComponent(
+                          project.id
+                        )}`
+                      );
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="error"
+                    fullWidth
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(project);
+                    }}
+                  >
+                    Delete
+                  </Button>
                 </Box>
-              )}
-              {project.thumbnail_url && (
-                <img
-                  alt="Project Thumbnail"
-                  src={project.thumbnail_url}
-                  style={{ height: "200px" }}
-                />
-              )}
-              <p>
-                <b>Description: </b>
-                {project.description}
-              </p>
-              {project.languages_used && (
-                <p>
-                  <b>Languages Used:</b> {project.languages_used.join(", ")}
-                </p>
-              )}
-              {project.frameworks_used && (
-                <p>
-                  <b>Frameworks Used:</b> {project.frameworks_used.join(", ")}
-                </p>
-              )}
-              {project.technologies_used && (
-                <p>
-                  <b>Technologies Used:</b>{" "}
-                  {project.technologies_used.join(", ")}
-                </p>
-              )}
-              <Box display="flex" gap="25%">
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="secondary"
-                  fullWidth
-                  onClick={() =>
-                    router.push(
-                      `/user/projects/edit?prevProjectID=${encodeURIComponent(
-                        project.id
-                      )}`
-                    )
-                  }
-                >
-                  Edit
-                </Button>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="error"
-                  fullWidth
-                  onClick={() => {
-                    handleDelete(project);
-                  }}
-                >
-                  Delete
-                </Button>
               </Box>
             </Collapse>
           </Box>
