@@ -69,7 +69,7 @@ export default function ProjectsList() {
           sx={{
             marginBottom: "1rem",
             border: 1,
-            padding: "2% 5%",
+            padding: "1% 5%",
             borderRadius: "0.25rem",
             borderColor: "#a1a1a1",
             cursor: "pointer",
@@ -151,7 +151,12 @@ export default function ProjectsList() {
                   <img
                     alt="Project Thumbnail"
                     src={project.thumbnail_url}
-                    style={{ height: "250px" }}
+                    style={{
+                      maxHeight: "250px",
+                      width: "100%",
+                      height: "auto",
+                      display: "block",
+                    }}
                   />
                 )}
                 <p>
