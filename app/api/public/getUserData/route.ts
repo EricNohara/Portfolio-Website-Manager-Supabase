@@ -5,6 +5,19 @@ import { validateKey } from "@/utils/auth/hash";
 import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
 
 export async function GET(req: NextRequest) {
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new NextResponse(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,OPTIONS",
+        "Access-Control-Allow-Headers":
+          "Authorization, User-Email, Content-Type",
+      },
+    });
+  }
+
   try {
     const supabase = await createServiceRoleClient();
 
@@ -133,9 +146,15 @@ export async function GET(req: NextRequest) {
       education: userEducationWithCourses,
     };
 
-    return NextResponse.json({ userInfo }, { status: 200 });
+    return NextResponse.json(
+      { userInfo },
+      { status: 200, headers: { "Access-Control-Allow-Origin": "*" } }
+    );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    return NextResponse.json(
+      { message: error.message },
+      { status: 400, headers: { "Access-Control-Allow-Origin": "*" } }
+    );
   }
 }
