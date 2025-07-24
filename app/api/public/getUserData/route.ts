@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET,OPTIONS",
         "Access-Control-Allow-Headers":
-          "Authorization, User-Email, Content-Type",
+          "Authorization, User-Email, Content-Type, Accept",
       },
     });
   }
@@ -154,7 +154,7 @@ export async function GET(req: NextRequest) {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET,OPTIONS",
           "Access-Control-Allow-Headers":
-            "Authorization, User-Email, Content-Type",
+            "Authorization, User-Email, Content-Type, Accept",
         },
       }
     );
@@ -168,7 +168,7 @@ export async function GET(req: NextRequest) {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET,OPTIONS",
           "Access-Control-Allow-Headers":
-            "Authorization, User-Email, Content-Type",
+            "Authorization, User-Email, Content-Type, Accept",
         },
       }
     );
