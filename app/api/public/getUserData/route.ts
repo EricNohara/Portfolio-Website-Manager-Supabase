@@ -148,13 +148,29 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { userInfo },
-      { status: 200, headers: { "Access-Control-Allow-Origin": "*" } }
+      {
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET,OPTIONS",
+          "Access-Control-Allow-Headers":
+            "Authorization, User-Email, Content-Type",
+        },
+      }
     );
   } catch (err) {
     const error = err as Error;
     return NextResponse.json(
       { message: error.message },
-      { status: 400, headers: { "Access-Control-Allow-Origin": "*" } }
+      {
+        status: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET,OPTIONS",
+          "Access-Control-Allow-Headers":
+            "Authorization, User-Email, Content-Type",
+        },
+      }
     );
   }
 }
