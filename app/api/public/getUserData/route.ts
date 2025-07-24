@@ -5,19 +5,6 @@ import { validateKey } from "@/utils/auth/hash";
 import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
 
 export async function GET(req: NextRequest) {
-  // Handle CORS preflight
-  if (req.method === "OPTIONS") {
-    return new NextResponse(null, {
-      status: 204,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET,OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Authorization, User-Email, Content-Type, Accept",
-      },
-    });
-  }
-
   try {
     const supabase = await createServiceRoleClient();
 
@@ -173,4 +160,16 @@ export async function GET(req: NextRequest) {
       }
     );
   }
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,OPTIONS",
+      "Access-Control-Allow-Headers":
+        "Authorization, User-Email, Content-Type, Accept",
+    },
+  });
 }
