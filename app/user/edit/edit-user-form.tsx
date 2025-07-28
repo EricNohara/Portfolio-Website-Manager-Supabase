@@ -78,7 +78,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.email}
+        value={userData.email || ""}
         required
       />
       <TextField
@@ -88,7 +88,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.name}
+        value={userData.name || ""}
         required
       />
       <TextField
@@ -98,7 +98,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.phone_number}
+        value={userData.phone_number || ""}
       />
       <TextField
         label="Address"
@@ -107,7 +107,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.location}
+        value={userData.location || ""}
       />
       <TextField
         label="GitHub URL"
@@ -116,7 +116,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.github_url}
+        value={userData.github_url || ""}
       />
       <TextField
         label="LinkedIn URL"
@@ -125,7 +125,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.linkedin_url}
+        value={userData.linkedin_url || ""}
       />
       <TextField
         label="Facebook URL"
@@ -134,7 +134,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.facebook_url}
+        value={userData.facebook_url || ""}
       />
       <TextField
         label="Instagram URL"
@@ -143,7 +143,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.instagram_url}
+        value={userData.instagram_url || ""}
       />
       <TextField
         label="Bio"
@@ -152,7 +152,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         fullWidth
         margin="dense"
         size="small"
-        value={userData.bio}
+        value={userData.bio || ""}
       />
       <TextField
         label="Current Position"
@@ -162,7 +162,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
         margin="dense"
         className="mb-10"
         size="small"
-        value={userData.current_position}
+        value={userData.current_position || ""}
       />
       <Button type="submit" variant="contained" color="primary">
         Save Changes
