@@ -40,6 +40,7 @@ export default function UserList({ user }: { user: User | null }) {
     instagram_url: null,
     facebook_url: null,
     bio: null,
+    current_position: null,
   });
 
   const [userMetadata, setUserMetadata] = useState({
@@ -127,10 +128,20 @@ export default function UserList({ user }: { user: User | null }) {
         component="h2"
         className="text-center"
         fontWeight="bold"
-        marginBottom="5%"
+        marginBottom="2.5%"
       >
         {userData?.name}
       </Typography>
+      {userData.current_position && (
+        <Typography
+          variant="h5"
+          component="h3"
+          className="text-center"
+          marginBottom="5%"
+        >
+          {userData?.current_position}
+        </Typography>
+      )}
       {userData.portrait_url ? (
         <Link
           href={userData.portrait_url}

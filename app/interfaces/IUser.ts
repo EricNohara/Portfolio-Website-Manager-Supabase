@@ -11,4 +11,5 @@ export default interface IUser {
   facebook_url: string | null;
   instagram_url: string | null;
   bio: string | null;
+  current_position: string | null;
 }

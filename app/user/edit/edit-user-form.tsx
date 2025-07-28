@@ -21,6 +21,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
     facebook_url: null,
     instagram_url: null,
     bio: null,
+    current_position: null,
   });
 
   useEffect(() => {
@@ -150,9 +151,18 @@ export default function EditUserForm({ user }: { user: User | null }) {
         onChange={handleChange}
         fullWidth
         margin="dense"
-        className="mb-10"
         size="small"
         value={userData.bio}
+      />
+      <TextField
+        label="Current Position"
+        name="current_position"
+        onChange={handleChange}
+        fullWidth
+        margin="dense"
+        className="mb-10"
+        size="small"
+        value={userData.current_position}
       />
       <Button type="submit" variant="contained" color="primary">
         Save Changes
