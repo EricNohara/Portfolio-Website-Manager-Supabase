@@ -12,9 +12,7 @@ export async function GET(_req: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    if (!user) throw new Error("User not authenticated");
 
     const { data, error, status } = await supabase
       .from("users")
@@ -22,9 +20,7 @@ export async function GET(_req: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    if (error && status !== 406) {
-      throw error;
-    }
+    if (error && status !== 406) throw error;
 
     if (!data) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -49,6 +45,7 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({ userData: userData }, { status: 200 });
   } catch (err) {
     const error = err as Error;
+    console.error(error.message);
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
@@ -64,20 +61,17 @@ export async function POST(req: NextRequest) {
 
     const { error } = await supabase
       .from("users")
-      .update(userData)
-      .eq("id", user?.id);
+      .insert([{ ...userData, id: user?.id }]);
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     return NextResponse.json(
-      { messgae: "User successfully created" },
+      { message: "User successfully created" },
       { status: 200 }
     );
   } catch (err) {
     const error = err as Error;
-    console.error(err);
+    console.error(error.message);
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
@@ -99,12 +93,10 @@ export async function PUT(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ message: "Update successful" }, { status: 200 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: "Error updating user information" },
-      { status: 400 }
-    );
+  } catch (err) {
+    const error = err as Error;
+    console.error(error.message);
+    return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
 
@@ -113,7 +105,6 @@ export async function DELETE(_req: NextRequest) {
   const serviceRoleSupabase = createServiceRoleClient();
 
   try {
-    //   Check if a user's logged in
     const supabase = await createClient();
 
     const {
@@ -160,22 +151,19 @@ export async function DELETE(_req: NextRequest) {
     if (userData.transcript_url && userData.transcript_url !== null)
       publicURLs.push(userData.transcript_url);
 
-    publicURLs.forEach(async (url: string) => {
-      if (!url || url === "") return;
-
+    for (const url of publicURLs) {
+      if (!url || url === "") continue;
       const { parsedBucket, parsedFilename } = parseURL(url);
-
       const { error } = await serviceRoleSupabase.storage
         .from(parsedBucket)
         .remove([parsedFilename]);
-
       if (error) throw error;
-    });
+    }
 
     // delete the user from the auth table - this will cause cascading deletions from all other tables
     const { error } = await serviceRoleSupabase.auth.admin.deleteUser(user.id);
 
-    if (error) throw new Error(error.message);
+    if (error) throw error;
 
     return NextResponse.json(
       { message: "User successfully deleted" },
@@ -183,7 +171,7 @@ export async function DELETE(_req: NextRequest) {
     );
   } catch (err) {
     const error = err as Error;
-    console.error(err);
+    console.error(error.message);
     return NextResponse.json({ message: error.message }, { status: 400 });
   }
 }
