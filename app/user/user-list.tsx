@@ -103,6 +103,12 @@ export default function UserList({ user }: { user: User | null }) {
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+
+    if (!confirmed) return;
+
     try {
       const res = await fetch("/api/user", { method: "DELETE" });
 
