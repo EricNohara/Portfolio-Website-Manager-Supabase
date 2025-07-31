@@ -13,6 +13,7 @@
 - [How to Install and Run](#how-to-install-and-run)
 - [AWS Lambda Function Supabase Uptime Trigger](#aws-lambda-function-supabase-uptime-trigger)
 - [Known Issues](#known-issues)
+- [Next Steps](#next-steps)
 
 ## Project Description
 
@@ -99,3 +100,16 @@ The free tier of Supabase automatically freezes a project after a period of inac
 ## Known Issues
 
 No known issues.
+
+## Next Steps
+
+- Code cleanup + surface level testing
+- Add unit/integration testing
+- UI/UX update
+- Support more languages through new libraries (Python, Java, C#, etc.)
+- Documentation page for API + code integrations
+- Rename application
+- Add CLI
+- Add ads to website
+- Test with live users
+- Monetize
