@@ -61,7 +61,8 @@ export async function POST(req: NextRequest) {
 
     const { error } = await supabase
       .from("users")
-      .insert([{ ...userData, id: user?.id }]);
+      .update(userData)
+      .eq("id", user?.id);
 
     if (error) throw error;
 
