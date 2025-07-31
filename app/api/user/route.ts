@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
 
@@ -86,7 +86,7 @@ export async function PUT(req: NextRequest) {
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
 
@@ -162,6 +162,6 @@ export async function DELETE(_req: NextRequest) {
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
