@@ -12,41 +12,30 @@ export async function GET(_req: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) throw new Error("User not authenticated");
+    if (!user) {
+      return NextResponse.json(
+        { message: "User not authenticated" },
+        { status: 401 }
+      );
+    }
 
     const { data, error, status } = await supabase
       .from("users")
       .select()
       .eq("id", user.id)
-      .single();
+      .single<IUser>();
 
-    if (error && status !== 406) throw error;
-
-    if (!data) {
+    if (error) {
+      throw error;
+    } else if (!data) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const userData: IUser = {
-      email: data.email,
-      name: data.name,
-      phone_number: data.phone_number,
-      location: data.location,
-      github_url: data.github_url,
-      linkedin_url: data.linkedin_url,
-      portrait_url: data.portrait_url,
-      resume_url: data.resume_url,
-      transcript_url: data.transcript_url,
-      facebook_url: data.facebook_url,
-      instagram_url: data.instagram_url,
-      bio: data.bio,
-      current_position: data.current_position,
-    };
-
-    return NextResponse.json({ userData: userData }, { status: 200 });
+    return NextResponse.json({ userData: data }, { status: 200 });
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }
 
