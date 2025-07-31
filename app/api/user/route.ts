@@ -19,7 +19,7 @@ export async function GET(_req: NextRequest) {
       );
     }
 
-    const { data, error, status } = await supabase
+    const { data, error } = await supabase
       .from("users")
       .select()
       .eq("id", user.id)
