@@ -19,6 +19,8 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import EmailIcon from "@mui/icons-material/Email";
+import SchoolIcon from "@mui/icons-material/School";
+import ContactPageIcon from "@mui/icons-material/ContactPage";
 
 export default function UserList({ user }: { user: User | null }) {
   const router = useRouter();
@@ -43,13 +45,6 @@ export default function UserList({ user }: { user: User | null }) {
     current_position: null,
   });
 
-  const [userMetadata, setUserMetadata] = useState({
-    num_experience: 0,
-    num_education: 0,
-    num_skills: 0,
-    num_projects: 0,
-  });
-
   const getProfile = useCallback(async () => {
     try {
       let res, data;
@@ -61,31 +56,6 @@ export default function UserList({ user }: { user: User | null }) {
       }
 
       setUserData(data.userData);
-
-      const metadata = {
-        num_experience: 0,
-        num_education: 0,
-        num_skills: 0,
-        num_projects: 0,
-      };
-
-      res = await fetch("/api/user/education?count=true");
-      data = await res.json();
-      metadata.num_education = data.count;
-
-      res = await fetch("/api/user/experience?count=true");
-      data = await res.json();
-      metadata.num_experience = data.count;
-
-      res = await fetch("/api/user/skills?count=true");
-      data = await res.json();
-      metadata.num_skills = data.count;
-
-      res = await fetch("/api/user/projects?count=true");
-      data = await res.json();
-      metadata.num_projects = data.count;
-
-      setUserMetadata(metadata);
     } catch (error) {
       alert("Error loading user data!");
       console.error(error);
@@ -189,75 +159,27 @@ export default function UserList({ user }: { user: User | null }) {
           </Card>
         )}
       </Box>
-      {userData?.resume_url && (
-        <Box display="flex" gap="0.5rem">
-          <b>Resume:</b>
+      <Box display="flex" gap="1rem" margin="1rem">
+        {userData?.resume_url && (
           <Link
-            underline="hover"
             href={userData.resume_url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`View ${userData.name}'s Resume`}
+            aria-label={`${userData.name}'s Resume`}
           >
-            Click to View
+            <ContactPageIcon fontSize="large" sx={{ fontSize: "3rem" }} />
           </Link>
-        </Box>
-      )}
-      {userData?.transcript_url && (
-        <Box display="flex" gap="0.5rem">
-          <b>Transcript:</b>
+        )}
+        {userData?.transcript_url && (
           <Link
-            underline="hover"
             href={userData.transcript_url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`View ${userData.name}'s Transcript`}
+            aria-label={`${userData.name}'s Transcript`}
           >
-            Click to View
+            <SchoolIcon fontSize="large" sx={{ fontSize: "3rem" }} />
           </Link>
-        </Box>
-      )}
-      <Box display="flex" gap="0.5rem">
-        <b>{userMetadata.num_education} Educations: </b>
-        <Link
-          href="/user/education"
-          underline="hover"
-          aria-label={`Navigate to education page`}
-        >
-          {userMetadata.num_education > 0 ? "Click to View" : "Click to Add"}
-        </Link>
-      </Box>
-      <Box display="flex" gap="0.5rem">
-        <b>{userMetadata.num_experience} Experiences: </b>
-        <Link
-          href="/user/experiences"
-          underline="hover"
-          aria-label={`Navigate to experiences page`}
-        >
-          {userMetadata.num_experience > 0 ? "Click to View" : "Click to Add"}
-        </Link>
-      </Box>
-      <Box display="flex" gap="0.5rem">
-        <b>{userMetadata.num_projects} Projects: </b>
-        <Link
-          href="/user/projects"
-          underline="hover"
-          aria-label={`Navigate to projects page`}
-        >
-          {userMetadata.num_projects > 0 ? "Click to View" : "Click to Add"}
-        </Link>
-      </Box>
-      <Box display="flex" gap="0.5rem">
-        <b>{userMetadata.num_skills} Skills: </b>
-        <Link
-          href="/user/skills"
-          underline="hover"
-          aria-label={`Navigate to skills page`}
-        >
-          {userMetadata.num_skills > 0 ? "Click to View" : "Click to Add"}
-        </Link>
-      </Box>
-      <Box display="flex" gap="1rem" margin="1rem">
+        )}
         {userData?.github_url && (
           <Link
             href={userData.github_url}
