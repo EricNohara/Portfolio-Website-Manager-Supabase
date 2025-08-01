@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { createServiceRoleClient } from "@/utils/supabase/server";
 import parseURL from "@/utils/general/parseURL";
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
 export const config = {
   api: {
@@ -9,27 +9,37 @@ export const config = {
   },
 };
 
-export async function POST(req: NextRequest) {
-  const serviceRoleSupabase = createServiceRoleClient();
+const ALLOWED_BUCKETS = [
+  "project_thumbnails",
+  "portraits",
+  "resumes",
+  "transcripts",
+];
 
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
+    const serviceRoleSupabase = createServiceRoleClient();
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const bucketName = formData.get("bucketName") as string | null;
 
-    if (!file || !bucketName) {
-      throw new Error("Invalid upload arguments");
+    if (!file || !bucketName || !ALLOWED_BUCKETS.includes(bucketName)) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
     }
 
-    // Check if a user's logged in
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    if (!file.type.startsWith("image/")) {
+      return NextResponse.json(
+        { message: "Only image files allowed" },
+        { status: 400 }
+      );
+    }
 
-    if (!user) {
-      throw new Error("User not authenticated");
+    if (file.size > 50 * 1024 * 1024) {
+      // 50MB limit
+      return NextResponse.json({ message: "File too large" }, { status: 400 });
     }
 
     // upload to supabase
@@ -105,41 +115,44 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(
         { message: "Upload successful" },
-        { status: 200 }
+        { status: 201 }
       );
     } else {
       return NextResponse.json(
         { publicURL: publicURL.publicUrl },
-        { status: 200 }
+        { status: 201 }
       );
     }
   } catch (err) {
-    console.error(err);
     const error = err as Error;
-    return NextResponse.json({ message: error }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function DELETE(req: NextRequest) {
-  const serviceRoleSupabase = createServiceRoleClient();
-  const publicURL: string | null = req.nextUrl.searchParams.get("publicURL");
-
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
+    const serviceRoleSupabase = createServiceRoleClient();
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
+
+    const publicURL: string | null = req.nextUrl.searchParams.get("publicURL");
     if (!publicURL) {
-      throw new Error("Missing public url to delete");
-    }
-
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
     }
 
     const { parsedBucket, parsedFilename } = parseURL(publicURL);
+
+    if (
+      !parsedBucket ||
+      !parsedFilename ||
+      !ALLOWED_BUCKETS.includes(parsedBucket)
+    ) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+    }
 
     if (parsedBucket === "project_thumbnails") {
       // if deleting project thumbnail, just need to delete from storage
@@ -149,7 +162,7 @@ export async function DELETE(req: NextRequest) {
 
       if (error) throw error;
 
-      return NextResponse.json({ message: "Success" }, { status: 200 });
+      return NextResponse.json(null, { status: 204 });
     } else {
       // try to delete from DB
       const userData =
@@ -164,9 +177,7 @@ export async function DELETE(req: NextRequest) {
         .update(userData)
         .eq("id", user?.id);
 
-      if (updateError) {
-        throw updateError;
-      }
+      if (updateError) throw updateError;
 
       const { error } = await serviceRoleSupabase.storage
         .from(parsedBucket)
@@ -174,10 +185,14 @@ export async function DELETE(req: NextRequest) {
 
       if (error) throw error;
 
-      return NextResponse.json({ message: "Success" }, { status: 200 });
+      return NextResponse.json(null, { status: 204 });
     }
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
