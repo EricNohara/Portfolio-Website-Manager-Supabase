@@ -1,4 +1,4 @@
-import { createClient, createServiceRoleClient } from "@/utils/supabase/server";
+import { createServiceRoleClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import IUser from "@/app/interfaces/IUser";
 import { IProject } from "@/app/interfaces/IProject";
@@ -121,7 +121,7 @@ export async function DELETE(_req: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    if (userError) userError;
+    if (userError) throw userError;
 
     if (userData.portrait_url && userData.portrait_url !== null)
       publicURLs.push(userData.portrait_url);
