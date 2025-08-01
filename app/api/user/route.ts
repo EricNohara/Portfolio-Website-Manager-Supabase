@@ -140,7 +140,7 @@ export async function DELETE(_req: NextRequest): Promise<NextResponse> {
 
     if (error) throw error;
 
-    return NextResponse.json(null, { status: 204 });
+    return new NextResponse(null, { status: 204 });
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
