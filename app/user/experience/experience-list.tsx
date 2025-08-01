@@ -46,11 +46,13 @@ export default function ExperienceList() {
         `/api/user/experience?company=${exp.company}&job_title=${exp.job_title}`,
         { method: "DELETE" }
       );
-      const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message);
-
-      alert(data.message);
+      if (res.status === 204) {
+        alert("Successfully deleted experience");
+      } else {
+        const data = await res.json();
+        throw new Error(data.message);
+      }
 
       const removedExperiences: IExperience[] = userExperiences.filter(
         (e) => e.company !== exp.company || e.job_title != exp.job_title

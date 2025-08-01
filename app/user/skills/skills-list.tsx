@@ -43,11 +43,13 @@ export default function SkillsList() {
       const res = await fetch(`/api/user/skills?skillName=${skill.name}`, {
         method: "DELETE",
       });
-      const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message);
-
-      alert("Skill deleted successfully");
+      if (res.status === 204) {
+        alert("Successfully deleted skill");
+      } else {
+        const data = await res.json();
+        throw new Error(data.message);
+      }
 
       const removedSkills: ISkills[] = skills.filter(
         (s) => s.name !== skill.name

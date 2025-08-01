@@ -79,14 +79,14 @@ export default function UserList({ user }: { user: User | null }) {
     try {
       const res = await fetch("/api/user", { method: "DELETE" });
 
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message);
+      if (res.status === 204) {
+        alert("Successfully deleted user");
+      } else {
+        const data = await res.json();
+        throw new Error(data.message);
+      }
 
       setIsLoggedIn(false);
-
-      alert("User successfully deleted");
-
       router.push("/user/login");
     } catch (err) {
       const error = err as Error;

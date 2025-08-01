@@ -49,13 +49,12 @@ export default function DocumentsList({ user }: { user: User | null }) {
         method: "DELETE",
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
+      if (res.status === 204) {
+        alert("Successfully deleted document");
+      } else {
+        const data = await res.json();
         throw new Error(data.message);
       }
-
-      alert("Successfully deleted document");
 
       // add code to change the state variables necessary
       const documentValues = Object.values(documents);

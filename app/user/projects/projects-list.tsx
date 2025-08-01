@@ -44,10 +44,13 @@ export default function ProjectsList() {
       res = await fetch(`/api/user/projects?projectID=${project.id}`, {
         method: "DELETE",
       });
-      data = await res.json();
 
-      if (!res.ok) throw new Error(data.message);
-      alert("Project deleted");
+      if (res.status === 204) {
+        alert("Successfully deleted project");
+      } else {
+        const data = await res.json();
+        throw new Error(data.message);
+      }
 
       const removedProjects: IProject[] = projects.filter(
         (p) => p.id !== project.id

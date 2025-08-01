@@ -1,11 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Box, Button, Table, TableContainer, TableHead, TableRow, Paper, TableCell, TableBody } from "@mui/material";
+import {
+  Box,
+  Button,
+  Table,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TableCell,
+  TableBody,
+} from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ICourse } from "@/app/interfaces/ICourse";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function ExperienceList() {
   const router = useRouter();
@@ -47,15 +57,19 @@ export default function ExperienceList() {
           method: "DELETE",
         }
       );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+
+      if (res.status === 204) {
+        alert("Successfully deleted course");
+      } else {
+        const data = await res.json();
+        throw new Error(data.message);
+      }
 
       const removedCourses: ICourse[] = courses.filter(
         (c) => c.name !== course.name
       );
 
       setCourses(removedCourses);
-      alert(data.message);
     } catch (err) {
       const error = err as Error;
       console.error(err);
@@ -69,21 +83,47 @@ export default function ExperienceList() {
         <Table size="small" aria-label="Course Table">
           <TableHead>
             <TableRow>
-              <TableCell><strong>Name</strong></TableCell>
-              <TableCell><strong>Grade</strong></TableCell>
-              <TableCell><strong>Description</strong></TableCell>
-              <TableCell><strong>Edit</strong></TableCell>
-              <TableCell><strong>Delete</strong></TableCell>
+              <TableCell>
+                <strong>Name</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Grade</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Description</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Edit</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Delete</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {courses.map((row, i) => (
-              <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell component="th" scope="row" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
+              <TableRow
+                key={i}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell
+                  component="th"
+                  scope="row"
+                  sx={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    maxWidth: 200,
+                  }}
+                >
                   {row.name}
                 </TableCell>
-                <TableCell align="left">{row.grade.length > 0 ? row.grade : "-"}</TableCell>
-                <TableCell align="left">{row.description.length > 0 ? row.description : "-"}</TableCell>
+                <TableCell align="left">
+                  {row.grade.length > 0 ? row.grade : "-"}
+                </TableCell>
+                <TableCell align="left">
+                  {row.description.length > 0 ? row.description : "-"}
+                </TableCell>
                 <TableCell align="left">
                   <Button
                     type="submit"
