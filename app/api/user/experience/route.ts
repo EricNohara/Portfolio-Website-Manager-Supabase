@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { IExperience, IUserExperience } from "@/app/interfaces/IExperience";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
-export async function GET(req: NextRequest): Promise<NextResponse> {
+export async function GET(_req: NextRequest): Promise<NextResponse> {
   try {
     const { user, supabase, response } = await getAuthenticatedUser();
     if (!user) return response;
