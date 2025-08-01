@@ -9,7 +9,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     const limit = req.nextUrl.searchParams.get("limit");
     const projectID = req.nextUrl.searchParams.get("projectID");
-    const count = req.nextUrl.searchParams.get("count");
 
     if (limit && projectID) {
       return NextResponse.json(
@@ -58,11 +57,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     if (error) throw error;
 
-    if (count) {
-      return NextResponse.json({ count: data.length }, { status: 200 });
-    } else {
-      return NextResponse.json(data, { status: 200 });
-    }
+    return NextResponse.json(data, { status: 200 });
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
