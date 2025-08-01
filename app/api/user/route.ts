@@ -35,12 +35,10 @@ export async function GET(_req: NextRequest): Promise<NextResponse> {
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    // authenticate input
-    const userData: IUser = await req.json();
-
-    // authenticate user
     const { user, supabase, response } = await getAuthenticatedUser();
     if (!user) return response;
+
+    const userData: IUser = await req.json();
 
     const { error } = await supabase
       .from("users")
@@ -65,12 +63,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
-    // authenticate input
-    const userData = await req.json();
-
-    // authenticate user
     const { user, supabase, response } = await getAuthenticatedUser();
     if (!user) return response;
+
+    const userData: IUser = await req.json();
 
     const { error } = await supabase
       .from("users")
@@ -144,7 +140,7 @@ export async function DELETE(_req: NextRequest): Promise<NextResponse> {
 
     if (error) throw error;
 
-    return NextResponse.json({ status: 204 });
+    return NextResponse.json(null, { status: 204 });
   } catch (err) {
     const error = err as Error;
     console.error(error.message);

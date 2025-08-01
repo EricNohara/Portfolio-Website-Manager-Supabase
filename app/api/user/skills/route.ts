@@ -46,14 +46,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
+
     // validate body
     const sentSkill: ISkillsInput = await req.json();
     const skillValidationResponse = validateSkill(sentSkill);
     if (skillValidationResponse) return skillValidationResponse;
-
-    // validate user
-    const { user, supabase, response } = await getAuthenticatedUser();
-    if (!user) return response;
 
     const skillData: ISkills = {
       ...sentSkill,
@@ -80,6 +79,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
+
     // validate input
     const skillName = req.nextUrl.searchParams.get("skillName");
 
@@ -90,10 +92,6 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // validate user
-    const { user, supabase, response } = await getAuthenticatedUser();
-    if (!user) return response;
-
     const { error } = await supabase
       .from("skills")
       .delete()
@@ -102,7 +100,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 
     if (error) throw error;
 
-    return NextResponse.json({ status: 204 });
+    return NextResponse.json(null, { status: 204 });
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
@@ -115,6 +113,9 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 
 export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
+
     // validate body
     const sentData = await req.json();
     const skillName = sentData.skillName;
@@ -124,10 +125,6 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
     const updatedSkill: ISkillsInput = sentData.updatedSkill;
     const skillValidationResponse = validateSkill(updatedSkill);
     if (skillValidationResponse) return skillValidationResponse;
-
-    // validate user
-    const { user, supabase, response } = await getAuthenticatedUser();
-    if (!user) return response;
 
     const skillData: ISkills = {
       ...updatedSkill,

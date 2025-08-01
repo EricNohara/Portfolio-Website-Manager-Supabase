@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { IExperience, IUserExperience } from "@/app/interfaces/IExperience";
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const count = req.nextUrl.searchParams.get("count");
 
@@ -30,28 +23,28 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const updatedExperience: IExperience = await req.json();
 
-    if (!updatedExperience) throw new Error("No data provided");
-
-    if (!updatedExperience.company || !updatedExperience.job_title)
-      throw new Error("Invalid data");
+    if (
+      !updatedExperience ||
+      !updatedExperience.company ||
+      !updatedExperience.job_title
+    ) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+    }
 
     const experienceData: IUserExperience = {
       ...updatedExperience,
@@ -66,32 +59,28 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Successfully added work experience" },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "User not signed in." },
-        { status: 404 }
-      );
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const company = req.nextUrl.searchParams.get("company");
     const job_title = req.nextUrl.searchParams.get("job_title");
-    if (!company || !job_title) throw new Error("Invalid inputs");
+    if (!company || !job_title) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+    }
 
     const { error } = await supabase
       .from("work_experiences")
@@ -102,27 +91,21 @@ export async function DELETE(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(
-      { message: "Successfully deleted work experience" },
-      { status: 200 }
-    );
+    return NextResponse.json(null, { status: 204 });
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const {
       prevCompany,
@@ -134,15 +117,15 @@ export async function PUT(req: NextRequest) {
       updatedExperience: IExperience;
     } = await req.json();
 
-    if (!updatedExperience) throw new Error("Missing data");
-
     if (
+      !updatedExperience ||
       !prevCompany ||
       !prevJob ||
       !updatedExperience.company ||
       !updatedExperience.job_title
-    )
-      throw new Error("Invalid data");
+    ) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+    }
 
     const experienceData: IUserExperience = {
       ...updatedExperience,
@@ -164,6 +147,10 @@ export async function PUT(req: NextRequest) {
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

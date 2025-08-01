@@ -125,7 +125,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 
     if (error) throw error;
 
-    return NextResponse.json({ status: 204 });
+    return NextResponse.json(null, { status: 204 });
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
