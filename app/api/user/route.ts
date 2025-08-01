@@ -3,21 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import IUser from "@/app/interfaces/IUser";
 import { IProject } from "@/app/interfaces/IProject";
 import parseURL from "@/utils/general/parseURL";
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
 export async function GET(_req: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "User not authenticated" },
-        { status: 401 }
-      );
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const { data, error } = await supabase
       .from("users")
@@ -35,18 +26,21 @@ export async function GET(_req: NextRequest) {
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    // authenticate input
     const userData: IUser = await req.json();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // authenticate user
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const { error } = await supabase
       .from("users")
@@ -62,18 +56,21 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(req: NextRequest) {
   try {
-    const supabase = await createClient();
+    // authenticate input
     const userData = await req.json();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // authenticate user
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const { error } = await supabase
       .from("users")
@@ -86,7 +83,10 @@ export async function PUT(req: NextRequest) {
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -95,18 +95,9 @@ export async function DELETE(_req: NextRequest) {
   const serviceRoleSupabase = createServiceRoleClient();
 
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "User not signed in." },
-        { status: 404 }
-      );
-    }
+    // authenticate user
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     // delete all items in storage associated with the user
     const publicURLs = [];
@@ -116,9 +107,7 @@ export async function DELETE(_req: NextRequest) {
       .select()
       .eq("user_id", user.id);
 
-    console.log(projectError);
-
-    if (projectError) throw new Error(projectError.message);
+    if (projectError) throw projectError;
 
     projectData?.forEach((project: IProject) => {
       if (project.thumbnail_url && project.thumbnail_url !== "") {
@@ -132,7 +121,7 @@ export async function DELETE(_req: NextRequest) {
       .eq("id", user.id)
       .single();
 
-    if (userError) throw new Error(userError.message);
+    if (userError) userError;
 
     if (userData.portrait_url && userData.portrait_url !== null)
       publicURLs.push(userData.portrait_url);
@@ -155,13 +144,13 @@ export async function DELETE(_req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(
-      { message: "User successfully deleted" },
-      { status: 200 }
-    );
+    return NextResponse.json({ status: 204 });
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
-    return NextResponse.json({ message: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

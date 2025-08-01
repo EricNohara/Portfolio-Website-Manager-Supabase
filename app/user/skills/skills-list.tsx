@@ -3,9 +3,19 @@
 import { useState, useEffect } from "react";
 import { ISkills } from "@/app/interfaces/ISkills";
 import { useRouter } from "next/navigation";
-import { Box, Button, Table, TableContainer, TableHead, TableRow, Paper, TableCell, TableBody } from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import {
+  Box,
+  Button,
+  Table,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TableCell,
+  TableBody,
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function SkillsList() {
   const router = useRouter();
@@ -37,7 +47,7 @@ export default function SkillsList() {
 
       if (!res.ok) throw new Error(data.message);
 
-      alert(data.message);
+      alert("Skill deleted successfully");
 
       const removedSkills: ISkills[] = skills.filter(
         (s) => s.name !== skill.name
@@ -57,21 +67,47 @@ export default function SkillsList() {
         <Table size="small" aria-label="Course Table">
           <TableHead>
             <TableRow>
-              <TableCell><strong>Name</strong></TableCell>
-              <TableCell><strong>Proficiency</strong></TableCell>
-              <TableCell><strong>Years of Experience</strong></TableCell>
-              <TableCell><strong>Edit</strong></TableCell>
-              <TableCell><strong>Delete</strong></TableCell>
+              <TableCell>
+                <strong>Name</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Proficiency</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Years of Experience</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Edit</strong>
+              </TableCell>
+              <TableCell>
+                <strong>Delete</strong>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {skills.map((row, i) => (
-              <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell component="th" scope="row" sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 200 }}>
+              <TableRow
+                key={i}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell
+                  component="th"
+                  scope="row"
+                  sx={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    maxWidth: 200,
+                  }}
+                >
                   {row.name}
                 </TableCell>
-                <TableCell align="left">{row.proficiency ? row.proficiency : "-"}</TableCell>
-                <TableCell align="left">{row.years_of_experience ? row.years_of_experience : "-"}</TableCell>
+                <TableCell align="left">
+                  {row.proficiency ? row.proficiency : "-"}
+                </TableCell>
+                <TableCell align="left">
+                  {row.years_of_experience ? row.years_of_experience : "-"}
+                </TableCell>
                 <TableCell align="left">
                   <Button
                     type="submit"
