@@ -118,7 +118,7 @@ export default function UserList({ user }: { user: User | null }) {
 
       setIsLoggedIn(false);
 
-      alert(data.message);
+      alert("User successfully deleted");
 
       router.push("/user/login");
     } catch (err) {

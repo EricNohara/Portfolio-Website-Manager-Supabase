@@ -106,6 +106,7 @@ No known issues.
 - Code cleanup + surface level testing
 - Add unit/integration testing
 - UI/UX update
+- Add search functionality to easily find fields to view/edit
 - Support more languages through new libraries (Python, Java, C#, etc.)
 - Documentation page for API + code integrations
 - Rename application

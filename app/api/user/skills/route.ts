@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { ISkills, ISkillsInput } from "@/app/interfaces/ISkills";
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const skillName = req.nextUrl.searchParams.get("skillName");
     const count = req.nextUrl.searchParams.get("count");
@@ -43,39 +36,24 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
-
+    // validate body
     const sentSkill: ISkillsInput = await req.json();
+    const skillValidationResponse = validateSkill(sentSkill);
+    if (skillValidationResponse) return skillValidationResponse;
 
-    if (!sentSkill || !sentSkill.name) throw new Error("Missing data");
-
-    if (
-      sentSkill.years_of_experience &&
-      (sentSkill.years_of_experience < 0 || sentSkill.years_of_experience > 100)
-    ) {
-      throw new Error("Invalid value for years of experience");
-    }
-
-    if (
-      sentSkill.proficiency &&
-      (sentSkill.proficiency < 0 || sentSkill.proficiency > 10)
-    ) {
-      throw new Error("Invalid value for skill proficiency");
-    }
+    // validate user
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const skillData: ISkills = {
       ...sentSkill,
@@ -87,33 +65,34 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json(
-      { message: "Successfully added skill" },
-      { status: 200 }
+      { message: "Successfully created skill" },
+      { status: 201 }
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function DELETE(req: NextRequest) {
-  const skillName = req.nextUrl.searchParams.get("skillName");
-
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
-    if (!skillName) throw new Error("Invalid inputs");
+    // validate input
+    const skillName = req.nextUrl.searchParams.get("skillName");
 
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!skillName) {
       return NextResponse.json(
-        { message: "User not signed in." },
-        { status: 404 }
+        { message: "Invalid skill name" },
+        { status: 400 }
       );
     }
+
+    // validate user
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const { error } = await supabase
       .from("skills")
@@ -123,47 +102,32 @@ export async function DELETE(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(
-      { message: "Successfully deleted skill" },
-      { status: 200 }
-    );
+    return NextResponse.json({ status: 204 });
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
-
+    // validate body
     const sentData = await req.json();
     const skillName = sentData.skillName;
+    if (!skillName)
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+
     const updatedSkill: ISkillsInput = sentData.updatedSkill;
+    const skillValidationResponse = validateSkill(updatedSkill);
+    if (skillValidationResponse) return skillValidationResponse;
 
-    if (!updatedSkill || !skillName || !updatedSkill.name)
-      throw new Error("Missing data");
-
-    if (
-      updatedSkill.years_of_experience &&
-      (updatedSkill.years_of_experience < 0 ||
-        updatedSkill.years_of_experience > 100)
-    )
-      throw new Error("Invalid years of experience value");
-
-    if (
-      updatedSkill.proficiency &&
-      (updatedSkill.proficiency < 0 || updatedSkill.proficiency > 10)
-    )
-      throw new Error("Invalid proficiency value");
+    // validate user
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const skillData: ISkills = {
       ...updatedSkill,
@@ -184,6 +148,43 @@ export async function PUT(req: NextRequest) {
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// helper function to validate a skill input
+function validateSkill(skill: ISkillsInput): NextResponse | undefined {
+  if (
+    !skill ||
+    !skill.name ||
+    typeof skill.name !== "string" ||
+    skill.name.trim() === ""
+  )
+    return NextResponse.json({ message: "Missing data" }, { status: 400 });
+
+  if (
+    skill.years_of_experience &&
+    typeof skill.years_of_experience === "number" &&
+    (skill.years_of_experience < 0 || skill.years_of_experience > 100)
+  ) {
+    return NextResponse.json(
+      { message: "Years of experience must be between 0 and 100" },
+      { status: 400 }
+    );
+  }
+
+  if (
+    skill.proficiency &&
+    typeof skill.proficiency === "number" &&
+    (skill.proficiency < 0 || skill.proficiency > 10)
+  ) {
+    return NextResponse.json(
+      { message: "Skill proficiency must be between 0 and 10" },
+      { status: 400 }
+    );
   }
 }
