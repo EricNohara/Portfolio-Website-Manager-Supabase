@@ -47,13 +47,10 @@ export default function UserList({ user }: { user: User | null }) {
 
   const getProfile = useCallback(async () => {
     try {
-      let res, data;
-      res = await fetch("/api/user");
-      data = await res.json();
+      const res = await fetch("/api/user");
+      const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.message);
-      }
+      if (!res.ok) throw new Error(data.message);
 
       setUserData(data.userData);
     } catch (error) {
