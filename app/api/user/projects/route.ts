@@ -1,31 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { IProjectInput } from "@/app/interfaces/IProject";
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const limit = req.nextUrl.searchParams.get("limit");
     const projectID = req.nextUrl.searchParams.get("projectID");
     const count = req.nextUrl.searchParams.get("count");
 
-    if (limit && projectID)
-      throw new Error("Limit and projectID cannot both be specified");
+    if (limit && projectID) {
+      return NextResponse.json(
+        { message: "Limit and projectID cannot both be specified" },
+        { status: 400 }
+      );
+    }
 
     if (limit) {
       const limitNum = parseInt(limit);
 
-      if (limitNum <= 0)
-        throw new Error("Limit parameter must be greater than 0");
+      if (isNaN(limitNum) || limitNum <= 0) {
+        return NextResponse.json(
+          { message: "Limit parameter must be greater than 0" },
+          { status: 400 }
+        );
+      }
 
       const { data, error } = await supabase
         .from("projects")
@@ -64,26 +65,24 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const sentProject: IProjectInput = await req.json();
 
-    if (!sentProject || !sentProject.name || !sentProject.description)
-      throw new Error("Invalid data provided");
+    if (!sentProject || !sentProject.name || !sentProject.description) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+    }
 
     const projectData = {
       ...sentProject,
@@ -95,32 +94,28 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json(
-      { message: "Successfully added project" },
-      { status: 200 }
+      { message: "Successfully created project" },
+      { status: 201 }
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "User not signed in." },
-        { status: 404 }
-      );
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const projectID = req.nextUrl.searchParams.get("projectID");
-    if (!projectID) throw new Error("Invalid input");
+    if (!projectID) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+    }
 
     const { error } = await supabase
       .from("projects")
@@ -130,27 +125,21 @@ export async function DELETE(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(
-      { message: "Successfully deleted project" },
-      { status: 200 }
-    );
+    return NextResponse.json({ status: 204 });
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const {
       prevProjectID,
@@ -165,8 +154,9 @@ export async function PUT(req: NextRequest) {
       !prevProjectID ||
       !updatedProject.name ||
       !updatedProject.description
-    )
-      throw new Error("Missing data");
+    ) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+    }
 
     const projectData = {
       ...updatedProject,
@@ -187,6 +177,10 @@ export async function PUT(req: NextRequest) {
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

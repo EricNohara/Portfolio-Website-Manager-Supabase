@@ -47,7 +47,7 @@ export default function ProjectsList() {
       data = await res.json();
 
       if (!res.ok) throw new Error(data.message);
-      alert(data.message);
+      alert("Project deleted");
 
       const removedProjects: IProject[] = projects.filter(
         (p) => p.id !== project.id

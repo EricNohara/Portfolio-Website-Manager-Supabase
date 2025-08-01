@@ -5,7 +5,7 @@ import { IProject } from "@/app/interfaces/IProject";
 import parseURL from "@/utils/general/parseURL";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
-export async function GET(_req: NextRequest) {
+export async function GET(_req: NextRequest): Promise<NextResponse> {
   try {
     const { user, supabase, response } = await getAuthenticatedUser();
     if (!user) return response;
@@ -33,7 +33,7 @@ export async function GET(_req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     // authenticate input
     const userData: IUser = await req.json();
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
     // authenticate input
     const userData = await req.json();
@@ -91,7 +91,7 @@ export async function PUT(req: NextRequest) {
 }
 
 // user only able to delete its own account and only if it is logged in
-export async function DELETE(_req: NextRequest) {
+export async function DELETE(_req: NextRequest): Promise<NextResponse> {
   const serviceRoleSupabase = createServiceRoleClient();
 
   try {
