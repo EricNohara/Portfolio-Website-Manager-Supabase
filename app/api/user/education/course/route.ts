@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { ICourseInput } from "@/app/interfaces/ICourse";
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
 const letterGrades = [
   "A",
@@ -21,17 +21,10 @@ const percentageGrades = Array.from({ length: 101 }, (_, i) => i.toString());
 
 const VALID_GRADES = [...letterGrades, ...otherGrades, ...percentageGrades];
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const education_id = req.nextUrl.searchParams.get("educationID");
     const courseName = req.nextUrl.searchParams.get("courseName");
@@ -71,32 +64,25 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const sentData = await req.json();
     const sentCourse: ICourseInput = sentData.course;
     const sentEducationID = sentData.educationID;
 
-    if (!sentCourse || !sentEducationID || !sentCourse.name)
-      throw new Error("Missing data");
-
-    if (sentCourse.grade && !VALID_GRADES.includes(sentCourse.grade)) {
-      throw new Error("Invalid grade format");
-    }
+    const inputValidationResponse = validateInput(sentCourse, sentEducationID);
+    if (inputValidationResponse) return inputValidationResponse;
 
     const courseData = {
       ...sentCourse,
@@ -110,32 +96,28 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Successfully added course" },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "User not signed in." },
-        { status: 404 }
-      );
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const educationID = req.nextUrl.searchParams.get("educationID");
     const courseName = req.nextUrl.searchParams.get("courseName");
-    if (!educationID || !courseName) throw new Error("Invalid inputs");
+    if (!educationID || !courseName) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+    }
 
     const { error } = await supabase
       .from("course")
@@ -146,40 +128,29 @@ export async function DELETE(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(
-      { message: "Successfully deleted course" },
-      { status: 200 }
-    );
+    return NextResponse.json(null, { status: 204 });
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const sentData = await req.json();
     const educationID = sentData.educationID;
     const courseName = sentData.courseName;
     const updatedCourse: ICourseInput = sentData.course;
 
-    if (
-      !updatedCourse ||
-      !educationID ||
-      !updatedCourse.name ||
-      (updatedCourse.grade && !VALID_GRADES.includes(updatedCourse.grade))
-    )
-      throw new Error("Missing data");
+    const inputValidationResponse = validateInput(updatedCourse, educationID);
+    if (inputValidationResponse) return inputValidationResponse;
 
     const courseData = {
       ...updatedCourse,
@@ -202,6 +173,26 @@ export async function PUT(req: NextRequest) {
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+function validateInput(
+  course: ICourseInput,
+  educationID: string
+): NextResponse | undefined {
+  if (!course || !educationID || !course.name) {
+    return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+  }
+
+  if (course.grade && !VALID_GRADES.includes(course.grade)) {
+    return NextResponse.json(
+      { message: "Invalid grade input" },
+      { status: 400 }
+    );
   }
 }

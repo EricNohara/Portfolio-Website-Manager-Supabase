@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
 import { IEducationInput } from "@/app/interfaces/IEducation";
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const id = req.nextUrl.searchParams.get("id");
     const count = req.nextUrl.searchParams.get("count");
@@ -43,32 +36,23 @@ export async function GET(req: NextRequest) {
     }
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const sentEducation: IEducationInput = await req.json();
 
-    if (!sentEducation) throw new Error("No data provided");
-
-    if (sentEducation.gpa && sentEducation.gpa > 4) {
-      throw new Error("GPA cannot be greater than 4.000");
-    }
-
-    if (!sentEducation.institution || !sentEducation.degree)
-      throw new Error("Invalid data");
+    const educationValidationResponse = validateEducation(sentEducation);
+    if (educationValidationResponse) return educationValidationResponse;
 
     const educationData = {
       ...sentEducation,
@@ -81,31 +65,27 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Successfully added education" },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json(
-        { message: "User not signed in." },
-        { status: 404 }
-      );
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const id = req.nextUrl.searchParams.get("id");
-    if (!id) throw new Error("Invalid inputs");
+    if (!id) {
+      return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+    }
 
     const { error } = await supabase
       .from("education")
@@ -115,27 +95,21 @@ export async function DELETE(req: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json(
-      { message: "Successfully deleted education" },
-      { status: 200 }
-    );
+    return NextResponse.json(null, { status: 204 });
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
-export async function PUT(req: NextRequest) {
+export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const {
       id,
@@ -145,10 +119,8 @@ export async function PUT(req: NextRequest) {
       updatedEducation: IEducationInput;
     } = await req.json();
 
-    if (!updatedEducation) throw new Error("Missing data");
-
-    if (!id || !updatedEducation.institution || !updatedEducation.degree)
-      throw new Error("Invalid data");
+    const educationValidationResponse = validateEducation(updatedEducation);
+    if (educationValidationResponse) return educationValidationResponse;
 
     const educationData = {
       ...updatedEducation,
@@ -169,6 +141,25 @@ export async function PUT(req: NextRequest) {
     );
   } catch (err) {
     const error = err as Error;
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+function validateEducation(
+  education: IEducationInput
+): NextResponse | undefined {
+  if (!education || !education.institution || !education.degree) {
+    return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+  }
+
+  if (
+    typeof education.gpa === "number" &&
+    (education.gpa > 4 || education.gpa < 0)
+  ) {
+    return NextResponse.json({ message: "Invalid GPA value" }, { status: 400 });
   }
 }
