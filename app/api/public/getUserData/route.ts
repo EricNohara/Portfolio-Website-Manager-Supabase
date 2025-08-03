@@ -12,15 +12,15 @@ export async function GET(req: NextRequest) {
     const apiKey = req.headers.get("Authorization")?.split(" ")[1];
     const userEmail = req.headers.get("User-Email");
 
-    if (!apiKey)
-      throw new Error("Requested data requires a valid private API key");
-
-    if (!userEmail)
-      throw new Error("Requested data requires a valid user email");
+    if (!apiKey || !userEmail) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
     // decrypt the api key
     const decryptedKey = decrypt(apiKey);
-    if (!decryptedKey) throw new Error("Invalid private API key");
+    if (!decryptedKey || typeof decryptedKey !== "string") {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
     // retrieve the hashed passkey
     const { data, error } = await supabase
@@ -30,16 +30,28 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
-    if (!data) throw new Error("Inputted email has no private API key");
+    if (!data) {
+      return NextResponse.json(
+        { message: "User data not found" },
+        { status: 404 }
+      );
+    }
 
     // validate user's key
     const isValid = await validateKey(decryptedKey, data[0].hashed_key);
 
-    if (!isValid) throw new Error("Invalid private API key");
+    if (!isValid) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
 
     const userId = data[0].user_id;
 
-    if (!userId) throw new Error("Error retrieiving user ID");
+    if (!userId) {
+      return NextResponse.json(
+        { message: "User id not found" },
+        { status: 404 }
+      );
+    }
 
     // get and clean information to add to the userInfo super object that is returned to the user
     const { data: userData, error: userDataError } = await supabase
@@ -145,12 +157,11 @@ export async function GET(req: NextRequest) {
         },
       }
     );
-  } catch (err) {
-    const error = err as Error;
+  } catch (_err) {
     return NextResponse.json(
-      { message: error.message },
+      { message: "Internal server error" },
       {
-        status: 400,
+        status: 500,
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET,OPTIONS",
