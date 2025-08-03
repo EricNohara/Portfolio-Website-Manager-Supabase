@@ -16,6 +16,8 @@ Table users {
   transcript_url text
   instagram_url text
   facebook_url text
+  bio text
+  current_position text
 }
 
 Table projects {
@@ -79,7 +81,7 @@ Table work_experiences {
   user_id uuid [ref: > users.id]
 
   indexes {
-    (company, job_title, user_id) [pk] // composite primary key for uniqueness
+    (company, job_title, user_id) [pk]
   }
 }
 

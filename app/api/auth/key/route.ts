@@ -42,7 +42,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-export async function POST(_req: NextRequest) {
+export async function POST(_req: NextRequest): Promise<NextResponse> {
   try {
     const { user, supabase, response } = await getAuthenticatedUser();
     if (!user) return response;

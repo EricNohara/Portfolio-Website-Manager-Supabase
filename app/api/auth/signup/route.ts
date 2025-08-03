@@ -5,8 +5,7 @@ import { encrypt } from "@/utils/auth/encrypt";
 import { generateAPIKey, hashKey } from "@/utils/auth/hash";
 import { createClient } from "@/utils/supabase/server";
 
-// route to add user to the auth table and generate, encrypt, and store a private API key for the user
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const supabase = await createClient();
 
@@ -14,19 +13,16 @@ export async function POST(req: NextRequest) {
       await req.json();
 
     if (!email || !password) {
-      throw new Error("Email or password missing");
+      return NextResponse.json(
+        { message: "Email or password missing" },
+        { status: 400 }
+      );
     }
 
-    const data = {
-      email: email,
-      password: password,
-    };
+    const data = { email, password };
 
     const { error } = await supabase.auth.signUp(data);
-
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     const {
       data: { user },
@@ -61,11 +57,14 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Sign up successful" },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (err) {
     const error = err as Error;
-    console.error(err);
-    return NextResponse.json({ message: error.message }, { status: 400 });
+    console.error(error.message);
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
