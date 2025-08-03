@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ISkills } from "@/app/interfaces/ISkills";
-import { useRouter } from "next/navigation";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
@@ -14,8 +13,10 @@ import {
   TableCell,
   TableBody,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
+import { ISkills } from "@/app/interfaces/ISkills";
 
 export default function SkillsList() {
   const router = useRouter();

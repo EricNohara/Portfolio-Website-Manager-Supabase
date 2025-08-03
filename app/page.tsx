@@ -1,10 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useAuth } from "./context/AuthProvider";
-import { useEffect } from "react";
 import { Typography, Container, Button, Box } from "@mui/material";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+import { useAuth } from "./context/AuthProvider";
 
 export default function Home() {
   const { isLoggedIn } = useAuth();

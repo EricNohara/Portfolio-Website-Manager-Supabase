@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { type User } from "@supabase/supabase-js";
 import { Button, TextField, Link } from "@mui/material";
+import { type User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
 import IUser from "@/app/interfaces/IUser";
 
 export default function EditUserForm({ user }: { user: User | null }) {

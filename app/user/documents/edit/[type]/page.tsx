@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
 import { Container, Box, Typography } from "@mui/material";
-import EditDocumentForm from "./edit-document-form";
 import { useParams } from "next/navigation";
+import React from "react";
+
+import EditDocumentForm from "./edit-document-form";
+
 
 export default function Page() {
   const params = useParams();

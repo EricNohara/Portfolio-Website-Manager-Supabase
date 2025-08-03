@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServiceRoleClient } from "@/utils/supabase/server";
+
+import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
 import { decrypt } from "@/utils/auth/encrypt";
 import { validateKey } from "@/utils/auth/hash";
-import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
+import { createServiceRoleClient } from "@/utils/supabase/server";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const supabase = await createServiceRoleClient();
 

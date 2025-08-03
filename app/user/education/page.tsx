@@ -2,6 +2,7 @@
 
 import { Typography, Button, Container } from "@mui/material";
 import { useRouter } from "next/navigation";
+
 import EducationList from "./education-list";
 
 export default function WorkExperiencePage() {

@@ -1,6 +1,7 @@
 import { Typography, Link, Container } from "@mui/material";
-import EditEducationForm from "./edit-education-form";
 import { Suspense } from "react";
+
+import EditEducationForm from "./edit-education-form";
 
 export default function EditExperiencePage() {
   return (

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { IEducationInput } from "@/app/interfaces/IEducation";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 

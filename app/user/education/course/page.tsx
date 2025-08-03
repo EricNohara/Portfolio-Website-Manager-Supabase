@@ -2,8 +2,9 @@
 
 import { Typography, Button, Container, Link } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
-import CourseList from "./course-list";
 import { Suspense } from "react";
+
+import CourseList from "./course-list";
 
 function CoursePageWrapper() {
   const router = useRouter();

@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
 import { Button, TextField, Link } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 import IUser from "@/app/interfaces/IUser";
 
 export default function CreateUserForm() {

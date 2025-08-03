@@ -1,9 +1,11 @@
 "use client";
 
 import { Container } from "@mui/material";
-import UserList from "./user-list";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import UserList from "./user-list";
+
 
 export default function AccountPage() {
   const router = useRouter();

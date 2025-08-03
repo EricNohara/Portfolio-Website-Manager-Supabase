@@ -1,9 +1,10 @@
-import { createServiceRoleClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
-import IUser from "@/app/interfaces/IUser";
+
 import { IProject } from "@/app/interfaces/IProject";
-import parseURL from "@/utils/general/parseURL";
+import IUser from "@/app/interfaces/IUser";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
+import parseURL from "@/utils/general/parseURL";
+import { createServiceRoleClient } from "@/utils/supabase/server";
 
 export async function GET(_req: NextRequest): Promise<NextResponse> {
   try {

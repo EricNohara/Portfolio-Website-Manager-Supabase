@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServiceRoleClient } from "@/utils/supabase/server";
-import parseURL from "@/utils/general/parseURL";
+
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
+import parseURL from "@/utils/general/parseURL";
+import { createServiceRoleClient } from "@/utils/supabase/server";
 
 export const config = {
   api: {

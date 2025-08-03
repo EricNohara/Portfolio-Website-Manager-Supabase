@@ -1,7 +1,7 @@
-import { ISkillsInput } from "./ISkills";
+import { ICourseInput } from "./ICourse";
 import { IExperience } from "./IExperience";
 import { IProjectInput } from "./IProject";
-import { ICourseInput } from "./ICourse";
+import { ISkillsInput } from "./ISkills";
 import IUser from "./IUser";
 
 export interface IUserInfo extends IUser {

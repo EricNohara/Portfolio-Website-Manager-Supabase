@@ -1,8 +1,9 @@
 "use client";
 
+import { Container, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Container, Typography } from "@mui/material";
+
 import DocumentsList from "./documents-list";
 
 export default function DocumentsPage() {

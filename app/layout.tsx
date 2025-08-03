@@ -1,10 +1,11 @@
 import "./globals.css";
-import Navigation from "./navigation";
+import { Container } from "@mui/material";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 import { AuthProvider } from "./context/AuthProvider";
 import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
-import { Container } from "@mui/material";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next";
+import Navigation from "./navigation";
 
 export const metadata = {
   title: "Portfolio Manager",

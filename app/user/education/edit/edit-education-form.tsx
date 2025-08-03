@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button, TextField, Box } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
+
 import { IEducationInput } from "@/app/interfaces/IEducation";
 
 export default function EditEducationForm() {

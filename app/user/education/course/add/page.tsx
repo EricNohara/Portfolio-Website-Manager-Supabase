@@ -1,9 +1,10 @@
 "use client";
 
 import { Typography, Link, Container } from "@mui/material";
-import AddCourseForm from "./add-course-form";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+
+import AddCourseForm from "./add-course-form";
 
 function AddCoursePageWrapper() {
   const searchParams = useSearchParams();

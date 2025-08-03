@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { Button, TextField } from "@mui/material";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+
 import { ICourseInput } from "@/app/interfaces/ICourse";
 
 export default function AddCourseForm() {

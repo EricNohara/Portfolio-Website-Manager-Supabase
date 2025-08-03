@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { IProjectInput } from "@/app/interfaces/IProject";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 

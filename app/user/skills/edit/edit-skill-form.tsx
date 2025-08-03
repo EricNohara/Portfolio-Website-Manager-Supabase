@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button, TextField } from "@mui/material";
-import { ISkillsInput } from "@/app/interfaces/ISkills";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
+import { ISkillsInput } from "@/app/interfaces/ISkills";
+
 
 export default function EditSkillsForm() {
   const router = useRouter();

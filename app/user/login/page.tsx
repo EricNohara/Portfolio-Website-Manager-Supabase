@@ -1,6 +1,7 @@
-import LoginForm from "./login-form";
-import React from "react";
 import { Container, Typography } from "@mui/material";
+import React from "react";
+
+import LoginForm from "./login-form";
 
 export default function LoginUserPage() {
   return (

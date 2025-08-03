@@ -1,5 +1,6 @@
-import CreateUserForm from "./create-user-form";
 import { Typography, Container } from "@mui/material";
+
+import CreateUserForm from "./create-user-form";
 
 export default async function CreateUserPage() {
   return (

@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button, TextField } from "@mui/material";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
 import { ICourseInput } from "@/app/interfaces/ICourse";
 
 export default function EditCoursePage() {

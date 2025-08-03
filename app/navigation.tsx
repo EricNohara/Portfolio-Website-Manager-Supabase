@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AppBar, Toolbar, Typography, Button, Drawer } from "@mui/material";
-import { useAuth } from "./context/AuthProvider";
-import { useRouter } from "next/navigation";
-import { useMediaQuery } from "@mui/material";
 import { Menu } from "@mui/icons-material";
+import { AppBar, Toolbar, Typography, Button, Drawer } from "@mui/material";
+import { useMediaQuery } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+import { useAuth } from "./context/AuthProvider";
+
 
 export default function Navigation() {
   const router = useRouter();

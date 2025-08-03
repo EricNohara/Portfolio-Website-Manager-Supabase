@@ -3,6 +3,7 @@
 import { Button, Link, Box, Avatar, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
 import type { User } from "@supabase/supabase-js";
 
 interface IUserDocuments {

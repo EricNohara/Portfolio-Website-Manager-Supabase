@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { IExperience, IUserExperience } from "@/app/interfaces/IExperience";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 

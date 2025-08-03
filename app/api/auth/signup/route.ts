@@ -1,8 +1,9 @@
-import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+
 import IApiKey from "@/app/interfaces/IApiKey";
 import { encrypt } from "@/utils/auth/encrypt";
 import { generateAPIKey, hashKey } from "@/utils/auth/hash";
+import { createClient } from "@/utils/supabase/server";
 
 // route to add user to the auth table and generate, encrypt, and store a private API key for the user
 export async function POST(req: NextRequest) {

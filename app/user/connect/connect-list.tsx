@@ -1,6 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import CloseIcon from "@mui/icons-material/Close";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
   Snackbar,
   Button,
@@ -9,14 +13,10 @@ import {
   Divider,
   Typography,
 } from "@mui/material";
-import * as React from "react";
-import { SnackbarCloseReason } from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { SnackbarCloseReason } from "@mui/material/Snackbar";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import { CopyBlock, dracula } from "react-code-blocks";
 
 export default function ConnectList() {

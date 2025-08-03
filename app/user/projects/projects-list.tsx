@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { IProject } from "@/app/interfaces/IProject";
 import { Box, Button, Typography, Link, Collapse, Paper } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
+import { IProject } from "@/app/interfaces/IProject";
 import formatDate from "@/utils/general/formatDate";
 
 export default function ProjectsList() {

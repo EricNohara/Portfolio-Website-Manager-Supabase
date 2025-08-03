@@ -1,9 +1,10 @@
 "use client";
 
 import { Typography, Container } from "@mui/material";
-import EditUserForm from "./edit-user-form";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+
+import EditUserForm from "./edit-user-form";
 
 export default function Account() {
   const router = useRouter();

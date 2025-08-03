@@ -1,9 +1,10 @@
 "use client";
 
 import { Typography, Link, Container } from "@mui/material";
-import EditCoursePage from "./edit-course-page";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+
+import EditCoursePage from "./edit-course-page";
 
 function EditCourseWrapper() {
   const searchParams = useSearchParams();

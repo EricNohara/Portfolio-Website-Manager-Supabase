@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
@@ -13,9 +14,10 @@ import {
   TableBody,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
 import { IEducation } from "@/app/interfaces/IEducation";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+
 
 export default function ExperienceList() {
   const router = useRouter();
