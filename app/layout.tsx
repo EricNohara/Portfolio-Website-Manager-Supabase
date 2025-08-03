@@ -8,8 +8,8 @@ import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
 import Navigation from "./navigation";
 
 export const metadata = {
-  title: "Portfolio Manager",
-  description: "Manager for portfolio website information and file storage",
+  title: "Portfolio Website Manager",
+  description: "All in one solution for portfolio website management",
 };
 
 export default function RootLayout({

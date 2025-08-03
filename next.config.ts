@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   async headers() {
     return [
       {
@@ -11,7 +10,7 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy-Report-Only",
             value: `
               default-src 'self';
-              script-src 'self' https://vercel.analytics.edge.com https://cdn.vercel-insights.com;
+              script-src 'self' 'unsafe-inline' https://vercel.analytics.edge.com https://cdn.vercel-insights.com;
               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
               img-src 'self' data: https:;
               connect-src 'self' https://vercel.analytics.edge.com https://api.vercel.com;
