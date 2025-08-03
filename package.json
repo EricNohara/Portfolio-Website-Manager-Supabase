@@ -1,5 +1,6 @@
 {
-  "name": "supabase-nextjs",
+  "name": "portfolio-website-manager",
+  "author": "Eric Nohara-LeClair",
   "version": "1.0.0",
   "private": true,
   "scripts": {
