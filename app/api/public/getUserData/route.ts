@@ -158,7 +158,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         },
       }
     );
-  } catch (_err) {
+  } catch (err) {
+    const error = err as Error;
+    console.error(error.message);
+
     return NextResponse.json(
       { message: "Internal server error" },
       {
