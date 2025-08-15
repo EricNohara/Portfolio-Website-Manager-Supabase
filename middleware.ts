@@ -6,14 +6,11 @@ const PUBLIC_PATHS = [
   "/site.webmanifest",
   "/manifest.json",
   "/robots.txt",
-  "/api/auth/authenticated",
 ];
 
 export async function middleware(request: NextRequest) {
   let path = request.nextUrl.pathname;
   path = path.replace(/\/$/, ""); // Remove trailing slash
-
-  console.log(path);
 
   if (
     PUBLIC_PATHS.includes(path) ||
