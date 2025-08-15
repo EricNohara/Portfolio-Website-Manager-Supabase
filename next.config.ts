@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
             value: `
               default-src 'self';
               script-src 'self' 'unsafe-inline' https://vercel.analytics.edge.com https://cdn.vercel-insights.com https://vercel.live;
-              style-src 'self' https://fonts.googleapis.com;
+              style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
               img-src 'self' data: https:;
               connect-src 'self' https://vercel.analytics.edge.com https://api.vercel.com;
               font-src 'self' https://fonts.gstatic.com;
