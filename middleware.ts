@@ -4,7 +4,9 @@ import { updateSession } from "@/utils/supabase/middleware";
 const PUBLIC_PATHS = [
   "/favicon.ico",
   "/site.webmanifest",
-  "/api/auth/authenticated", // your public auth check endpoint
+  "/manifest.json",
+  "/robots.txt",
+  "/api/auth/authenticated",
 ];
 
 export async function middleware(request: NextRequest) {
@@ -12,7 +14,7 @@ export async function middleware(request: NextRequest) {
 
   // Skip middleware for public paths or static files
   if (
-    PUBLIC_PATHS.includes(path) ||
+    PUBLIC_PATHS.some((publicPath) => path.startsWith(publicPath)) ||
     path.startsWith("/_next/") ||
     path.match(/\.(svg|png|jpg|jpeg|gif|webp|ico)$/)
   ) {
