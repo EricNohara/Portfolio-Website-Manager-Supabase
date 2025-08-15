@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
   console.log(path);
 
   if (
-    PUBLIC_PATHS.some((publicPath) => path.includes(publicPath)) ||
+    PUBLIC_PATHS.includes(path) ||
     path.startsWith("/_next/") ||
     path.match(/\.(svg|png|jpg|jpeg|gif|webp|ico)$/)
   ) {
