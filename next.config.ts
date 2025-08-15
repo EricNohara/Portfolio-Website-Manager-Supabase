@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
               img-src 'self' data: https:;
               connect-src 'self' https://vercel.analytics.edge.com https://api.vercel.com;
               font-src 'self' https://fonts.gstatic.com;
-              frame-src 'none';
+              frame-src https://vercel.live;
               object-src 'none';
               base-uri 'self';
               form-action 'self';
