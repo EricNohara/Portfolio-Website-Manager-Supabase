@@ -10,18 +10,19 @@ const PUBLIC_PATHS = [
 ];
 
 export async function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
+  let path = request.nextUrl.pathname;
+  path = path.replace(/\/$/, ""); // Remove trailing slash
 
-  // Skip middleware for public paths or static files
+  console.log(path);
+
   if (
-    PUBLIC_PATHS.some((publicPath) => path.startsWith(publicPath)) ||
+    PUBLIC_PATHS.some((publicPath) => path.includes(publicPath)) ||
     path.startsWith("/_next/") ||
     path.match(/\.(svg|png|jpg|jpeg|gif|webp|ico)$/)
   ) {
     return NextResponse.next();
   }
 
-  // Only run session update/auth for protected routes
   return await updateSession(request);
 }
 
