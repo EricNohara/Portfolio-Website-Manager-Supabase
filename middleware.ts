@@ -1,15 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 
+const PUBLIC_PATHS = [
+  "/favicon.ico",
+  "/site.webmanifest",
+  "/api/auth/authenticated", // your public auth check endpoint
+];
+
 export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
-  // Skip middleware for static files, icons, and the manifest
+  // Skip middleware for public paths or static files
   if (
+    PUBLIC_PATHS.includes(path) ||
     path.startsWith("/_next/") ||
-    path.startsWith("/api/auth/") || // skip your auth endpoints if public
-    path === "/favicon.ico" ||
-    path === "/site.webmanifest" ||
     path.match(/\.(svg|png|jpg|jpeg|gif|webp|ico)$/)
   ) {
     return NextResponse.next();
@@ -20,7 +24,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|site.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
-  ],
+  matcher: "/((?!_next/static|_next/image).*)", // keep matcher broad
 };
