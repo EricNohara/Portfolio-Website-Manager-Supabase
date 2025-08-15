@@ -48,7 +48,7 @@ export async function uploadThumbnail(file: File | null, bucketName: string) {
     if (!res.ok) throw new Error(data.message.message);
   } catch (err) {
     const error = err as Error;
-    console.log(err);
+    console.error(err);
     alert("Error uploading file: " + error.message);
   }
 

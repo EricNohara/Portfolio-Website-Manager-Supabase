@@ -73,8 +73,6 @@ export default function EditEducationForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log(education);
-
     if (!education.institution.trim() || !education.degree.trim()) {
       alert("Please fill out all required fields.");
       return;

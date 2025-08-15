@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 
 import { ISkillsInput } from "@/app/interfaces/ISkills";
 
-
 export default function EditSkillsForm() {
   const router = useRouter();
   const [skill, setSkill] = useState<ISkillsInput>({
@@ -73,8 +72,6 @@ export default function EditSkillsForm() {
         }),
       });
       const data = await res.json();
-
-      console.log(data.message);
 
       if (!res.ok) throw new Error(data.message);
       alert(data.message);

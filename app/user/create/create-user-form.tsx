@@ -72,7 +72,6 @@ export default function CreateUserForm() {
       alert("Successfully Created User!");
       router.push("/user");
     } catch (error) {
-      console.log(error);
       alert(error);
     }
   };

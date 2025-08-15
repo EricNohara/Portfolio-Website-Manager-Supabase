@@ -8,8 +8,8 @@ import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
 import Navigation from "./navigation";
 
 export const metadata = {
-  title: "Portfolio Manager",
-  description: "Manager for portfolio website information and file storage",
+  title: "Portfolio Website Manager",
+  description: "All in one solution for portfolio website management",
 };
 
 export default function RootLayout({
@@ -37,7 +37,11 @@ export default function RootLayout({
           sizes="16x16"
           href="/icons/favicon-16x16.png"
         />
-        <link rel="manifest" href="/site.webmanifest" />
+        <link
+          rel="manifest"
+          href="/site.webmanifest"
+          crossOrigin="use-credentials"
+        />
       </head>
       <body>
         <AuthProvider>

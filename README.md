@@ -14,6 +14,7 @@
 - [AWS Lambda Function Supabase Uptime Trigger](#aws-lambda-function-supabase-uptime-trigger)
 - [Known Issues](#known-issues)
 - [Next Steps](#next-steps)
+- [Eventual Work Items](#eventual-work-items)
 
 ## Project Description
 
@@ -104,15 +105,23 @@ No known issues.
 ## Next Steps
 
 - Code cleanup + surface level testing
-- Disable all buttons when loading
-- Add unit/integration testing
+- Security vulnerability testing and cleanup
 - UI/UX update (remove all alerts and redo the user interface)
-- Allow for other file upload types
-- Add search functionality to easily find fields to view/edit
+  - Disable all buttons when loading
+- Add unit/integration testing
 - Support more languages through new libraries (Python, Java, C#, etc.)
 - Documentation page for API + code integrations
 - Rename application
-- Add CLI
 - Add ads to website
 - Test with live users
 - Monetize
+
+## Eventual Work Items
+
+- Add search functionality to easily find fields to view/edit
+- Allow for other file upload types
+- Add AI feature for generating text for descriptions
+- Migrate backend to external application
+  - Reintegrate the web app with this external backend
+  - Create CLI
+  - Create desktop app

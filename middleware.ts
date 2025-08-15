@@ -1,21 +1,28 @@
-import { type NextRequest } from "next/server";
-
+import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 
+const PUBLIC_PATHS = [
+  "/favicon.ico",
+  "/site.webmanifest",
+  "/manifest.json",
+  "/robots.txt",
+];
+
 export async function middleware(request: NextRequest) {
-  // update user's auth session
+  let path = request.nextUrl.pathname;
+  path = path.replace(/\/$/, ""); // Remove trailing slash
+
+  if (
+    PUBLIC_PATHS.includes(path) ||
+    path.startsWith("/_next/") ||
+    path.match(/\.(svg|png|jpg|jpeg|gif|webp|ico)$/)
+  ) {
+    return NextResponse.next();
+  }
+
   return await updateSession(request);
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: "/((?!_next/static|_next/image).*)", // keep matcher broad
 };
