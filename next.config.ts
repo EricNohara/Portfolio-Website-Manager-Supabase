@@ -7,10 +7,10 @@ const nextConfig: NextConfig = {
         source: "/(.*)", // apply to all routes
         headers: [
           {
-            key: "Content-Security-Policy-Report-Only",
+            key: "Content-Security-Policy",
             value: `
               default-src 'self';
-              script-src 'self' 'unsafe-inline' https://vercel.analytics.edge.com https://cdn.vercel-insights.com;
+              script-src 'self' 'unsafe-inline' https://vercel.analytics.edge.com https://cdn.vercel-insights.com https://vercel.live;
               style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
               img-src 'self' data: https:;
               connect-src 'self' https://vercel.analytics.edge.com https://api.vercel.com;
