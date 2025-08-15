@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 
 import { useAuth } from "./context/AuthProvider";
 
-
 export default function Navigation() {
   const router = useRouter();
   const { isLoggedIn, setIsLoggedIn } = useAuth();
@@ -19,12 +18,8 @@ export default function Navigation() {
   useEffect(() => {
     const fetchUser = async () => {
       const res = await fetch("/api/auth/authenticated", { method: "GET" });
-
-      if (!res.ok) {
-        setIsLoggedIn(false);
-      } else {
-        setIsLoggedIn(true);
-      }
+      if (!res.ok) setIsLoggedIn(false);
+      else setIsLoggedIn(true);
     };
 
     fetchUser();

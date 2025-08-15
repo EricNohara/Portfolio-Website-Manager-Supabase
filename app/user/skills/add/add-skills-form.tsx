@@ -46,15 +46,11 @@ export default function AddSkillsForm() {
       });
       const data = await res.json();
 
-      console.log(data.message);
-
       if (!res.ok) throw new Error(data.message);
       alert(data.message);
       setSkill({ name: "", proficiency: null, years_of_experience: null });
     } catch (err) {
-      console.error(err);
-      const error = err as Error;
-      alert(error.message);
+      alert(err);
     }
   };
 

@@ -23,9 +23,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthProvider";
 import IUser from "../interfaces/IUser";
 
-
-
-
 export default function UserList({ user }: { user: User | null }) {
   const router = useRouter();
   const { setIsLoggedIn } = useAuth();
