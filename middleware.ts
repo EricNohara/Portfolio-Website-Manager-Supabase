@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
 
 const PUBLIC_PATHS = [
-  "/favicon.ico",
+  "/icons/favicon.ico",
   "/site.webmanifest",
   "/manifest.json",
   "/robots.txt",
