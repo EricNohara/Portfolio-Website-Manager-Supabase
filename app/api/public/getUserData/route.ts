@@ -6,6 +6,7 @@ import { validateKey } from "@/utils/auth/hash";
 import { createServiceRoleClient } from "@/utils/supabase/server";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
+  logRequestDetails(req);
   try {
     const supabase = await createServiceRoleClient();
 
@@ -186,5 +187,28 @@ export async function OPTIONS() {
       "Access-Control-Allow-Headers":
         "Authorization, User-Email, Content-Type, Accept",
     },
+  });
+}
+
+function logRequestDetails(req: NextRequest) {
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0] ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+  const userAgent = req.headers.get("user-agent") || "unknown";
+  const referer = req.headers.get("referer") || "none";
+  const origin = req.headers.get("origin") || "none";
+  const url = req.url;
+  const method = req.method;
+  const timestamp = new Date().toISOString();
+
+  console.log("📥 Incoming Request:", {
+    method,
+    url,
+    ip,
+    userAgent,
+    referer,
+    origin,
+    timestamp,
   });
 }
