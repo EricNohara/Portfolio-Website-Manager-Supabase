@@ -12,15 +12,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     // get the api key from the authorization header
     const apiKey = req.headers.get("Authorization")?.split(" ")[1];
-    const userEmail = req.headers.get("User-Email");
 
-    if (!apiKey || !userEmail) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    // decrypt the api key
-    const decryptedKey = decrypt(apiKey);
-    if (!decryptedKey || typeof decryptedKey !== "string") {
+    if (!apiKey) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
@@ -37,6 +30,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         { message: "User data not found" },
         { status: 404 }
       );
+    }
+
+    // decrypt the api key
+    const decryptedKey = decrypt(apiKey);
+    if (!decryptedKey || typeof decryptedKey !== "string") {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // validate user's key
