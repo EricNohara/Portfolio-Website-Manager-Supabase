@@ -3,25 +3,12 @@ import { Button, TextField, Link } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import defaultUser from "@/app/constants/defaultUser";
 import IUser from "@/app/interfaces/IUser";
 
 export default function CreateUserForm() {
   const router = useRouter();
-  const [userData, setUserData] = useState<IUser>({
-    email: "",
-    name: "",
-    phone_number: null,
-    location: null,
-    github_url: null,
-    linkedin_url: null,
-    portrait_url: null,
-    resume_url: null,
-    transcript_url: null,
-    facebook_url: null,
-    instagram_url: null,
-    bio: null,
-    current_position: null,
-  });
+  const [userData, setUserData] = useState<IUser>(defaultUser);
   const [password, setPassword] = useState("");
 
   const minPasswordLen: number = parseInt(process.env.MIN_PASSWORD_LEN || "6");
@@ -116,7 +103,7 @@ export default function CreateUserForm() {
       />
       <TextField
         label="Address"
-        name="location"
+        name="current_address"
         onChange={handleChange}
         fullWidth
         margin="dense"

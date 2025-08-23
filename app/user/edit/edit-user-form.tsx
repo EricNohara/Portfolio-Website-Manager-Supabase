@@ -5,25 +5,12 @@ import { type User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import defaultUser from "@/app/constants/defaultUser";
 import IUser from "@/app/interfaces/IUser";
 
 export default function EditUserForm({ user }: { user: User | null }) {
   const router = useRouter();
-  const [userData, setUserData] = useState<IUser>({
-    email: "",
-    name: "",
-    phone_number: null,
-    location: null,
-    github_url: null,
-    linkedin_url: null,
-    portrait_url: null,
-    resume_url: null,
-    transcript_url: null,
-    facebook_url: null,
-    instagram_url: null,
-    bio: null,
-    current_position: null,
-  });
+  const [userData, setUserData] = useState<IUser>(defaultUser);
 
   useEffect(() => {
     const fetcher = async () => {
@@ -103,12 +90,12 @@ export default function EditUserForm({ user }: { user: User | null }) {
       />
       <TextField
         label="Address"
-        name="location"
+        name="current_address"
         onChange={handleChange}
         fullWidth
         margin="dense"
         size="small"
-        value={userData.location || ""}
+        value={userData.current_address || ""}
       />
       <TextField
         label="GitHub URL"
