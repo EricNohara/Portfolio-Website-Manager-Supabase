@@ -40,7 +40,7 @@ export default function AddCourseForm() {
     };
 
     try {
-      const res = await fetch("/api/user/education/course", {
+      const res = await fetch("/api/internal/user/education/course", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -54,7 +54,7 @@ export default function AddExperienceForm() {
     }
 
     try {
-      const res = await fetch("/api/user/education", {
+      const res = await fetch("/api/internal/user/education", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(education),

@@ -23,7 +23,7 @@ export default function LoginForm() {
     e.preventDefault();
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/internal/auth/login", {
         method: "POST",
         headers: { ContentType: "application/json" },
         body: JSON.stringify(credentials),

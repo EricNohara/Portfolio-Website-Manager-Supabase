@@ -29,7 +29,7 @@ export default function ExperienceList() {
     const fetcher = async () => {
       try {
         const res = await fetch(
-          `/api/user/education/course?educationID=${encodeURIComponent(
+          `/api/internal/user/education/course?educationID=${encodeURIComponent(
             educationID
           )}`,
           {
@@ -52,7 +52,7 @@ export default function ExperienceList() {
   const handleDelete = async (course: ICourse) => {
     try {
       const res = await fetch(
-        `/api/user/education/course?educationID=${encodeURIComponent(
+        `/api/internal/user/education/course?educationID=${encodeURIComponent(
           course.education_id
         )}&courseName=${encodeURIComponent(course.name)}`,
         {

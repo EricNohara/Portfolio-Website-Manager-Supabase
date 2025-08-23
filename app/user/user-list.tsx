@@ -20,6 +20,7 @@ import { type User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+import defaultUser from "../constants/defaultUser";
 import { useAuth } from "../context/AuthProvider";
 import IUser from "../interfaces/IUser";
 
@@ -27,28 +28,14 @@ export default function UserList({ user }: { user: User | null }) {
   const router = useRouter();
   const { setIsLoggedIn } = useAuth();
   useEffect(() => {
-    if (user) setIsLoggedIn(true); // Only set the state inside useEffect
-  }, [setIsLoggedIn, user]); // Make sure to list setIsLoggedIn as a dependency
+    if (user) setIsLoggedIn(true);
+  }, [setIsLoggedIn, user]);
 
-  const [userData, setUserData] = useState<IUser>({
-    email: "",
-    name: "",
-    phone_number: null,
-    location: null,
-    github_url: null,
-    linkedin_url: null,
-    portrait_url: null,
-    resume_url: null,
-    transcript_url: null,
-    instagram_url: null,
-    facebook_url: null,
-    bio: null,
-    current_position: null,
-  });
+  const [userData, setUserData] = useState<IUser>(defaultUser);
 
   const getProfile = useCallback(async () => {
     try {
-      const res = await fetch("/api/user");
+      const res = await fetch("/api/internal/user");
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message);
@@ -78,7 +65,7 @@ export default function UserList({ user }: { user: User | null }) {
     if (!confirmed) return;
 
     try {
-      const res = await fetch("/api/user", { method: "DELETE" });
+      const res = await fetch("/api/internal/user", { method: "DELETE" });
 
       if (res.status === 204) {
         alert("Successfully deleted user");
@@ -140,7 +127,7 @@ export default function UserList({ user }: { user: User | null }) {
         fontStyle="italic"
         alignItems="center"
       >
-        <Typography>{userData?.location}</Typography>
+        <Typography>{userData?.current_address}</Typography>
         <Typography>{userData?.email}</Typography>
         <Typography>{userData?.phone_number}</Typography>
         {userData?.bio && (

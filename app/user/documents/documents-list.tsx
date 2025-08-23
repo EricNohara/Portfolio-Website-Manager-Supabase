@@ -27,7 +27,7 @@ export default function DocumentsList({ user }: { user: User | null }) {
   useEffect(() => {
     const fetcher = async () => {
       if (!user) return;
-      const res = await fetch("/api/user");
+      const res = await fetch("/api/internal/user");
       const data = await res.json();
 
       if (res.ok) {
@@ -46,7 +46,7 @@ export default function DocumentsList({ user }: { user: User | null }) {
 
   const handleDelete = async (url: string) => {
     try {
-      const res = await fetch(`/api/storage?publicURL=${url}`, {
+      const res = await fetch(`/api/internal/storage?publicURL=${url}`, {
         method: "DELETE",
       });
 

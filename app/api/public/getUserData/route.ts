@@ -28,7 +28,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const { data, error } = await supabase
       .from("api_keys")
       .select("hashed_key, user_id")
-      .eq("user_email", userEmail);
+      .eq("encrypted_key", apiKey);
 
     if (error) throw error;
 

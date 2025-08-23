@@ -37,7 +37,7 @@ export default function EditProjectsForm() {
         if (!prevProjectID) throw new Error("Invalid previous project ID");
 
         const res = await fetch(
-          `/api/user/projects?projectID=${encodeURIComponent(prevProjectID)}`
+          `/api/internal/user/projects?projectID=${encodeURIComponent(prevProjectID)}`
         );
         const data = await res.json();
 
@@ -111,7 +111,7 @@ export default function EditProjectsForm() {
       // if there is already a thumbnail, delete it from storage
       if (project.thumbnail_url) {
         res = await fetch(
-          `/api/storage?publicURL=${encodeURIComponent(project.thumbnail_url)}`,
+          `/api/internal/storage?publicURL=${encodeURIComponent(project.thumbnail_url)}`,
           { method: "DELETE" }
         );
         data = await res.json();
@@ -139,7 +139,7 @@ export default function EditProjectsForm() {
     };
 
     try {
-      res = await fetch("/api/user/projects", {
+      res = await fetch("/api/internal/user/projects", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

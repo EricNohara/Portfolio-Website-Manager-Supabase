@@ -7,7 +7,7 @@ export async function uploadFile(file: File | null, bucketName: string) {
   formData.append("bucketName", bucketName);
 
   try {
-    const res = await fetch("/api/storage", {
+    const res = await fetch("/api/internal/storage", {
       method: "POST",
       body: formData,
     });
@@ -37,7 +37,7 @@ export async function uploadThumbnail(file: File | null, bucketName: string) {
   formData.append("bucketName", bucketName);
 
   try {
-    const res = await fetch("/api/storage", {
+    const res = await fetch("/api/internal/storage", {
       method: "POST",
       body: formData,
     });

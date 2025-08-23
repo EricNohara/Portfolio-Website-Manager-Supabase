@@ -57,7 +57,7 @@ export default function EditExperienceForm() {
     }
 
     try {
-      const res = await fetch("/api/user/experience", {
+      const res = await fetch("/api/internal/user/experience", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -15,7 +15,7 @@ export default function ProjectsList() {
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch("/api/user/projects", { method: "GET" });
+        const res = await fetch("/api/internal/user/projects", { method: "GET" });
         const data = await res.json();
 
         if (!res.ok) throw new Error("Failed to retrieve projects data");
@@ -35,14 +35,14 @@ export default function ProjectsList() {
       // delete project thumbnail from storage if it exists
       if (project.thumbnail_url) {
         res = await fetch(
-          `/api/storage?publicURL=${encodeURIComponent(project.thumbnail_url)}`,
+          `/api/internal/storage?publicURL=${encodeURIComponent(project.thumbnail_url)}`,
           { method: "DELETE" }
         );
         data = await res.json();
         if (!res.ok) throw new Error(data.message);
       }
 
-      res = await fetch(`/api/user/projects?projectID=${project.id}`, {
+      res = await fetch(`/api/internal/user/projects?projectID=${project.id}`, {
         method: "DELETE",
       });
 

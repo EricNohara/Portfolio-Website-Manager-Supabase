@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+
 import { updateSession } from "@/utils/supabase/middleware";
 
 const PUBLIC_PATHS = [

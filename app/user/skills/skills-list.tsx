@@ -25,7 +25,7 @@ export default function SkillsList() {
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch("/api/user/skills", { method: "GET" });
+        const res = await fetch("/api/internal/user/skills", { method: "GET" });
         const data = await res.json();
 
         if (!res.ok) throw new Error("Failed to retrieve skills data");
@@ -41,7 +41,7 @@ export default function SkillsList() {
 
   const handleDelete = async (skill: ISkills) => {
     try {
-      const res = await fetch(`/api/user/skills?skillName=${skill.name}`, {
+      const res = await fetch(`/api/internal/user/skills?skillName=${skill.name}`, {
         method: "DELETE",
       });
 

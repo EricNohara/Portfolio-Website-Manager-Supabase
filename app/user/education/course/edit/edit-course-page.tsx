@@ -23,7 +23,7 @@ export default function EditCoursePage() {
     const fetcher = async () => {
       try {
         const res = await fetch(
-          `/api/user/education/course?educationID=${encodeURIComponent(
+          `/api/internal/user/education/course?educationID=${encodeURIComponent(
             educationID
           )}&courseName=${encodeURIComponent(courseName)}`
         );
@@ -74,7 +74,7 @@ export default function EditCoursePage() {
     };
 
     try {
-      const res = await fetch("/api/user/education/course", {
+      const res = await fetch("/api/internal/user/education/course", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

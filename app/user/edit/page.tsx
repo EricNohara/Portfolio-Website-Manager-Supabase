@@ -14,7 +14,7 @@ export default function Account() {
   useEffect(() => {
     const authenticator = async () => {
       try {
-        const res = await fetch("/api/auth/authenticated", { method: "GET" });
+        const res = await fetch("/api/internal/auth/authenticated", { method: "GET" });
         const data = await res.json();
 
         if (!res.ok) {

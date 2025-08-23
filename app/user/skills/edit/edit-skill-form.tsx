@@ -20,7 +20,7 @@ export default function EditSkillsForm() {
     const fetcher = async () => {
       try {
         const res = await fetch(
-          `/api/user/skills?skillName=${encodeURIComponent(skillName)}`
+          `/api/internal/user/skills?skillName=${encodeURIComponent(skillName)}`
         );
 
         const data = await res.json();
@@ -63,7 +63,7 @@ export default function EditSkillsForm() {
     }
 
     try {
-      const res = await fetch("/api/user/skills", {
+      const res = await fetch("/api/internal/user/skills", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
