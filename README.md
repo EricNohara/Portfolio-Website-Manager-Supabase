@@ -104,10 +104,12 @@ No known issues.
 
 ## Next Steps
 
-- Code cleanup + surface level testing
-- Security vulnerability testing and cleanup
+- Update database and attributes for tables
+- Update API table for PER APP api keys
+- Add a table in the DB for storing calls that users make to their public endpoints
 - UI/UX update (remove all alerts and redo the user interface)
   - Disable all buttons when loading
+  - Migrate from tailwind + MUI to using CSS modules
 - Add unit/integration testing
 - Support more languages through new libraries (Python, Java, C#, etc.)
 - Documentation page for API + code integrations
