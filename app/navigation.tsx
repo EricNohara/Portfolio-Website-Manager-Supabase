@@ -17,7 +17,7 @@ export default function Navigation() {
   // Fetch user when component mounts
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await fetch("/api/auth/authenticated", { method: "GET" });
+      const res = await fetch("/api/internal/auth/authenticated", { method: "GET" });
       if (!res.ok) setIsLoggedIn(false);
       else setIsLoggedIn(true);
     };
@@ -27,7 +27,7 @@ export default function Navigation() {
 
   const handleSignOut = async () => {
     try {
-      const res = await fetch("/api/auth/signout", { method: "POST" });
+      const res = await fetch("/api/internal/auth/signout", { method: "POST" });
 
       if (res.ok) {
         setIsLoggedIn(false);

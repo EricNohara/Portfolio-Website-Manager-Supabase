@@ -30,7 +30,7 @@ export default function ConnectList() {
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch("/api/auth/key?getUserEmail=true");
+        const res = await fetch("/api/internal/auth/key?getUserEmail=true");
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message);
@@ -48,7 +48,7 @@ export default function ConnectList() {
   });
 
   useEffect(() => {
-    setApiUrl(`${window.location.origin}/api/public/getUserData`);
+    setApiUrl(`${window.location.origin}/api/internal/public/getUserData`);
   }, []);
 
   const handleClick = () => {
@@ -91,7 +91,7 @@ export default function ConnectList() {
 
   const handleGenerateNewAPIKey = async () => {
     try {
-      const res = await fetch("/api/auth/key", { method: "POST" });
+      const res = await fetch("/api/internal/auth/key", { method: "POST" });
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message);
@@ -154,7 +154,7 @@ export default function ConnectList() {
           </Button>
           <TextField
             label="API Key"
-            onChange={() => {}}
+            onChange={() => { }}
             value={isVisible ? apiKey : setStars(apiKey)}
             fullWidth
           ></TextField>

@@ -39,7 +39,7 @@ export default function AddSkillsForm() {
     }
 
     try {
-      const res = await fetch("/api/user/skills", {
+      const res = await fetch("/api/internal/user/skills", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(skill),

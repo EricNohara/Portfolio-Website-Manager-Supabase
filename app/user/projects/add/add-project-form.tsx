@@ -95,7 +95,7 @@ export default function AddProjectForm() {
     }
 
     try {
-      const res = await fetch("/api/user/projects", {
+      const res = await fetch("/api/internal/user/projects", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(projectData),

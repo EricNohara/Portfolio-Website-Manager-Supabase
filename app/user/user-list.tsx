@@ -48,7 +48,7 @@ export default function UserList({ user }: { user: User | null }) {
 
   const getProfile = useCallback(async () => {
     try {
-      const res = await fetch("/api/user");
+      const res = await fetch("/api/internal/user");
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message);
@@ -78,7 +78,7 @@ export default function UserList({ user }: { user: User | null }) {
     if (!confirmed) return;
 
     try {
-      const res = await fetch("/api/user", { method: "DELETE" });
+      const res = await fetch("/api/internal/user", { method: "DELETE" });
 
       if (res.status === 204) {
         alert("Successfully deleted user");

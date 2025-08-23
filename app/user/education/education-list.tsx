@@ -26,7 +26,7 @@ export default function ExperienceList() {
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch("/api/user/education", { method: "GET" });
+        const res = await fetch("/api/internal/user/education", { method: "GET" });
         const data = await res.json();
 
         if (!res.ok) throw new Error("Failed to retrieve experience data");
@@ -42,7 +42,7 @@ export default function ExperienceList() {
 
   const handleDelete = async (exp: IEducation) => {
     try {
-      const res = await fetch(`/api/user/education?id=${exp.id}`, {
+      const res = await fetch(`/api/internal/user/education?id=${exp.id}`, {
         method: "DELETE",
       });
       if (res.status === 204) {

@@ -27,7 +27,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
 
   useEffect(() => {
     const fetcher = async () => {
-      const res = await fetch("/api/user");
+      const res = await fetch("/api/internal/user");
       const data = await res.json();
 
       if (res.ok) {
@@ -49,7 +49,7 @@ export default function EditUserForm({ user }: { user: User | null }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/user", {
+      const res = await fetch("/api/internal/user", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),

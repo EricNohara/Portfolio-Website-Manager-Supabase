@@ -29,7 +29,7 @@ export default function EditEducationForm() {
         const id = params.get("id");
         if (!id) throw new Error("Invalid education ID");
 
-        const res = await fetch(`/api/user/education?id=${id}`);
+        const res = await fetch(`/api/internal/user/education?id=${id}`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message);
@@ -79,7 +79,7 @@ export default function EditEducationForm() {
     }
 
     try {
-      const res = await fetch("/api/user/education", {
+      const res = await fetch("/api/internal/user/education", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
