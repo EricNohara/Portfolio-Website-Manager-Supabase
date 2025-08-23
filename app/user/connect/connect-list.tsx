@@ -22,7 +22,6 @@ import { CopyBlock, dracula } from "react-code-blocks";
 export default function ConnectList() {
   const [open, setOpen] = React.useState(false);
   const [apiKey, setApiKey] = useState<string>("");
-  const [userEmail, setUserEmail] = useState<string>("");
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [apiUrl, setApiUrl] = useState('');
 
@@ -30,15 +29,13 @@ export default function ConnectList() {
   useEffect(() => {
     const fetcher = async () => {
       try {
-        const res = await fetch("/api/internal/auth/key?getUserEmail=true");
+        const res = await fetch("/api/internal/auth/key");
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message);
 
         const key = data[0].encrypted_key;
-        const userEmail = data[0].user_email;
         setApiKey(key);
-        setUserEmail(userEmail);
       } catch (error) {
         console.error(error);
       }
@@ -91,7 +88,7 @@ export default function ConnectList() {
 
   const handleGenerateNewAPIKey = async () => {
     try {
-      const res = await fetch("/api/internal/auth/key", { method: "POST" });
+      const res = await fetch("/api/internal/auth/key", { method: "PUT" });
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message);
@@ -105,7 +102,7 @@ export default function ConnectList() {
   };
 
   function generateCodeBlock() {
-    return `NEXT_PUBLIC_PORTFOLIO_API_URL="${apiUrl}"\nPORTFOLIO_PRIVATE_API_KEY="${apiKey}"\nUSER_EMAIL="${userEmail}"`;
+    return `NEXT_PUBLIC_PORTFOLIO_API_URL="${apiUrl}"\nPORTFOLIO_PRIVATE_API_KEY="${apiKey}"`;
   }
 
   return (

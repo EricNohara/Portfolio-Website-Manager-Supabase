@@ -1,0 +1,33 @@
+import IApiKey from "@/app/interfaces/IApiKey";
+import { encrypt } from "@/utils/auth/encrypt";
+import { generateAPIKey, hashKey } from "@/utils/auth/hash";
+
+export async function generateAndStoreKey(
+  supabase: any,
+  userId: string,
+  email: string,
+  description: string,
+  expires: string | null
+): Promise<{ encryptedKey: string }> {
+  // generate api key
+  const apiKey = await generateAPIKey(userId, email);
+
+  const hashedKey: string | null = await hashKey(apiKey);
+  if (!hashedKey) throw new Error("Error hashing api key");
+
+  const encryptedKey: string | null = encrypt(apiKey);
+  if (!encryptedKey) throw new Error("Error encrypting api key");
+
+  const keyData: IApiKey = {
+    user_id: userId,
+    hashed_key: hashedKey,
+    encrypted_key: encryptedKey,
+    description,
+    expires,
+  };
+
+  const { error } = await supabase.from("api_keys").insert(keyData);
+  if (error) throw new Error("Error inserting API key into database");
+
+  return { encryptedKey };
+}

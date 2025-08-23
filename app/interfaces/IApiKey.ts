@@ -1,6 +1,7 @@
 export default interface IApiKey {
-  hashed_key: string;
   user_id: string;
+  description: string;
+  expires: string | null;
+  hashed_key: string;
   encrypted_key: string;
-  user_email: string;
 }
