@@ -29,8 +29,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     // retrieve the API key information
     const { data, error } = await supabase
       .from("api_keys")
-      .select("hashed_key, user_id, key_description")
-      .eq("encrypted_key", apiKey);
+      .select("hashed_key, user_id, description")
+      .filter("encrypted_key", "eq", apiKey);
 
     if (error || !data || data.length === 0) {
       statusCode = 404;
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    keyDescription = data[0].key_description;
+    keyDescription = data[0].description;
 
     // decrypt the api key
     const decryptedKey = decrypt(apiKey);
