@@ -26,11 +26,15 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     }
 
+    console.log(apiKey);
+
     // retrieve the API key information
     const { data, error } = await supabase
       .from("api_keys")
       .select("hashed_key, user_id, key_description")
       .eq("encrypted_key", apiKey);
+
+    console.log(data);
 
     if (error || !data || data.length === 0) {
       statusCode = 404;
