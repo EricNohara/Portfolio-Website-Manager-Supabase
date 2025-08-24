@@ -1,12 +1,9 @@
 "use client";
 
-import { IApiKey } from "@/app/interfaces/IApiKey";
 import {
-  Snackbar,
   Button,
   Box,
   TextField,
-  Divider,
   Typography,
   Table,
   TableContainer,
@@ -18,6 +15,8 @@ import {
 } from "@mui/material";
 import * as React from "react";
 import { useState, useEffect } from "react";
+
+import { IApiKey } from "@/app/interfaces/IApiKey";
 
 export default function ConnectList() {
   const [apiKeys, setApiKeys] = useState<IApiKey[]>([]);
@@ -35,7 +34,6 @@ export default function ConnectList() {
         if (!res.ok) throw new Error(data.message);
 
         setApiKeys(data.keys);
-        console.log(apiKeys);
       } catch (error) {
         console.error(error);
       }
