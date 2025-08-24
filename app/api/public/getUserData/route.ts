@@ -32,8 +32,6 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       .select("hashed_key, user_id, description")
       .filter("encrypted_key", "eq", apiKey);
 
-    console.log({ data, error });
-
     if (error || !data || data.length === 0) {
       statusCode = 404;
       return NextResponse.json(
