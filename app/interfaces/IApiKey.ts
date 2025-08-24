@@ -1,6 +1,14 @@
-export default interface IApiKey {
-  hashed_key: string;
+export interface IApiKey {
   user_id: string;
+  description: string;
+  expires: string | null;
+  created: string;
+}
+
+export interface IApiKeyInput {
+  user_id: string;
+  description: string;
+  expires: string | null;
+  hashed_key: string;
   encrypted_key: string;
-  user_email: string;
 }

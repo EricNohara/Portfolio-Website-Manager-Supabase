@@ -104,8 +104,6 @@ No known issues.
 
 ## Next Steps
 
-- Update database and attributes for tables
-- Update API table for PER APP api keys
 - Add a table in the DB for storing calls that users make to their public endpoints
 - UI/UX update (remove all alerts and redo the user interface)
   - Disable all buttons when loading
