@@ -3,6 +3,7 @@ import { encrypt } from "@/utils/auth/encrypt";
 import { generateAPIKey, hashKey } from "@/utils/auth/hash";
 
 export async function generateAndStoreKey(
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   supabase: any,
   userId: string,
   email: string,
@@ -10,7 +11,7 @@ export async function generateAndStoreKey(
   expires: string | null
 ): Promise<{ encryptedKey: string }> {
   // generate api key
-  const apiKey = await generateAPIKey(userId, email);
+  const apiKey: string = await generateAPIKey(userId, email);
 
   const hashedKey: string | null = await hashKey(apiKey);
   if (!hashedKey) throw new Error("Error hashing api key");

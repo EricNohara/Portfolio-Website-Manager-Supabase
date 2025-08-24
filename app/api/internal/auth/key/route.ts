@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { generateAndStoreKey } from "@/utils/auth/generateAndStoreKey";
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
 export async function GET(_req: NextRequest): Promise<NextResponse> {
   try {
