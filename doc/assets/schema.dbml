@@ -8,7 +8,7 @@ Table users {
   name text
   phone_number text
   email text
-  location text
+  current_address text
   github_url text
   linkedin_url text
   portrait_url text
@@ -16,8 +16,10 @@ Table users {
   transcript_url text
   instagram_url text
   facebook_url text
+  x_url text
   bio text
   current_position text
+  current_company text
 }
 
 Table projects {
@@ -61,15 +63,26 @@ Table course {
 }
 
 Table api_keys {
-  hashed_key text
   user_id int [ref: > users.id]
-  created_at timestamp
+  description tinytext
+  created timestamp
+  expires timestamp
+  hashed_key text
   encrypted_key text
-  user_email text
 
   indexes {
-    (hashed_key, user_id, created_at) [pk]
+    (user_id, description) [pk]
   }
+}
+
+Table public_api_logs {
+  id int pk
+  user_id int [ref: > users.id]
+  requested_at timestamp
+  responded_at timestamp
+  status_code int
+  key_description text
+  user_agent text
 }
 
 Table work_experiences {
