@@ -32,9 +32,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const { data, error } = await supabase
       .from("api_keys")
       .select("hashed_key, user_id, key_description")
-      .eq("encrypted_key", apiKey);
+      .filter("encrypted_key", "eq", apiKey);
 
-    console.log(data);
+    console.log({ data, error });
 
     if (error || !data || data.length === 0) {
       statusCode = 404;
