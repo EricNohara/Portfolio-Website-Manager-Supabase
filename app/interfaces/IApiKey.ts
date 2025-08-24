@@ -1,4 +1,11 @@
-export default interface IApiKey {
+export interface IApiKey {
+  user_id: string;
+  description: string;
+  expires: string | null;
+  created: string;
+}
+
+export interface IApiKeyInput {
   user_id: string;
   description: string;
   expires: string | null;

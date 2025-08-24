@@ -1,4 +1,4 @@
-import IApiKey from "@/app/interfaces/IApiKey";
+import { IApiKeyInput } from "@/app/interfaces/IApiKey";
 import { encrypt } from "@/utils/auth/encrypt";
 import { generateAPIKey, hashKey } from "@/utils/auth/hash";
 
@@ -19,7 +19,7 @@ export async function generateAndStoreKey(
   const encryptedKey: string | null = encrypt(apiKey);
   if (!encryptedKey) throw new Error("Error encrypting api key");
 
-  const keyData: IApiKey = {
+  const keyData: IApiKeyInput = {
     user_id: userId,
     hashed_key: hashedKey,
     encrypted_key: encryptedKey,
