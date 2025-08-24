@@ -26,12 +26,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    console.log(apiKey);
-
     // retrieve the API key information
     const { data, error } = await supabase
       .from("api_keys")
-      .select("hashed_key, user_id, key_description")
+      .select("hashed_key, user_id, description")
       .filter("encrypted_key", "eq", apiKey);
 
     console.log({ data, error });
@@ -44,7 +42,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    keyDescription = data[0].key_description;
+    keyDescription = data[0].description;
 
     // decrypt the api key
     const decryptedKey = decrypt(apiKey);
