@@ -1,56 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import IPublicApiLog from "@/app/interfaces/IPublicApiLog";
 import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
 import { decrypt } from "@/utils/auth/encrypt";
 import { validateKey } from "@/utils/auth/hash";
 import { createServiceRoleClient } from "@/utils/supabase/server";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  logRequestDetails(req);
+  // create fields for log
+  const requestedAt = new Date().toISOString();
+  let userId: string | null = null;
+  let keyDescription: string | null = null;
+  let statusCode: number = 500;
+
   try {
     const supabase = await createServiceRoleClient();
 
     // get the api key from the authorization header
     const apiKey = req.headers.get("Authorization")?.split(" ")[1];
-
     if (!apiKey) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-
-    // retrieve the hashed passkey
-    const { data, error } = await supabase
-      .from("api_keys")
-      .select("hashed_key, user_id")
-      .eq("encrypted_key", apiKey);
-
-    if (error) throw error;
-
-    if (!data) {
+      statusCode = 401;
       return NextResponse.json(
-        { message: "User data not found" },
-        { status: 404 }
+        { message: "Unauthorized" },
+        { status: statusCode }
       );
     }
+
+    // retrieve the API key information
+    const { data, error } = await supabase
+      .from("api_keys")
+      .select("hashed_key, user_id, key_description")
+      .eq("encrypted_key", apiKey);
+
+    if (error || !data || data.length === 0) {
+      statusCode = 404;
+      return NextResponse.json(
+        { message: "User API key not found" },
+        { status: statusCode }
+      );
+    }
+
+    keyDescription = data[0].key_description;
 
     // decrypt the api key
     const decryptedKey = decrypt(apiKey);
     if (!decryptedKey || typeof decryptedKey !== "string") {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      statusCode = 401;
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: statusCode }
+      );
     }
 
     // validate user's key
     const isValid = await validateKey(decryptedKey, data[0].hashed_key);
-
     if (!isValid) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      statusCode = 401;
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: statusCode }
+      );
     }
 
-    const userId = data[0].user_id;
-
+    userId = data[0].user_id;
     if (!userId) {
+      statusCode = 404;
       return NextResponse.json(
         { message: "User id not found" },
-        { status: 404 }
+        { status: statusCode }
       );
     }
 
@@ -64,6 +81,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     const cleanedUserData = userData.map(({ _id, ...rest }) => rest)[0];
 
+    // skills
     const { data: userSkills, error: userSkillsError } = await supabase
       .from("skills")
       .select()
@@ -73,6 +91,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     const cleanedUserSkills = userSkills.map(({ _user_id, ...rest }) => rest);
 
+    // experiences
     const { data: userExperience, error: userExperienceError } = await supabase
       .from("work_experiences")
       .select()
@@ -84,6 +103,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       ({ _user_id, ...rest }) => rest
     );
 
+    // projects
     const { data: userProject, error: userProjectError } = await supabase
       .from("projects")
       .select()
@@ -95,6 +115,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       ({ _id, _user_id, ...rest }) => rest
     );
 
+    // education + courses
     const { data: userEducation, error: userEducationError } = await supabase
       .from("education")
       .select()
@@ -146,10 +167,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       education: userEducationWithCourses,
     };
 
+    statusCode = 200;
     return NextResponse.json(
       { userInfo },
       {
-        status: 200,
+        status: statusCode,
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET,OPTIONS",
@@ -162,10 +184,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     const error = err as Error;
     console.error(error.message);
 
+    statusCode = 500;
     return NextResponse.json(
       { message: "Internal server error" },
       {
-        status: 500,
+        status: statusCode,
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET,OPTIONS",
@@ -174,6 +197,30 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         },
       }
     );
+  } finally {
+    // add a log if we know the user id
+    if (userId) {
+      try {
+        // create the log
+        const respondedAt = new Date().toISOString();
+        const userAgent = req.headers.get("user-agent") || "unknown";
+
+        const publicApiLog: IPublicApiLog = {
+          user_id: userId,
+          requested_at: requestedAt,
+          responded_at: respondedAt,
+          status_code: statusCode,
+          key_description: keyDescription ? keyDescription.trim() : "Unknown",
+          user_agent: userAgent,
+        };
+
+        // insert the log
+        const supabase = await createServiceRoleClient();
+        await supabase.from("public_api_logs").insert(publicApiLog);
+      } catch (logErr) {
+        console.error("Failed to insert API log:", (logErr as Error).message);
+      }
+    }
   }
 }
 
@@ -186,28 +233,5 @@ export async function OPTIONS() {
       "Access-Control-Allow-Headers":
         "Authorization, User-Email, Content-Type, Accept",
     },
-  });
-}
-
-function logRequestDetails(req: NextRequest) {
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0] ||
-    req.headers.get("x-real-ip") ||
-    "unknown";
-  const userAgent = req.headers.get("user-agent") || "unknown";
-  const referer = req.headers.get("referer") || "none";
-  const origin = req.headers.get("origin") || "none";
-  const url = req.url;
-  const method = req.method;
-  const timestamp = new Date().toISOString();
-
-  console.log("📥 Incoming Request:", {
-    method,
-    url,
-    ip,
-    userAgent,
-    referer,
-    origin,
-    timestamp,
   });
 }
