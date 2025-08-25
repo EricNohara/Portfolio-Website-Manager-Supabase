@@ -1,0 +1,26 @@
+.one,
+.two,
+.three {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: none;
+}
+
+.one {
+}
+
+.two {
+}
+
+.three {
+}
+
+.edit {
+}
+
+.delete {
+}
+
+.exit {
+}

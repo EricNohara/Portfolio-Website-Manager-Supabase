@@ -1,12 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 * {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 1rem;
   margin: 0;
@@ -14,4 +11,43 @@ html, body {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+}
+
+/* color variables */
+:root {
+  /* home page */
+  --home-bg-grad-1: #131624;
+  --home-bg-grad-2: #142132;
+  --home-bg-grad-3: #000000;
+  --home-txt-1: white;
+  --home-txt-2: #aeaeae;
+  --home-txt-3: #6dabff;
+
+  /* login page */
+  --login-bg: #202020;
+  --login-txt-1: white;
+  --login-txt-2: #bfbfbf;
+  --login-txt-3: #909090;
+
+  /* general colors */
+  --btn-1: #378afb;
+  --btn-2: #1f254a;
+  --btn-3: #334673;
+
+  --nav-bg: #131624;
+  --page-bg: #f5f5f5;
+  --page-box-bg: white;
+  --page-box-border: #d1d1d1;
+
+  --page-txt-1: black;
+  --page-txt-2: #5f5f5f;
+
+  --page-btn-1: #e5f0ff;
+  --page-btn-2: #ffe2e2;
+
+  /* add more later */
+}
+
+/* Dark mode overrides */
+.dark-theme {
 }

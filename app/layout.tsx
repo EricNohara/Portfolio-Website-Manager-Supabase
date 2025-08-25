@@ -1,5 +1,4 @@
 import "./globals.css";
-import { Container } from "@mui/material";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -8,7 +7,7 @@ import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
 import Navigation from "./navigation";
 
 export const metadata = {
-  title: "Portfolio Website Manager",
+  title: "Nukleio",
   description: "All in one solution for portfolio website management",
 };
 
@@ -30,11 +29,11 @@ export default function RootLayout({
         <AuthProvider>
           <LocalizationProviderWrapper>
             <Navigation />
-            <Container sx={{ padding: "5% 0 5% 0" }}>
+            <div>
               {children}
               <SpeedInsights />
               <Analytics />
-            </Container>
+            </div>
           </LocalizationProviderWrapper>
         </AuthProvider>
       </body>
