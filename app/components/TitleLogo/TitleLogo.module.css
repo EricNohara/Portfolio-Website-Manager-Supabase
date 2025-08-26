@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+}
+
+.container > h1 {
+  font-size: 2rem;
+}
+
+.container:hover {
+  cursor: pointer;
+}

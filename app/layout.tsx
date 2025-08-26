@@ -4,7 +4,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { AuthProvider } from "./context/AuthProvider";
 import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
-import Navigation from "./navigation";
+import Navigation from "./components/Navigation/Navigation";
+import BodyWrapper from "./components/BodyWrapper/BodyWrapper";
 
 export const metadata = {
   title: "Nukleio",
@@ -28,12 +29,14 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <LocalizationProviderWrapper>
-            <Navigation />
-            <div>
-              {children}
-              <SpeedInsights />
-              <Analytics />
-            </div>
+            <BodyWrapper>
+              <Navigation />
+              <div className="pageContent">
+                {children}
+                <SpeedInsights />
+                <Analytics />
+              </div>
+            </BodyWrapper>
           </LocalizationProviderWrapper>
         </AuthProvider>
       </body>
