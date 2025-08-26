@@ -5,22 +5,51 @@
   font-size: 0.9rem;
   font-weight: bold;
   border: none;
+  border-radius: var(--global-border-radius);
+  color: white;
+}
+
+.one:hover,
+.two:hover,
+.three:hover {
+  cursor: pointer;
 }
 
 .one {
+  background-color: var(--btn-1);
 }
 
 .two {
+  background-color: var(--btn-2);
 }
 
 .three {
+  background-color: var(--btn-3);
+}
+
+.edit,
+.delete,
+.exit {
+  border: none;
+  border-radius: 50%;
+  padding: 0.75rem;
+}
+
+.edit:hover,
+.delete:hover,
+.exit:hover {
+  cursor: pointer;
 }
 
 .edit {
+  background-color: var(--page-btn-1);
 }
 
 .delete {
+  background-color: var(--page-btn-2);
 }
 
 .exit {
+  background-color: var(--exit-btn);
+  color: white;
 }

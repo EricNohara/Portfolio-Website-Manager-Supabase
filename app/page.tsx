@@ -3,7 +3,7 @@
 // import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { ButtonOne } from "./components/Buttons/Buttons";
+import { ButtonOne, ButtonTwo, ButtonThree, EditButton, DeleteButton, ExitButton } from "./components/Buttons/Buttons";
 
 import { useAuth } from "./context/AuthProvider";
 
@@ -18,6 +18,13 @@ export default function Home() {
   }, [isLoggedIn, router]);
 
   return (
-    <div><ButtonOne>Testing</ButtonOne></div>
+    <div>
+      <ButtonOne>Testing</ButtonOne>
+      <ButtonTwo>Testing</ButtonTwo>
+      <ButtonThree>Testing</ButtonThree>
+      <EditButton>Testing</EditButton>
+      <DeleteButton>Testing</DeleteButton>
+      <ExitButton>Testing</ExitButton>
+    </div>
   );
 }
