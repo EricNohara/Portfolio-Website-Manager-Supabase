@@ -4,7 +4,7 @@ import { Button } from "@mui/material";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
-import { useAuth } from "@/context/AuthProvider";
+import { useAuth } from "@/app/context/AuthProvider";
 
 import styles from "./Navigation.module.css";
 import { ButtonOne, ButtonTwo } from "../Buttons/buttons";
