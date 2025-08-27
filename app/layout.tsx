@@ -2,10 +2,9 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
+import BodyWrapper from "./components/BodyWrapper/body-wrapper";
 import { AuthProvider } from "./context/AuthProvider";
 import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
-import Navigation from "./components/Navigation/Navigation";
-import BodyWrapper from "./components/BodyWrapper/BodyWrapper";
 
 export const metadata = {
   title: "Nukleio",
@@ -30,12 +29,9 @@ export default function RootLayout({
         <AuthProvider>
           <LocalizationProviderWrapper>
             <BodyWrapper>
-              <Navigation />
-              <div className="pageContent">
-                {children}
-                <SpeedInsights />
-                <Analytics />
-              </div>
+              {children}
+              <SpeedInsights />
+              <Analytics />
             </BodyWrapper>
           </LocalizationProviderWrapper>
         </AuthProvider>

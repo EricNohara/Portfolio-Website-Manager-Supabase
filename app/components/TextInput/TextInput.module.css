@@ -1,0 +1,32 @@
+.textInput {
+  background-color: var(--login-btn-bg);
+  border: 2px solid var(--login-txt-3);
+  color: var(--login-txt-1);
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--global-border-radius);
+  width: 100%;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.textInput::placeholder {
+  color: var(--login-txt-3);
+}
+
+.textInput:focus {
+  outline: none;
+  border-color: var(--login-txt-1);
+  background-color: var(--login-btn-bg);
+}
+
+.inputDiv {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.inputLabel {
+  color: var(--login-txt-2);
+  font-size: 0.8rem;
+}

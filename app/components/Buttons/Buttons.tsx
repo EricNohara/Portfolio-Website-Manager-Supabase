@@ -1,31 +1,31 @@
+import { ReactNode, ButtonHTMLAttributes } from "react"
+
 import styles from "./Buttons.module.css"
-import { ReactNode } from "react"
 
-interface ButtonProps {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     children: ReactNode;
-    onClick?: () => void;
 }
 
-export function ButtonOne({ children, onClick }: ButtonProps) {
-    return <button className={styles.one} onClick={onClick}>{children}</button>
+export function ButtonOne({ children, className, ...props }: ButtonProps) {
+    return <button className={`${styles.one} ${className || ""}`} {...props}>{children}</button>
 }
 
-export function ButtonTwo({ children, onClick }: ButtonProps) {
-    return <button className={styles.two} onClick={onClick}>{children}</button>
+export function ButtonTwo({ children, className, ...props }: ButtonProps) {
+    return <button className={`${styles.two} ${className || ""}`} {...props}>{children}</button>
 }
 
-export function ButtonThree({ children, onClick }: ButtonProps) {
-    return <button className={styles.three} onClick={onClick}>{children}</button>
+export function ButtonThree({ children, className, ...props }: ButtonProps) {
+    return <button className={`${styles.three} ${className || ""}`} {...props}>{children}</button>
 }
 
-export function EditButton({ children, onClick }: ButtonProps) {
-    return <button className={styles.edit} onClick={onClick}>{children}</button>
+export function EditButton({ children, className, ...props }: ButtonProps) {
+    return <button className={`${styles.edit} ${className || ""}`} {...props}>{children}</button>
 }
 
-export function DeleteButton({ children, onClick }: ButtonProps) {
-    return <button className={styles.delete} onClick={onClick}>{children}</button>
+export function DeleteButton({ children, className, ...props }: ButtonProps) {
+    return <button className={`${styles.delete} ${className || ""}`} {...props}>{children}</button>
 }
 
-export function ExitButton({ children, onClick }: ButtonProps) {
-    return <button className={styles.exit} onClick={onClick}>{children}</button>
+export function ExitButton({ children, className, ...props }: ButtonProps) {
+    return <button className={`${styles.exit} ${className || ""}`} {...props}>{children}</button>
 }

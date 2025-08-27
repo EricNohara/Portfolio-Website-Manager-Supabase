@@ -1,6 +1,7 @@
 import Image from "next/image";
-import styles from "./TitleLogo.module.css";
 import { useRouter } from "next/navigation";
+
+import styles from "./TitleLogo.module.css";
 
 export default function TitleLogo() {
     const router = useRouter();

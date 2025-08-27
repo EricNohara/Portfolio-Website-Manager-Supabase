@@ -3,10 +3,11 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { ButtonOne, ButtonTwo } from "./components/Buttons/Buttons";
-import styles from "./LandingPage.module.css";
 
+import { ButtonOne, ButtonTwo } from "./components/Buttons/buttons";
+import Navigation from "./components/Navigation/navigation";
 import { useAuth } from "./context/AuthProvider";
+import styles from "./LandingPage.module.css";
 
 export default function LandingPage() {
   const { isLoggedIn } = useAuth();
@@ -24,6 +25,8 @@ export default function LandingPage() {
 
   return (
     <>
+      <Navigation />
+
       <div className={styles.backgroundImage}>
         <Image
           src="/images/home-logo.png"

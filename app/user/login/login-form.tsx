@@ -1,8 +1,12 @@
 "use client";
 
-import { Link, Button, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+import { ButtonOne, ButtonThree } from "@/app/components/Buttons/buttons";
+import TextInput from "@/app/components/TextInput/text-input";
+
+import styles from "./LoginPage.module.css";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -42,38 +46,46 @@ export default function LoginForm() {
     }
   };
 
+  const handleSignUp = () => {
+    router.push("/user/create")
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col">
-      <TextField
-        label="email"
-        name="email"
-        required
-        fullWidth
-        onChange={handleChange}
-        margin="normal"
-        value={credentials.email}
-      />
-      <TextField
-        label="password"
-        name="password"
-        required
-        fullWidth
-        onChange={handleChange}
-        margin="normal"
-        type="password"
-        value={credentials.password}
-      />
-      <Button type="submit" variant="contained" color="primary" sx={{ mt: 3 }}>
-        Sign In
-      </Button>
-      <Link
-        underline="hover"
-        align="center"
-        marginTop="2rem"
-        href="/user/create"
-      >
-        Sign Up
-      </Link>
-    </form>
+    <>
+      <form onSubmit={handleSubmit} className={styles.loginForm}>
+        <TextInput
+          label="Email"
+          name="email"
+          value={credentials.email}
+          onChange={handleChange}
+          placeholder="Enter your email"
+          required
+        />
+        <TextInput
+          label="Password"
+          name="password"
+          value={credentials.password}
+          onChange={handleChange}
+          placeholder="Enter your password"
+          required
+          type="password"
+        />
+        <ButtonOne type="submit" className={styles.loginButton}>Sign in</ButtonOne>
+      </form >
+
+      {/* Form Footer */}
+      <div className={styles.formFooterContainer}>
+        <div className={styles.dividerContainer}>
+          <div className={styles.divider} />
+          <p className={styles.inputLabel}>Other</p>
+          <div className={styles.divider} />
+        </div>
+        <div className={styles.otherContent}>
+          <p>Don&apos;t have an account?</p>
+          <ButtonThree onClick={handleSignUp} className={styles.loginButton}>Sign up</ButtonThree>
+          <a href="">Forgot password</a>
+        </div>
+      </div>
+    </>
   );
 }

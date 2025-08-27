@@ -30,3 +30,13 @@
   left: 50%;
   z-index: 0;
 }
+
+.loginNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loginNav > div {
+  width: 40%;
+}

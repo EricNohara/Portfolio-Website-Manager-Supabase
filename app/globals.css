@@ -28,6 +28,7 @@ body {
   --login-txt-1: white;
   --login-txt-2: #bfbfbf;
   --login-txt-3: #909090;
+  --login-btn-bg: #333333;
 
   /* general colors */
   --btn-1: #378afb;
@@ -53,10 +54,4 @@ body {
 
 /* Dark mode overrides */
 .dark-theme {
-}
-
-/* Layout styling */
-.pageContent {
-  height: 100%;
-  width: 100%;
 }

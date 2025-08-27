@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import UserList from "./user-list";
+import Navigation from "../components/Navigation/navigation";
+
 
 
 export default function AccountPage() {
@@ -36,6 +38,7 @@ export default function AccountPage() {
     <Container
       sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
+      <Navigation />
       <UserList user={user} />
     </Container>
   );
