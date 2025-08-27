@@ -3,8 +3,8 @@
 import Image from "next/image";
 import React from "react";
 
-import Navigation from "@/app/components/Navigation/navigation";
-import TitleLogo from "@/app/components/TitleLogo/title-logo";
+import Navigation from "@/components/Navigation/navigation";
+import TitleLogo from "@/components/TitleLogo/title-logo";
 
 import LoginForm from "./login-form";
 import styles from "./LoginPage.module.css";

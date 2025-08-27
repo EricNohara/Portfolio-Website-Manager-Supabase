@@ -8,7 +8,6 @@ import UserList from "./user-list";
 import Navigation from "../components/Navigation/navigation";
 
 
-
 export default function AccountPage() {
   const router = useRouter();
 
