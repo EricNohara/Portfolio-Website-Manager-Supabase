@@ -31,9 +31,14 @@ body {
   --login-btn-bg: #333333;
 
   /* general colors */
+  /* buttons */
   --btn-1: #378afb;
+  --btn-1-hover: #2c6fcb;
   --btn-2: #1f254a;
+  --btn-2-hover: #28305f;
   --btn-3: #334673;
+  --btn-3-hover: #3e558a;
+
   --page-btn-1: #e5f0ff;
   --page-btn-2: #ffe2e2;
   --exit-btn: #f44336;

@@ -7,6 +7,7 @@
   border: none;
   border-radius: var(--global-border-radius);
   color: white;
+  transition: 0.2s ease;
 }
 
 .one:hover,
@@ -19,12 +20,24 @@
   background-color: var(--btn-1);
 }
 
+.one:hover {
+  background-color: var(--btn-1-hover);
+}
+
 .two {
   background-color: var(--btn-2);
 }
 
+.two:hover {
+  background-color: var(--btn-2-hover);
+}
+
 .three {
   background-color: var(--btn-3);
+}
+
+.three:hover {
+  background-color: var(--btn-3-hover);
 }
 
 .edit,

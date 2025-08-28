@@ -3,6 +3,7 @@
   align-items: center;
   gap: 1rem;
   color: white;
+  transition: 0.2s ease;
 }
 
 .container > h1 {
@@ -11,4 +12,5 @@
 
 .container:hover {
   cursor: pointer;
+  transform: scale(1.1);
 }

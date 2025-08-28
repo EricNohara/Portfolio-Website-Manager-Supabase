@@ -16,6 +16,11 @@
   text-decoration: none;
   font-size: 1.1rem;
   color: white;
+  transition: 0.2s ease;
+}
+
+.landingLinks > li > a:hover {
+  color: var(--home-txt-3);
 }
 
 .buttonsContainer {
