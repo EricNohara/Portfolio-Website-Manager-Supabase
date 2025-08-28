@@ -4,8 +4,8 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-import { ButtonOne, ButtonTwo } from "./components/Buttons/buttons";
-import Navigation from "./components/Navigation/navigation";
+import { ButtonOne, ButtonTwo } from "./components/Buttons/Buttons";
+import Navigation from "./components/Navigation/Navigation";
 import { useAuth } from "./context/AuthProvider";
 import styles from "./LandingPage.module.css";
 

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import UserList from "./user-list";
-import Navigation from "../components/Navigation/navigation";
+import Navigation from "../components/Navigation/Navigation";
 
 export default function AccountPage() {
   const router = useRouter();

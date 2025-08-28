@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { ButtonOne, ButtonThree } from "@/app/components/Buttons/buttons";
-import TextInput from "@/app/components/TextInput/text-input";
+import { ButtonOne, ButtonThree } from "@/app/components/Buttons/Buttons";
+import TextInput from "@/app/components/TextInput/TextInput";
 
 import styles from "../login/LoginPage.module.css";
 

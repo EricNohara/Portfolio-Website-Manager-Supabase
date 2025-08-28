@@ -3,10 +3,10 @@
 import Image from "next/image";
 import React from "react";
 
-import Navigation from "@/app/components/Navigation/navigation";
-import TitleLogo from "@/app/components/TitleLogo/title-logo";
+import Navigation from "@/app/components/Navigation/Navigation";
+import TitleLogo from "@/app/components/TitleLogo/TitleLogo";
 
-import SignUpForm from "./sign-up-form";
+import SignUpForm from "./SignUpForm";
 import styles from "../login/LoginPage.module.css";
 
 export default function SignUpPage() {

@@ -2,7 +2,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-import BodyWrapper from "./components/BodyWrapper/body-wrapper";
+import BodyWrapper from "./components/BodyWrapper/BodyWrapper";
 import { AuthProvider } from "./context/AuthProvider";
 import LocalizationProviderWrapper from "./context/LocalizationProviderWrapper";
 

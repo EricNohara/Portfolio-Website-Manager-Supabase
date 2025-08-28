@@ -7,8 +7,8 @@ import { useEffect } from "react";
 import { useAuth } from "@/app/context/AuthProvider";
 
 import styles from "./Navigation.module.css";
-import { ButtonOne, ButtonTwo } from "../Buttons/buttons";
-import TitleLogo from "../TitleLogo/title-logo";
+import { ButtonOne, ButtonTwo } from "../Buttons/Buttons";
+import TitleLogo from "../TitleLogo/TitleLogo";
 
 
 export default function Navigation() {
