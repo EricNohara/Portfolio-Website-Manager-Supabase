@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const isDev = process.env.NODE_ENV === "development";
 
 const nextConfig: NextConfig = {
+  images: {
+    domains: ["jfsetifsqcpkwdtcrhdt.supabase.co"],
+  },
   async headers() {
     return [
       {

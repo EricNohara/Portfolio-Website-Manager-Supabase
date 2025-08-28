@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import SearchBar from "../components/SearchBar/SearchBar";
+import UserDropdown from "../components/UserDropdown/UserDropdown";
 import UserList from "./user-list";
 import styles from "./UserHomePage.module.css";
 import Navigation from "../components/Navigation/Navigation";
@@ -35,7 +37,13 @@ export default function UserHomePage() {
   return (
     <div className={styles.pageContainer} >
       <Navigation />
-      <UserList user={user} />
+      <div className={styles.pageContentContainer}>
+        <div className={styles.pageContentHeader}>
+          <SearchBar />
+          <UserDropdown />
+        </div>
+        <UserList user={user} />
+      </div>
     </div>
   );
 }
