@@ -1,13 +1,13 @@
 "use client";
 
-import { Container } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import UserList from "./user-list";
+import styles from "./UserHomePage.module.css";
 import Navigation from "../components/Navigation/Navigation";
 
-export default function AccountPage() {
+export default function UserHomePage() {
   const router = useRouter();
 
   const [user, setUser] = useState(null);
@@ -33,11 +33,9 @@ export default function AccountPage() {
   }, [router]);
 
   return (
-    <Container
-      sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-    >
+    <div className={styles.pageContainer} >
       <Navigation />
       <UserList user={user} />
-    </Container>
+    </div>
   );
 }

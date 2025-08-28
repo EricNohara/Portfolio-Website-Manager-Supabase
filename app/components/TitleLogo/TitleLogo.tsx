@@ -1,13 +1,17 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+import { useAuth } from "@/app/context/AuthProvider";
+
 import styles from "./TitleLogo.module.css";
 
 export default function TitleLogo() {
     const router = useRouter();
+    const { isLoggedIn } = useAuth();
 
     const handleClick = () => {
-        router.push("/")
+        if (!isLoggedIn) router.push("/")
+        else router.push("/user")
     }
 
     return (

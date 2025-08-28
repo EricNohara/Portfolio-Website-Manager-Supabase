@@ -1,10 +1,12 @@
 "use client";
 
-import { Container, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
+import Navigation from "@/app/components/Navigation/Navigation";
+
 import DocumentsList from "./documents-list";
+import styles from "../UserHomePage.module.css";
 
 export default function DocumentsPage() {
   const router = useRouter();
@@ -32,17 +34,9 @@ export default function DocumentsPage() {
   }, [router]);
 
   return (
-    <Container maxWidth="sm">
-      <Typography
-        variant="h3"
-        component="h2"
-        className="text-center"
-        fontWeight="bold"
-        marginBottom="5%"
-      >
-        User Documents
-      </Typography>
+    <div className={styles.pageContainer} >
+      <Navigation />
       <DocumentsList user={user} />
-    </Container>
+    </div>
   );
 }

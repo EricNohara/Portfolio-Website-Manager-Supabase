@@ -25,6 +25,7 @@
     "bcrypt": "^5.1.1",
     "browser-image-compression": "^2.0.2",
     "dayjs": "^1.11.13",
+    "lucide-react": "^0.542.0",
     "next": "^15.4.5",
     "pdf-lib": "^1.17.1",
     "react": "^18.3.1",
