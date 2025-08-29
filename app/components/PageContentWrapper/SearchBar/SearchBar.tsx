@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import styles from "./SearchBar.module.css";
 import { Search } from "lucide-react";
+import { useState } from "react";
+
+import styles from "./SearchBar.module.css";
 
 export default function SearchBar() {
     const [query, setQuery] = useState<string>("");

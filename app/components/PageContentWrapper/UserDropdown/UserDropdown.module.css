@@ -2,10 +2,36 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  flex-shrink: 0;
   color: var(--page-txt-2);
+  border: none;
+  border-radius: var(--global-border-radius);
+  background-color: inherit;
+}
+
+.container:hover {
+  cursor: pointer;
+}
+
+.openContainer {
+  background-color: var(--search-bg);
+  color: var(--page-txt-1);
 }
 
 .avatar {
-  border-radius: 50%;
+  border-radius: var(--global-border-radius);
+  box-shadow: 0 0 1px var(--search-txt);
+}
+
+.relativeContainer {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.popupContainer {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.25rem;
+  z-index: 999;
 }

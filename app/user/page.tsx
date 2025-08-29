@@ -4,9 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import UserList from "./user-list";
-import styles from "./UserHomePage.module.css";
 import PageContentWrapper from "../components/PageContentWrapper/PageContentWrapper";
-
 export default function UserHomePage() {
   const router = useRouter();
 

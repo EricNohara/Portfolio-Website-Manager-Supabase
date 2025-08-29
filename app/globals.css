@@ -54,6 +54,10 @@ body {
   --page-txt-1: black;
   --page-txt-2: #5f5f5f;
 
+  --popup-bg: white;
+  --popup-hover: #d6e2f2;
+
+  --user-dropdown-bg: white;
   /* add more later */
 
   /* sizes */

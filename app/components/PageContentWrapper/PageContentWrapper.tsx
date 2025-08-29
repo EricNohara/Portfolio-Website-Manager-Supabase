@@ -1,8 +1,9 @@
 import { ReactNode } from "react"
+
+import styles from "./PageContentWrapper.module.css";
 import Navigation from "../Navigation/Navigation";
 import SearchBar from "./SearchBar/SearchBar";
 import UserDropdown from "./UserDropdown/UserDropdown";
-import styles from "./PageContentWrapper.module.css";
 
 interface IPageContentWrapperProps {
     children: ReactNode;

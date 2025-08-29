@@ -3,10 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
-import Navigation from "@/app/components/Navigation/Navigation";
+import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
 
 import DocumentsList from "./documents-list";
-import styles from "../UserHomePage.module.css";
 
 export default function DocumentsPage() {
   const router = useRouter();
@@ -34,9 +33,8 @@ export default function DocumentsPage() {
   }, [router]);
 
   return (
-    <div className={styles.pageContainer} >
-      <Navigation />
+    <PageContentWrapper>
       <DocumentsList user={user} />
-    </div>
+    </PageContentWrapper>
   );
 }
