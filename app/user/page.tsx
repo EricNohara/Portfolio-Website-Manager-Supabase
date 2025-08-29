@@ -3,11 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import SearchBar from "../components/SearchBar/SearchBar";
-import UserDropdown from "../components/UserDropdown/UserDropdown";
 import UserList from "./user-list";
 import styles from "./UserHomePage.module.css";
-import Navigation from "../components/Navigation/Navigation";
+import PageContentWrapper from "../components/PageContentWrapper/PageContentWrapper";
 
 export default function UserHomePage() {
   const router = useRouter();
@@ -35,15 +33,8 @@ export default function UserHomePage() {
   }, [router]);
 
   return (
-    <div className={styles.pageContainer} >
-      <Navigation />
-      <div className={styles.pageContentContainer}>
-        <div className={styles.pageContentHeader}>
-          <SearchBar />
-          <UserDropdown />
-        </div>
-        <UserList user={user} />
-      </div>
-    </div>
+    <PageContentWrapper>
+      <UserList user={user} />
+    </PageContentWrapper>
   );
 }
