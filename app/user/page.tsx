@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 
 import UserList from "./user-list";
 import PageContentWrapper from "../components/PageContentWrapper/PageContentWrapper";
+// import PageContentHeader from "../components/PageContentHeader/PageContentHeader";
+
+// import { IButton } from "../components/PageContentHeader/PageContentHeader";
+
 export default function UserHomePage() {
   const router = useRouter();
 
@@ -30,9 +34,15 @@ export default function UserHomePage() {
     authenticator();
   }, [router]);
 
+  // const buttonOne: IButton = {
+  //   name: "Add Skill",
+  //   onClick: () => { }
+  // }
+
   return (
     <PageContentWrapper>
       <UserList user={user} />
+      {/* <PageContentHeader title="Skills" buttonOne={buttonOne} /> */}
     </PageContentWrapper>
   );
 }

@@ -57,11 +57,14 @@ body {
   --popup-bg: white;
   --popup-hover: #d6e2f2;
 
-  --user-dropdown-bg: white;
+  --user-dropdown-bg: rgb(220, 220, 220);
+
+  --table-head-txt: #626262;
   /* add more later */
 
   /* sizes */
   --global-border-radius: 10px;
+  --title-font-size: 2rem;
 }
 
 /* Dark mode overrides */

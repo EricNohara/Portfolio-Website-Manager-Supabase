@@ -7,7 +7,7 @@
 }
 
 .container > h1 {
-  font-size: 2rem;
+  font-size: var(--title-font-size);
 }
 
 .container:hover {

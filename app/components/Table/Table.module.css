@@ -1,0 +1,25 @@
+.tableContainer {
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem;
+  border: 1px solid var(--page-box-border);
+  background-color: var(--page-box-bg);
+  border-radius: var(--global-border-radius);
+}
+
+.table {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+}
+
+.th,
+.td {
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.th {
+  color: var(--table-head-txt);
+}
