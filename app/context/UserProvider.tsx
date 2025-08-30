@@ -6,6 +6,7 @@ import IUser from "../interfaces/IUser";
 import { IExperience } from "../interfaces/IExperience";
 import { ISkillsInput } from "../interfaces/ISkills";
 import { IProjectInput } from "../interfaces/IProject";
+import { ICourseInput } from "../interfaces/ICourse";
 
 type Action =
     | { type: "SET_ALL_DATA"; payload: IUserInfo }
@@ -22,6 +23,9 @@ type Action =
     | { type: "ADD_EDUCATION"; payload: IUserEducation }
     | { type: "UPDATE_EDUCATION"; payload: { old: IUserEducation, new: IUserEducation } }
     | { type: "DELETE_EDUCATION"; payload: IUserEducation }
+    | { type: "ADD_COURSE"; payload: { educationIndex: number; course: ICourseInput } }
+    | { type: "DELETE_COURSE"; payload: { educationIndex: number; courseIndex: number } }
+    | { type: "UPDATE_COURSE"; payload: { educationIndex: number; courseIndex: number; newCourse: ICourseInput } };
 
 const initialState: IUserInfo = {
     email: "",
@@ -130,6 +134,45 @@ function reducer(state: IUserInfo, action: Action): IUserInfo {
             return {
                 ...state,
                 education: state.education.filter((edu) => edu !== action.payload),
+            };
+
+        // --- COURSES ---
+        case "ADD_COURSE":
+            return {
+                ...state,
+                education: state.education.map((edu, idx) =>
+                    idx === action.payload.educationIndex
+                        ? { ...edu, courses: [...edu.courses, action.payload.course] }
+                        : edu
+                ),
+            };
+        case "DELETE_COURSE":
+            return {
+                ...state,
+                education: state.education.map((edu, idx) =>
+                    idx === action.payload.educationIndex
+                        ? {
+                            ...edu,
+                            courses: edu.courses.filter(
+                                (_, cIdx) => cIdx !== action.payload.courseIndex
+                            ),
+                        }
+                        : edu
+                ),
+            };
+        case "UPDATE_COURSE":
+            return {
+                ...state,
+                education: state.education.map((edu, idx) =>
+                    idx === action.payload.educationIndex
+                        ? {
+                            ...edu,
+                            courses: edu.courses.map((course, cIdx) =>
+                                cIdx === action.payload.courseIndex ? action.payload.newCourse : course
+                            ),
+                        }
+                        : edu
+                ),
             };
 
         default:
