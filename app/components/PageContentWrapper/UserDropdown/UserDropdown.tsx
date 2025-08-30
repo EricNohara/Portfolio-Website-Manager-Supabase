@@ -30,7 +30,6 @@ export default function UserDropdown() {
             try {
                 const res = await fetch("/api/internal/user", { method: "GET" });
                 const data = await res.json();
-                console.log(data.userData);
                 if (!res.ok) throw new Error("Failed to retrieve experience data");
                 setUserDropdownInfo(data.userData);
             } catch (err) {

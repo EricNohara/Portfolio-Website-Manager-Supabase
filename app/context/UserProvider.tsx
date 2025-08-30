@@ -1,12 +1,13 @@
 "use client";
 
 import { createContext, useContext, useReducer, useEffect } from "react";
-import { IUserEducation, IUserInfo } from "../interfaces/IUserInfo";
-import IUser from "../interfaces/IUser";
-import { IExperience } from "../interfaces/IExperience";
-import { ISkillsInput } from "../interfaces/ISkills";
-import { IProjectInput } from "../interfaces/IProject";
+
 import { ICourseInput } from "../interfaces/ICourse";
+import { IExperience } from "../interfaces/IExperience";
+import { IProjectInput } from "../interfaces/IProject";
+import { ISkillsInput } from "../interfaces/ISkills";
+import IUser from "../interfaces/IUser";
+import { IUserEducation, IUserInfo } from "../interfaces/IUserInfo";
 
 type Action =
     | { type: "SET_ALL_DATA"; payload: IUserInfo }
@@ -60,7 +61,7 @@ const UserContext = createContext<{
 function reducer(state: IUserInfo, action: Action): IUserInfo {
     switch (action.type) {
         case "SET_ALL_DATA":
-            return { ...action.payload };
+            return action.payload;
         case "SET_USER":
             const { skills, experiences, projects, education, ...rest } = state;
             return {
@@ -186,8 +187,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const fetcher = async () => {
             const res = await fetch("/api/internal/user/data");
-            const data: IUserInfo = await res.json();
-            dispatch({ type: "SET_ALL_DATA", payload: data });
+            const data = await res.json();
+            dispatch({ type: "SET_ALL_DATA", payload: data.userInfo });
         };
         fetcher();
     }, []);

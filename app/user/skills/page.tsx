@@ -4,6 +4,8 @@ import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentW
 import Table from "@/app/components/Table/Table";
 
 // import SkillsList from "./skills-list";
+import { useUser } from "@/app/context/UserProvider";
+
 import PageContentHeader from "../../components/PageContentHeader/PageContentHeader";
 import { IButton } from "../../components/PageContentHeader/PageContentHeader";
 
@@ -12,15 +14,30 @@ const buttonOne: IButton = {
   onClick: () => { }
 }
 
+const columns = ["Name", "Proficiency", "Years of Experience"];
+const columnWidths = [50, 25, 25]
+
 export default function WorkExperiencePage() {
-  const columns = ["Name", "Proficiency", "Years of Experience"];
+  const { state } = useUser();
   const handleEdit = () => { }
   const handleDelete = () => { }
+
+  const rows = state.skills.map((skill) => ({
+    "Name": skill.name,
+    "Proficiency": skill.proficiency,
+    "Years of Experience": skill.years_of_experience
+  }));
 
   return (
     <PageContentWrapper>
       <PageContentHeader title="Skills" buttonOne={buttonOne} />
-      <Table columns={columns} rows={[]} handleEdit={handleEdit} handleDelete={handleDelete} />
+      <Table
+        columns={columns}
+        rows={rows}
+        handleEdit={handleEdit}
+        handleDelete={handleDelete}
+        columnWidths={columnWidths}
+      />
       {/* <SkillsList /> */}
     </PageContentWrapper>
   );

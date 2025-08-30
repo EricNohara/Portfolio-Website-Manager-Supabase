@@ -4,7 +4,13 @@ const isDev = process.env.NODE_ENV === "development";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["jfsetifsqcpkwdtcrhdt.supabase.co"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "jfsetifsqcpkwdtcrhdt.supabase.co",
+        pathname: "/**",
+      },
+    ],
   },
   async headers() {
     return [

@@ -26,7 +26,7 @@ export async function GET(_req: NextRequest): Promise<NextResponse> {
 
         if (userSkillsError) throw userSkillsError;
 
-        const cleanedUserSkills = userSkills.map(({ _user_id, ...rest }) => rest);
+        const cleanedUserSkills = userSkills.map(({ user_id, ...rest }) => rest);
 
         // experiences
         const { data: userExperience, error: userExperienceError } = await supabase
