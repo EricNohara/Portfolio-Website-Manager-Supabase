@@ -1,0 +1,38 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--global-border-radius);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* fix this later */
+  background: linear-gradient(
+    var(--input-form-gradient-1) 0%,
+    var(--input-form-gradient-2),
+    100%
+  );
+  padding: 2rem 1rem;
+}
+
+.title {
+  font-size: 2rem;
+}
+
+.inputRowsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.splitInputRow {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}

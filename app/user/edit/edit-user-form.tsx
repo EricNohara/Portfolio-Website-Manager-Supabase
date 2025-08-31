@@ -5,12 +5,27 @@ import { type User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import defaultUser from "@/app/constants/defaultUser";
 import IUser from "@/app/interfaces/IUser";
 
 export default function EditUserForm({ user }: { user: User | null }) {
   const router = useRouter();
-  const [userData, setUserData] = useState<IUser>(defaultUser);
+  const [userData, setUserData] = useState<IUser>({
+    email: "",
+    name: "",
+    phone_number: null,
+    current_address: null,
+    current_company: null,
+    x_url: null,
+    github_url: null,
+    linkedin_url: null,
+    portrait_url: null,
+    resume_url: null,
+    transcript_url: null,
+    instagram_url: null,
+    facebook_url: null,
+    bio: null,
+    current_position: null,
+  });
 
   useEffect(() => {
     const fetcher = async () => {

@@ -20,7 +20,6 @@ import { type User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import defaultUser from "../constants/defaultUser";
 import { useAuth } from "../context/AuthProvider";
 import IUser from "../interfaces/IUser";
 
@@ -31,7 +30,23 @@ export default function UserList({ user }: { user: User | null }) {
     if (user) setIsLoggedIn(true);
   }, [setIsLoggedIn, user]);
 
-  const [userData, setUserData] = useState<IUser>(defaultUser);
+  const [userData, setUserData] = useState<IUser>({
+    email: "",
+    name: "",
+    phone_number: null,
+    current_address: null,
+    current_company: null,
+    x_url: null,
+    github_url: null,
+    linkedin_url: null,
+    portrait_url: null,
+    resume_url: null,
+    transcript_url: null,
+    instagram_url: null,
+    facebook_url: null,
+    bio: null,
+    current_position: null,
+  });
 
   const getProfile = useCallback(async () => {
     try {

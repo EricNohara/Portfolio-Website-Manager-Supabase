@@ -3,7 +3,6 @@
 import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
 import Table from "@/app/components/Table/Table";
 
-// import SkillsList from "./skills-list";
 import { useUser } from "@/app/context/UserProvider";
 
 import PageContentHeader from "../../components/PageContentHeader/PageContentHeader";
@@ -15,7 +14,7 @@ const buttonOne: IButton = {
 }
 
 const columns = ["Name", "Proficiency", "Years of Experience"];
-const columnWidths = [50, 25, 25]
+const columnWidths = [50, 25, 25];
 
 export default function WorkExperiencePage() {
   const { state } = useUser();
@@ -38,7 +37,6 @@ export default function WorkExperiencePage() {
         handleDelete={handleDelete}
         columnWidths={columnWidths}
       />
-      {/* <SkillsList /> */}
     </PageContentWrapper>
   );
 }

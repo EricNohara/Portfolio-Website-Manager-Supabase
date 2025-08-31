@@ -60,6 +60,9 @@ body {
   --user-dropdown-bg: rgb(220, 220, 220);
 
   --table-head-txt: #626262;
+
+  --input-form-gradient-1: #378afb;
+  --input-form-gradient-2: #0b1c34;
   /* add more later */
 
   /* sizes */
