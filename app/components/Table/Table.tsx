@@ -2,6 +2,7 @@ import { Trash, Pencil } from "lucide-react";
 
 import styles from "./Table.module.css";
 import { EditButton, DeleteButton } from "../Buttons/Buttons";
+import { LucideIcon } from "lucide-react";
 
 export interface ITableProps {
     columns: string[];
@@ -9,9 +10,19 @@ export interface ITableProps {
     handleEdit: (rowIndex: number) => void;
     handleDelete: (rowIndex: number) => void;
     columnWidths?: number[];
+    editButtonOverride?: LucideIcon;
+    deleteButtonOverride?: LucideIcon;
 }
 
-export default function Table({ columns, rows, handleEdit, handleDelete, columnWidths }: ITableProps) {
+export default function Table({
+    columns,
+    rows,
+    handleEdit,
+    handleDelete,
+    columnWidths,
+    editButtonOverride,
+    deleteButtonOverride
+}: ITableProps) {
     return (
         <div className={styles.tableContainer}>
             <table className={styles.table}>
@@ -42,8 +53,12 @@ export default function Table({ columns, rows, handleEdit, handleDelete, columnW
                                 </td>
                             ))}
                             <td className={styles.actions}>
-                                <EditButton onClick={() => handleEdit(i)}><Pencil size={20} strokeWidth={2} /></EditButton>
-                                <DeleteButton onClick={() => handleDelete(i)}><Trash size={20} strokeWidth={2} /></DeleteButton>
+                                <EditButton onClick={() => handleEdit(i)}>
+                                    {editButtonOverride ? <editButtonOverride size={20} strokeWidth={2} /> : <Pencil size={20} strokeWidth={2} />}
+                                </EditButton>
+                                <DeleteButton onClick={() => handleDelete(i)}>
+                                    {deleteButtonOverride ? <deleteButtonOverride size={20} strokeWidth={2} /> : <Trash size={20} strokeWidth={2} />}
+                                </DeleteButton>
                             </td>
                         </tr>
                     ))}
