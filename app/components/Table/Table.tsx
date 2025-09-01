@@ -53,12 +53,21 @@ export default function Table({
                                 </td>
                             ))}
                             <td className={styles.actions}>
-                                <EditButton onClick={() => handleEdit(i)}>
-                                    {editButtonOverride ? <editButtonOverride size={20} strokeWidth={2} /> : <Pencil size={20} strokeWidth={2} />}
-                                </EditButton>
-                                <DeleteButton onClick={() => handleDelete(i)}>
-                                    {deleteButtonOverride ? <deleteButtonOverride size={20} strokeWidth={2} /> : <Trash size={20} strokeWidth={2} />}
-                                </DeleteButton>
+                                <div className={styles.actionsContent}>
+
+                                    <EditButton onClick={() => handleEdit(i)}>
+                                        {(() => {
+                                            const EditIcon = editButtonOverride ?? Pencil;
+                                            return <EditIcon size={20} strokeWidth={2} />;
+                                        })()}
+                                    </EditButton>
+                                    <DeleteButton onClick={() => handleDelete(i)}>
+                                        {(() => {
+                                            const DeleteIcon = deleteButtonOverride ?? Trash;
+                                            return <DeleteIcon size={20} strokeWidth={2} />;
+                                        })()}
+                                    </DeleteButton>
+                                </div>
                             </td>
                         </tr>
                     ))}

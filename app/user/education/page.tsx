@@ -5,6 +5,7 @@ import Table from "@/app/components/Table/Table";
 import { useUser } from "@/app/context/UserProvider";
 import PageContentHeader from "@/app/components/PageContentHeader/PageContentHeader";
 import { IButton } from "@/app/components/PageContentHeader/PageContentHeader";
+import { ExternalLink } from "lucide-react";
 
 const buttonOne: IButton = {
   name: "Add Education",
@@ -12,7 +13,7 @@ const buttonOne: IButton = {
 }
 
 const columns = ["Institution", "Degree", "Majors", "Minors", "GPA", "Start", "End", "Awards", "Courses"];
-const columnWidths = [20, 20, 15, 15, 5, 5, 5, 10, 5];
+const columnWidths = [20, 20, 12.5, 12.5, 5, 5, 5, 12.5, 7.5];
 
 export default function EducationPage() {
   const { state } = useUser();
@@ -28,7 +29,7 @@ export default function EducationPage() {
     "Start": education.year_start,
     "End": education.year_end,
     "Awards": education.awards.join(", "),
-    "Courses": education.courses.length, // edit this to link to courses page later
+    "Courses": <a><ExternalLink /></a>
   }));
 
   return (

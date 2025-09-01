@@ -35,12 +35,21 @@
 .td {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 0;
 }
 
 .actions {
   border-left: 1px solid var(--page-box-border);
   border-bottom: 1px solid #ddd;
   padding-left: 0.75rem;
+  vertical-align: middle;
+}
+
+.actionsContent {
   display: flex;
   align-items: center;
   gap: 0.75rem;
