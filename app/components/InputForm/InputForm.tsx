@@ -1,9 +1,10 @@
+import { X } from "lucide-react";
 import { useState } from "react";
+import { ChangeEvent } from "react";
+
 import styles from "./ImportForm.module.css";
 import { ButtonOne, ExitButton } from "../Buttons/Buttons";
 import TextInput from "../TextInput/TextInput";
-import { ChangeEvent } from "react";
-import { X } from "lucide-react";
 
 export interface IInputFormInput {
     label: string;

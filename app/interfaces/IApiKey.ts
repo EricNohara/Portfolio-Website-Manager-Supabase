@@ -1,14 +1,13 @@
-export interface IApiKey {
-  user_id: string;
+export interface IApiKeyInternal {
   description: string;
   expires: string | null;
   created: string;
 }
 
-export interface IApiKeyInput {
+export interface IApiKey extends IApiKeyInternal {
   user_id: string;
-  description: string;
-  expires: string | null;
-  hashed_key: string;
+}
+
+export interface IApiKeyInput extends IApiKey {
   encrypted_key: string;
 }

@@ -1,10 +1,10 @@
 "use client";
 
+import PageContentHeader from "@/app/components/PageContentHeader/PageContentHeader";
+import { IButton } from "@/app/components/PageContentHeader/PageContentHeader";
 import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
 import Table from "@/app/components/Table/Table";
 import { useUser } from "@/app/context/UserProvider";
-import PageContentHeader from "@/app/components/PageContentHeader/PageContentHeader";
-import { IButton } from "@/app/components/PageContentHeader/PageContentHeader";
 
 const buttonOne: IButton = {
   name: "Add Experience",

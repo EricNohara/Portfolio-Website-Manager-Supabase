@@ -2,15 +2,18 @@
 
 import { createContext, useContext, useReducer, useEffect } from "react";
 
+import { IApiKeyInternal } from "../interfaces/IApiKey";
 import { ICourseInput } from "../interfaces/ICourse";
 import { IExperience } from "../interfaces/IExperience";
 import { IProjectInput } from "../interfaces/IProject";
+import { IPublicApiLogInternal } from "../interfaces/IPublicApiLog";
 import { ISkillsInput } from "../interfaces/ISkills";
 import IUser from "../interfaces/IUser";
-import { IUserEducation, IUserInfo } from "../interfaces/IUserInfo";
+import { IUserEducation } from "../interfaces/IUserInfo";
+import { IUserInfoInternal } from "../interfaces/IUserInfoInternal";
 
 type Action =
-    | { type: "SET_ALL_DATA"; payload: IUserInfo }
+    | { type: "SET_ALL_DATA"; payload: IUserInfoInternal }
     | { type: "SET_USER"; payload: IUser }
     | { type: "ADD_EXPERIENCE"; payload: IExperience }
     | { type: "UPDATE_EXPERIENCE"; payload: { old: IExperience, new: IExperience } }
@@ -25,10 +28,14 @@ type Action =
     | { type: "UPDATE_EDUCATION"; payload: { old: IUserEducation, new: IUserEducation } }
     | { type: "DELETE_EDUCATION"; payload: IUserEducation }
     | { type: "ADD_COURSE"; payload: { educationIndex: number; course: ICourseInput } }
+    | { type: "UPDATE_COURSE"; payload: { educationIndex: number; courseIndex: number; newCourse: ICourseInput } }
     | { type: "DELETE_COURSE"; payload: { educationIndex: number; courseIndex: number } }
-    | { type: "UPDATE_COURSE"; payload: { educationIndex: number; courseIndex: number; newCourse: ICourseInput } };
+    | { type: "ADD_API_KEY"; payload: IApiKeyInternal }
+    | { type: "UPDATE_API_KEY"; payload: { old: IApiKeyInternal, new: IApiKeyInternal } }
+    | { type: "DELETE_API_KEY"; payload: IApiKeyInternal }
+    | { type: "REFRESH_PUBLIC_API_LOGS"; payload: IPublicApiLogInternal[] };
 
-const initialState: IUserInfo = {
+const initialState: IUserInfoInternal = {
     email: "",
     name: null,
     bio: null,
@@ -48,22 +55,24 @@ const initialState: IUserInfo = {
     experiences: [],
     projects: [],
     education: [],
+    api_keys: [],
+    public_api_logs: []
 };
 
 const UserContext = createContext<{
-    state: IUserInfo;
+    state: IUserInfoInternal;
     dispatch: React.Dispatch<Action>;
 }>({
     state: initialState,
     dispatch: () => { },
 });
 
-function reducer(state: IUserInfo, action: Action): IUserInfo {
+function reducer(state: IUserInfoInternal, action: Action): IUserInfoInternal {
     switch (action.type) {
         case "SET_ALL_DATA":
             return action.payload;
         case "SET_USER":
-            const { skills, experiences, projects, education, ...rest } = state;
+            const { skills, experiences, projects, education, api_keys, public_api_logs, ...rest } = state;
             return {
                 ...rest,
                 ...action.payload,
@@ -71,6 +80,8 @@ function reducer(state: IUserInfo, action: Action): IUserInfo {
                 experiences,
                 projects,
                 education,
+                api_keys,
+                public_api_logs
             };
 
         // --- EXPERIENCES ---
@@ -175,6 +186,26 @@ function reducer(state: IUserInfo, action: Action): IUserInfo {
                         : edu
                 ),
             };
+
+        // --- API_KEYS ---
+        case "ADD_API_KEY":
+            return { ...state, api_keys: [...state.api_keys, action.payload] };
+        case "UPDATE_API_KEY":
+            return {
+                ...state,
+                api_keys: state.api_keys.map((k) =>
+                    k === action.payload.old ? action.payload.new : k
+                ),
+            };
+        case "DELETE_API_KEY":
+            return {
+                ...state,
+                api_keys: state.api_keys.filter((k) => k !== action.payload),
+            };
+
+        // --- PUBLIC_API_LOGS ---
+        case "REFRESH_PUBLIC_API_LOGS":
+            return { ...state, public_api_logs: action.payload };
 
         default:
             return state;

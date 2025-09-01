@@ -1,8 +1,8 @@
 import { Trash, Pencil } from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 import styles from "./Table.module.css";
 import { EditButton, DeleteButton } from "../Buttons/Buttons";
-import { LucideIcon } from "lucide-react";
 
 export interface ITableProps {
     columns: string[];
