@@ -5,6 +5,7 @@ import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
 import { decrypt } from "@/utils/auth/encrypt";
 import { validateKey } from "@/utils/auth/hash";
 import { createServiceRoleClient } from "@/utils/supabase/server";
+import { ApiOutlined } from "@mui/icons-material";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   // create fields for log
@@ -12,12 +13,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   let userId: string | null = null;
   let keyDescription: string | null = null;
   let statusCode: number = 500;
+  let apiKey: string | undefined;
 
   try {
     const supabase = await createServiceRoleClient();
 
     // get the api key from the authorization header
-    const apiKey = req.headers.get("Authorization")?.split(" ")[1];
+    apiKey = req.headers.get("Authorization")?.split(" ")[1];
     if (!apiKey) {
       statusCode = 401;
       return NextResponse.json(
@@ -198,7 +200,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       }
     );
   } finally {
-    // add a log if we know the user id
+    // add a log and update last used field for api key if we know the user id
     if (userId) {
       try {
         // create the log
@@ -217,6 +219,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         // insert the log
         const supabase = await createServiceRoleClient();
         await supabase.from("public_api_logs").insert(publicApiLog);
+
+        // update the last_used field
+        if (apiKey) {
+          await supabase
+            .from("api_keys")
+            .update({ last_used: requestedAt })
+            .eq("encrypted_key", apiKey);
+        }
       } catch (logErr) {
         console.error("Failed to insert API log:", (logErr as Error).message);
       }

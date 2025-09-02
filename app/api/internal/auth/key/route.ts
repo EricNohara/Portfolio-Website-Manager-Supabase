@@ -10,7 +10,7 @@ export async function GET(_req: NextRequest): Promise<NextResponse> {
 
     const { data, error } = await supabase
       .from("api_keys")
-      .select("created, expires, description")
+      .select("created, expires, description, last_used")
       .eq("user_id", user.id);
 
     if (error) throw error;
