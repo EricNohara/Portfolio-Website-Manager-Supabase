@@ -7,7 +7,6 @@ import { IButton } from "@/app/components/PageContentHeader/PageContentHeader";
 import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
 import Table from "@/app/components/Table/Table";
 import { useUser } from "@/app/context/UserProvider";
-import { useEffect } from "react";
 
 const buttonOne: IButton = {
   name: "Add Education",
@@ -33,10 +32,6 @@ export default function EducationPage() {
     "Awards": education.awards.join(", "),
     "Courses": <a><ExternalLink /></a>
   }));
-
-  useEffect(() => {
-    console.log(state);
-  })
 
   return (
     <PageContentWrapper>

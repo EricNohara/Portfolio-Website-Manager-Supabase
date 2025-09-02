@@ -19,36 +19,33 @@ const buttonTwo: IButton = {
   onClick: () => { }
 }
 
-const columns = ["Description", "Created", "Expires", "Last Used"];
-const columnWidths = [40, 20, 20, 20];
+const columns = ["Description", "Created", "Expires"];
+// const columns = ["Description", "Created", "Expires", "Last Used"];
+const columnWidths = [50, 25, 25];
+// const columnWidths = [40, 20, 20, 20];
 
 export default function ConnectPage() {
   const { state } = useUser();
   const handleEdit = () => { }
   const handleDelete = () => { }
 
-  // const rows = state.education.map((education) => ({
-  //   "Institution": education.institution,
-  //   "Degree": education.degree,
-  //   "Majors": education.majors.join(", "),
-  //   "Minors": education.minors.join(", "),
-  //   "GPA": education.gpa,
-  //   "Start": education.year_start,
-  //   "End": education.year_end,
-  //   "Awards": education.awards.join(", "),
-  //   "Courses": <a><ExternalLink /></a>
-  // }));
+  const rows = state.api_keys.map((key) => ({
+    "Description": key.description,
+    "Created": key.created,
+    "Expires": key.expires ? key.expires : "Never",
+    // "Last Used": key.,
+  }));
 
   return (
     <PageContentWrapper>
       <PageContentHeader title="Education" buttonOne={buttonOne} />
-      {/* <Table
+      <Table
         columns={columns}
         rows={rows}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
         columnWidths={columnWidths}
-      /> */}
+      />
     </PageContentWrapper>
   );
 }
