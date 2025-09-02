@@ -5,7 +5,6 @@ import { IUserEducation, IUserInfo } from "@/app/interfaces/IUserInfo";
 import { decrypt } from "@/utils/auth/encrypt";
 import { validateKey } from "@/utils/auth/hash";
 import { createServiceRoleClient } from "@/utils/supabase/server";
-import { ApiOutlined } from "@mui/icons-material";
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   // create fields for log

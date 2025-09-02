@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { useState } from "react";
+// import { useState } from "react";
 import { ChangeEvent } from "react";
 
 import styles from "./ImportForm.module.css";
@@ -36,29 +36,9 @@ export default function InputForm({ inputRows, title, buttonLabel, handleSubmit 
                 <ExitButton><X size={15} /></ExitButton>
             </header>
             <div className={styles.inputRowsContainer}>
-                {inputRows.map((row) => (
-                    row.inputTwo ?
-                        <div className={styles.splitInputRow}>
-                            <TextInput
-                                label={row.inputOne.label}
-                                name={row.inputOne.name}
-                                value={row.inputOne.value}
-                                type={row.inputOne.type}
-                                placeholder={row.inputOne.placeholder}
-                                onChange={row.inputOne.onChange}
-                                required={row.inputOne.required}
-                            />
-                            <TextInput
-                                label={row.inputTwo.label}
-                                name={row.inputTwo.name}
-                                value={row.inputTwo.value}
-                                type={row.inputTwo.type}
-                                placeholder={row.inputTwo.placeholder}
-                                onChange={row.inputTwo.onChange}
-                                required={row.inputTwo.required}
-                            />
-                        </div>
-                        : <TextInput
+                {inputRows.map((row, i) => (
+                    <div className={styles.InputRow} key={i}>
+                        <TextInput
                             label={row.inputOne.label}
                             name={row.inputOne.name}
                             value={row.inputOne.value}
@@ -67,6 +47,16 @@ export default function InputForm({ inputRows, title, buttonLabel, handleSubmit 
                             onChange={row.inputOne.onChange}
                             required={row.inputOne.required}
                         />
+                        {row.inputTwo && <TextInput
+                            label={row.inputTwo.label}
+                            name={row.inputTwo.name}
+                            value={row.inputTwo.value}
+                            type={row.inputTwo.type}
+                            placeholder={row.inputTwo.placeholder}
+                            onChange={row.inputTwo.onChange}
+                            required={row.inputTwo.required}
+                        />}
+                    </div>
                 ))}
             </div>
             <ButtonOne type="submit">{buttonLabel}</ButtonOne>

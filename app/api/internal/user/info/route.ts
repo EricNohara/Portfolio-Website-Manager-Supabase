@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { IUserEducation } from "@/app/interfaces/IUserInfo";
-import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { IUserInfoInternal } from "@/app/interfaces/IUserInfoInternal";
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 
 export async function GET(_req: NextRequest): Promise<NextResponse> {
   try {

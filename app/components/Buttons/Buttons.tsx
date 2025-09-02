@@ -18,6 +18,10 @@ export function ButtonThree({ children, className, ...props }: ButtonProps) {
     return <button className={`${styles.three} ${className || ""}`} {...props}>{children}</button>
 }
 
+export function ButtonFour({ children, className, ...props }: ButtonProps) {
+    return <button className={`${styles.four} ${className || ""}`} {...props}>{children}</button>
+}
+
 export function EditButton({ children, className, ...props }: ButtonProps) {
     return <button className={`${styles.edit} ${className || ""}`} {...props}>{children}</button>
 }

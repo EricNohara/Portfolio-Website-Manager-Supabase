@@ -14,7 +14,7 @@ const buttonOne: IButton = {
   onClick: () => { }
 }
 
-const buttonTwo: IButton = {
+const buttonFour: IButton = {
   name: "API Docs",
   onClick: () => { }
 }
@@ -33,18 +33,19 @@ export default function ConnectPage() {
     "Description": key.description,
     "Created": key.created,
     "Expires": key.expires ? key.expires : "Never",
-    // "Last Used": key.,
+    "Last Used": key.last_used ? key.last_used : "Never",
   }));
 
   return (
     <PageContentWrapper>
-      <PageContentHeader title="Education" buttonOne={buttonOne} />
+      <PageContentHeader title="Connect" buttonOne={buttonOne} buttonFour={buttonFour} />
       <Table
         columns={columns}
         rows={rows}
         handleEdit={handleEdit}
         handleDelete={handleDelete}
         columnWidths={columnWidths}
+        editButtonOverride={RefreshCcw}
       />
     </PageContentWrapper>
   );

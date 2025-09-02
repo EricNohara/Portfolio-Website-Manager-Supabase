@@ -10,3 +10,10 @@
   font-size: var(--title-font-size);
   margin: 0;
 }
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}

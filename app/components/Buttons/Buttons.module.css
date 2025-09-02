@@ -1,6 +1,7 @@
 .one,
 .two,
-.three {
+.three,
+.four {
   padding: 0.5rem 1.5rem;
   font-size: 0.9rem;
   font-weight: bold;
@@ -12,7 +13,8 @@
 
 .one:hover,
 .two:hover,
-.three:hover {
+.three:hover,
+.four:hover {
   cursor: pointer;
 }
 
@@ -38,6 +40,16 @@
 
 .three:hover {
   background-color: var(--btn-3-hover);
+}
+
+.four {
+  border: 2px solid var(--btn-4);
+  background-color: inherit;
+  color: var(--btn-4-txt);
+}
+
+.four:hover {
+  background-color: var(--btn-4-hover);
 }
 
 .edit,
