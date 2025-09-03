@@ -64,8 +64,12 @@ body {
 
   --table-head-txt: #626262;
 
+  --input-form: white;
   --input-form-gradient-1: #378afb;
   --input-form-gradient-2: #0b1c34;
+
+  --input-form-title-txt: white;
+  --input-form-overlay: rgba(0, 0, 0, 0.8);
   /* add more later */
 
   /* sizes */

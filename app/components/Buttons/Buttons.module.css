@@ -43,7 +43,7 @@
 }
 
 .four {
-  border: 2px solid var(--btn-4);
+  box-shadow: inset 0 0 0 2px var(--btn-4);
   background-color: inherit;
   color: var(--btn-4-txt);
 }
@@ -58,6 +58,9 @@
   border: none;
   border-radius: 50%;
   padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .edit:hover,
