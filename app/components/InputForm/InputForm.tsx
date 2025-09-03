@@ -1,5 +1,4 @@
 import { X } from "lucide-react";
-// import { useState } from "react";
 import { ChangeEvent } from "react";
 
 import styles from "./InputForm.module.css";
@@ -25,16 +24,23 @@ export interface IInputFormProps {
     inputRows: IInputFormRow[];
     title: string;
     buttonLabel: string;
-    handleSubmit: () => void;
+    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+    onClose: () => void;
 }
 
-export default function InputForm({ inputRows, title, buttonLabel, handleSubmit }: IInputFormProps) {
+export default function InputForm({ inputRows, title, buttonLabel, onSubmit, onClose }: IInputFormProps) {
+    const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    };
+
     return (
-        <div className={styles.overlay}>
-            <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.overlay} onClick={handleOverlayClick}>
+            <form onSubmit={onSubmit} className={styles.form}>
                 <header className={styles.header}>
                     <h1 className={styles.title}>{title}</h1>
-                    <ExitButton><X size={15} /></ExitButton>
+                    <ExitButton onClick={onClose}><X size={15} /></ExitButton>
                 </header>
                 <div className={styles.inputRowsContainer}>
                     {inputRows.map((row, i) => (
