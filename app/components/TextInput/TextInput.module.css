@@ -1,4 +1,5 @@
-.textInput {
+.textInput,
+.inputFormInput {
   background-color: var(--login-btn-bg);
   border: 2px solid var(--login-txt-3);
   color: var(--login-txt-1);
@@ -19,6 +20,15 @@
   color: var(--login-txt-3);
 }
 
+.textInput:-webkit-autofill,
+.textInput:-webkit-autofill:hover,
+.textInput:-webkit-autofill:focus,
+.textInput:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px var(--login-btn-bg) inset !important;
+  -webkit-text-fill-color: var(--login-txt-1) !important;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
 .inputDiv {
   display: flex;
   flex-direction: column;
@@ -31,11 +41,30 @@
   font-size: 0.8rem;
 }
 
-.textInput:-webkit-autofill,
-.textInput:-webkit-autofill:hover,
-.textInput:-webkit-autofill:focus,
-.textInput:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0px 1000px var(--login-btn-bg) inset !important;
-  -webkit-text-fill-color: var(--login-txt-1) !important;
+.inputFormInputLabel {
+  color: var(--input-form-input-label-txt);
+}
+
+.inputFormInput {
+  background-color: var(--input-form-input);
+  border: 1.5px solid var(--input-form-input-placeholder-txt);
+  color: var(--input-form-input-txt);
+}
+
+.inputFormInput:focus {
+  outline: none;
+  border-color: var(--input-form-input-focus);
+  transition: border-color 0.2s ease;
+}
+.inputFormInput::placeholder {
+  color: var(--input-form-input-placeholder-txt);
+}
+
+.inputFormInput:-webkit-autofill,
+.inputFormInput:-webkit-autofill:hover,
+.inputFormInput:-webkit-autofill:focus,
+.inputFormInput:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px var(--input-form-input) inset !important;
+  -webkit-text-fill-color: var(--input-form-input-txt) !important;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }

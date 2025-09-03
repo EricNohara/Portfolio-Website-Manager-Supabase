@@ -1,14 +1,15 @@
 "use client";
 
+import { useState } from "react";
+
+import InputForm from "@/app/components/InputForm/InputForm";
+import { IInputFormRow, IInputFormProps } from "@/app/components/InputForm/InputForm";
 import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
 import Table from "@/app/components/Table/Table";
 import { useUser } from "@/app/context/UserProvider";
 
 import PageContentHeader, { IButton } from "../../components/PageContentHeader/PageContentHeader";
-import InputForm from "@/app/components/InputForm/InputForm";
-import { IInputFormInput, IInputFormRow, IInputFormProps } from "@/app/components/InputForm/InputForm";
 
-import { useState } from "react";
 
 const columns = ["Name", "Proficiency", "Years of Experience"];
 const columnWidths = [50, 25, 25];
@@ -16,9 +17,23 @@ const columnWidths = [50, 25, 25];
 export default function WorkExperiencePage() {
   const { state } = useUser();
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const [formValues, setFormValues] = useState({
+    name: "",
+    proficiency: "",
+    years_of_experience: ""
+  });
 
   const handleEdit = () => { }
   const handleDelete = () => { }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormValues(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  const handleSubmit = () => {
+    console.log("Submitting:", formValues);
+    setIsFormOpen(false);
+  }
 
   const buttonOne: IButton = {
     name: "Add Skill",
@@ -39,8 +54,8 @@ export default function WorkExperiencePage() {
         type: "text",
         placeholder: "Enter skill name",
         required: true,
-        onChange: () => { },
-        value: ""
+        onChange: handleChange,
+        value: formValues.name
       }
     }, {
       inputOne: {
@@ -49,8 +64,8 @@ export default function WorkExperiencePage() {
         type: "number",
         placeholder: "Enter skill proficiency",
         required: false,
-        onChange: () => { },
-        value: ""
+        onChange: handleChange,
+        value: formValues.proficiency
       },
       inputTwo: {
         label: "Years of Experience",
@@ -58,8 +73,8 @@ export default function WorkExperiencePage() {
         type: "number",
         placeholder: "Enter years of experience",
         required: false,
-        onChange: () => { },
-        value: ""
+        onChange: handleChange,
+        value: formValues.years_of_experience
       }
     }
   ]
@@ -67,7 +82,7 @@ export default function WorkExperiencePage() {
   const formProps: IInputFormProps = {
     title: "Add Skill Information",
     buttonLabel: "Add Skill",
-    handleSubmit: () => { },
+    handleSubmit: handleSubmit,
     inputRows: inputRows
   }
 

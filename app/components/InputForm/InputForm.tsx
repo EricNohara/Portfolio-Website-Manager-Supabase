@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 // import { useState } from "react";
 import { ChangeEvent } from "react";
 
-import styles from "./ImportForm.module.css";
+import styles from "./InputForm.module.css";
 import { ButtonOne, ExitButton } from "../Buttons/Buttons";
 import TextInput from "../TextInput/TextInput";
 
@@ -38,7 +38,7 @@ export default function InputForm({ inputRows, title, buttonLabel, handleSubmit 
                 </header>
                 <div className={styles.inputRowsContainer}>
                     {inputRows.map((row, i) => (
-                        <div className={styles.InputRow} key={i}>
+                        <div className={styles.inputRow} key={i}>
                             <TextInput
                                 label={row.inputOne.label}
                                 name={row.inputOne.name}
@@ -47,6 +47,7 @@ export default function InputForm({ inputRows, title, buttonLabel, handleSubmit 
                                 placeholder={row.inputOne.placeholder}
                                 onChange={row.inputOne.onChange}
                                 required={row.inputOne.required}
+                                isInInputForm={true}
                             />
                             {
                                 row.inputTwo &&
@@ -58,12 +59,15 @@ export default function InputForm({ inputRows, title, buttonLabel, handleSubmit 
                                     placeholder={row.inputTwo.placeholder}
                                     onChange={row.inputTwo.onChange}
                                     required={row.inputTwo.required}
+                                    isInInputForm={true}
                                 />
                             }
                         </div>
                     ))}
                 </div>
-                <ButtonOne type="submit">{buttonLabel}</ButtonOne>
+                <div className={styles.buttonContainer}>
+                    <ButtonOne type="submit">{buttonLabel}</ButtonOne>
+                </div>
             </form>
         </div>
     );

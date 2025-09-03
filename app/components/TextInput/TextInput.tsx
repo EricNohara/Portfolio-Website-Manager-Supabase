@@ -12,6 +12,7 @@ interface TextInputProps {
     placeholder?: string;
     type?: string;
     required?: boolean;
+    isInInputForm?: boolean;
 }
 
 export default function TextInput({
@@ -22,14 +23,15 @@ export default function TextInput({
     placeholder,
     type = "text",
     required = false,
+    isInInputForm = false
 }: TextInputProps) {
     return (
         <div className={styles.inputDiv}>
-            <label className={styles.inputLabel} htmlFor={name}>
+            <label className={`${styles.inputLabel} ${isInInputForm && styles.inputFormInputLabel}`} htmlFor={name}>
                 {label}
             </label>
             <input
-                className={styles.textInput}
+                className={isInInputForm ? styles.inputFormInput : styles.textInput}
                 id={name}
                 name={name}
                 value={value}
