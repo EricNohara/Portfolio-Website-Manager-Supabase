@@ -19,25 +19,51 @@ const columnWidths = [50, 25, 25];
 export default function WorkExperiencePage() {
   const { state, dispatch } = useUser();
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
-  const [formValues, setFormValues] = useState({
+  const [formValues, setFormValues] = useState<ISkillsInput>({
     name: "",
-    proficiency: "",
-    years_of_experience: ""
+    proficiency: null,
+    years_of_experience: null
   });
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editingSkill, setEditingSkill] = useState<ISkillsInput | null>(null);
 
-  const handleEdit = () => { }
-  const handleDelete = () => { }
+  const handleEdit = (rowIndex: number) => {
+    const skill = state.skills[rowIndex];
+    setEditingSkill(skill);
+    setFormValues({
+      name: skill.name,
+      proficiency: skill.proficiency,
+      years_of_experience: skill.years_of_experience
+    });
+    setIsEditing(true);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = async (rowIndex: number) => {
+    const skill = state.skills[rowIndex];
+    try {
+      const res = await fetch(`/api/internal/user/skills?skillName=${skill.name}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(data.message);
+
+      // update cached state
+      dispatch({ type: "DELETE_SKILL", payload: skill });
+    } catch (error) {
+      console.error(error);
+      alert(error);
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormValues(prev => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
+  // split this into add vs edit later
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const name = formValues.name.trim();
-    const proficiency = Number(formValues.proficiency.trim());
-    const years_of_experience = Number(formValues.years_of_experience.trim());
+    const proficiency = formValues.proficiency;
+    const years_of_experience = formValues.years_of_experience;
 
     // validate input
     if (!name) {
@@ -61,33 +87,48 @@ export default function WorkExperiencePage() {
       years_of_experience: years_of_experience ? years_of_experience : null
     }
 
-    // add the skill
     try {
-      const res = await fetch("/api/internal/user/skills", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newSkill),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+      if (isEditing && editingSkill) {
+        // update the skill
+        const editPayload = {
+          skillName: editingSkill.name,
+          updatedSkill: newSkill
+        }
+        const res = await fetch("/api/internal/user/skills", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(editPayload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        // update cached state
+        dispatch({ type: "UPDATE_SKILL", payload: { old: editingSkill, new: newSkill } });
+      } else {
+        // Add the skill
+        const res = await fetch("/api/internal/user/skills", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newSkill),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        // update the cached user
+        dispatch({ type: "ADD_SKILL", payload: newSkill });
+      }
+
     } catch (err) {
       console.error(err);
       const error = err as Error;
       alert(error.message);
     }
 
-    // update the cached user
-    dispatch({ type: "ADD_SKILL", payload: newSkill });
-
     // reset form
-    setFormValues({
-      name: "",
-      proficiency: "",
-      years_of_experience: ""
-    });
-
-    // close the form
+    setFormValues({ name: "", proficiency: null, years_of_experience: null });
     setIsFormOpen(false);
+    setIsEditing(false);
+    setEditingSkill(null);
   }
 
   const onClose = () => {
@@ -124,7 +165,7 @@ export default function WorkExperiencePage() {
         placeholder: "Enter skill proficiency",
         required: false,
         onChange: handleChange,
-        value: formValues.proficiency
+        value: formValues.proficiency ? `${formValues.proficiency}` : ""
       },
       inputTwo: {
         label: "Years of Experience",
@@ -133,14 +174,14 @@ export default function WorkExperiencePage() {
         placeholder: "Enter years of experience",
         required: false,
         onChange: handleChange,
-        value: formValues.years_of_experience
+        value: formValues.years_of_experience ? `${formValues.years_of_experience}` : ""
       }
     }
   ]
 
   const formProps: IInputFormProps = {
-    title: "Add Skill Information",
-    buttonLabel: "Add Skill",
+    title: isEditing ? "Edit Skill Information" : "Add Skill Information",
+    buttonLabel: isEditing ? "Save Changes" : "Add Skill",
     onSubmit: onSubmit,
     inputRows: inputRows,
     onClose: onClose
