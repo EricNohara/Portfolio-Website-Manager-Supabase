@@ -43,7 +43,7 @@ export default function WorkExperiencePage() {
     const skill = state.skills[rowIndex];
     try {
       const res = await fetch(`/api/internal/user/skills?skillName=${skill.name}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(data.message);
+      if (!res.ok) throw new Error(`Error deleting skill: ${skill.name}.`);
 
       // update cached state
       dispatch({ type: "DELETE_SKILL", payload: skill });
