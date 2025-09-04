@@ -11,12 +11,10 @@ import { ISkillsInput } from "@/app/interfaces/ISkills";
 
 import PageContentHeader, { IButton } from "../../components/PageContentHeader/PageContentHeader";
 
-
-
 const columns = ["Name", "Proficiency", "Years of Experience"];
 const columnWidths = [50, 25, 25];
 
-export default function WorkExperiencePage() {
+export default function SkillsPage() {
   const { state, dispatch } = useUser();
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<ISkillsInput>({
@@ -24,18 +22,12 @@ export default function WorkExperiencePage() {
     proficiency: null,
     years_of_experience: null
   });
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editingSkill, setEditingSkill] = useState<ISkillsInput | null>(null);
+  const [skillToEdit, setSkillToEdit] = useState<ISkillsInput | null>(null);
 
   const handleEdit = (rowIndex: number) => {
     const skill = state.skills[rowIndex];
-    setEditingSkill(skill);
-    setFormValues({
-      name: skill.name,
-      proficiency: skill.proficiency,
-      years_of_experience: skill.years_of_experience
-    });
-    setIsEditing(true);
+    setSkillToEdit(skill);
+    setFormValues(skill);
     setIsFormOpen(true);
   };
 
@@ -57,7 +49,6 @@ export default function WorkExperiencePage() {
     setFormValues(prev => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  // split this into add vs edit later
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -88,10 +79,10 @@ export default function WorkExperiencePage() {
     }
 
     try {
-      if (isEditing && editingSkill) {
+      if (skillToEdit) {
         // update the skill
         const editPayload = {
-          skillName: editingSkill.name,
+          skillName: skillToEdit.name,
           updatedSkill: newSkill
         }
         const res = await fetch("/api/internal/user/skills", {
@@ -103,7 +94,7 @@ export default function WorkExperiencePage() {
         if (!res.ok) throw new Error(data.message);
 
         // update cached state
-        dispatch({ type: "UPDATE_SKILL", payload: { old: editingSkill, new: newSkill } });
+        dispatch({ type: "UPDATE_SKILL", payload: { old: skillToEdit, new: newSkill } });
       } else {
         // Add the skill
         const res = await fetch("/api/internal/user/skills", {
@@ -127,8 +118,7 @@ export default function WorkExperiencePage() {
     // reset form
     setFormValues({ name: "", proficiency: null, years_of_experience: null });
     setIsFormOpen(false);
-    setIsEditing(false);
-    setEditingSkill(null);
+    setSkillToEdit(null);
   }
 
   const onClose = () => {
@@ -180,8 +170,8 @@ export default function WorkExperiencePage() {
   ]
 
   const formProps: IInputFormProps = {
-    title: isEditing ? "Edit Skill Information" : "Add Skill Information",
-    buttonLabel: isEditing ? "Save Changes" : "Add Skill",
+    title: skillToEdit ? "Edit Skill Information" : "Add Skill Information",
+    buttonLabel: skillToEdit ? "Save Changes" : "Add Skill",
     onSubmit: onSubmit,
     inputRows: inputRows,
     onClose: onClose

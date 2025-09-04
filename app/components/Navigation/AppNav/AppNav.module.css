@@ -36,6 +36,7 @@
   gap: 0.75rem;
 }
 
-.activeNavButton {
+.activeNavButton,
+.activeNavButton:hover {
   background-color: var(--btn-1);
 }
