@@ -24,7 +24,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
     const [snackbar, setSnackbar] = useState<SnackbarState>(null);
-    const [duration, setDuration] = useState<number>(4000);
+    const [duration, setDuration] = useState<number>(8000);
 
     // Optional: force re-mount to restart enter animation when showing back-to-back toasts
     const [snackbarKey, setSnackbarKey] = useState(0);
@@ -35,7 +35,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             messageDescription: t.messageDescription ?? "",
             variant: t.variant ?? "info",
         };
-        setDuration(t.duration ?? 4000);
+        setDuration(t.duration ?? 8000);
         setSnackbarKey((k) => k + 1);
         setSnackbar(next);
     }, []);

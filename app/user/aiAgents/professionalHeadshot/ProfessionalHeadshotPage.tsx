@@ -197,7 +197,7 @@ export default function ProfessionalHeadshotPage() {
             const compressed = await compressImage(imageFile);
             const publicPortraitUrl = await uploadFile(compressed, "portraits");
             dispatch({ type: "UPDATE_DOCUMENT", payload: { url: publicPortraitUrl, docType: "portrait_url" } });
-            toast.success("User portrait successfully updated.")
+            toast.success("Success", "Portrait successfully updated.")
         } catch {
             toast.error("Failed to update user portrait.")
         } finally {

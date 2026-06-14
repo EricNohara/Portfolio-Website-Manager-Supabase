@@ -112,21 +112,11 @@
   width: 100%;
 }
 
-.resultButtonWrapper {
-  flex: 1;
-  display: flex;
-}
-
-.resultButtonWrapper > * {
-  width: 100%;
-}
-
 .resultButton {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  flex: 1;
   gap: 0.75rem;
 }
 
