@@ -1,3 +1,5 @@
+import { LucideIcon } from "lucide-react";
+
 import { headerFont } from "@/app/localFonts";
 
 import styles from "./PageContentHeader.module.css";
@@ -13,6 +15,7 @@ export interface IButton {
     form?: string;          // form id to submit (works even outside form)
     disabled?: boolean;
     isLoading?: boolean;
+    icon?: LucideIcon;
 }
 
 export interface IPageContentHeaderProps {
@@ -35,7 +38,9 @@ export default function PageContentHeader({ title, buttonOne, buttonFour, classN
                                     type={buttonFour.type ?? "button"}
                                     form={buttonFour.form}
                                     disabled={buttonFour.disabled}
+                                    className={styles.button}
                                 >
+                                    {buttonFour.icon && <buttonFour.icon size={20} />}
                                     {
                                         buttonFour.isLoading ?
                                             <LoadableButtonContent isLoading={buttonFour.isLoading} buttonLabel={buttonFour.name} />
@@ -51,7 +56,9 @@ export default function PageContentHeader({ title, buttonOne, buttonFour, classN
                             form={buttonFour.form}
                             disabled={buttonFour.disabled}
                             onClick={buttonFour.onClick}
+                            className={styles.button}
                         >
+                            {buttonFour.icon && <buttonFour.icon size={20} />}
                             {buttonFour.name}
                         </ButtonFour>
                     )
@@ -64,7 +71,10 @@ export default function PageContentHeader({ title, buttonOne, buttonFour, classN
                                     type={buttonOne.type ?? "button"}
                                     form={buttonOne.form}
                                     disabled={buttonOne.disabled}
+                                    className={styles.button}
                                 >
+                                    {buttonOne.icon && <buttonOne.icon size={20} />}
+
                                     {
                                         buttonOne.isLoading ?
                                             <LoadableButtonContent isLoading={buttonOne.isLoading} buttonLabel={buttonOne.name} />
@@ -80,7 +90,9 @@ export default function PageContentHeader({ title, buttonOne, buttonFour, classN
                             form={buttonOne.form}
                             disabled={buttonOne.disabled}
                             onClick={buttonOne.onClick}
+                            className={styles.button}
                         >
+                            {buttonOne.icon && <buttonOne.icon size={20} />}
                             {buttonOne.name}
                         </ButtonOne>
                     )

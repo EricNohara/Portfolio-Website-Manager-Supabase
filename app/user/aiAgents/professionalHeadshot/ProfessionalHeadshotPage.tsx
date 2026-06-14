@@ -1,11 +1,11 @@
 "use client";
 
-import { WandSparkles } from "lucide-react";
+import { Check, Download, MoveLeft, WandSparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 
 import { AsyncButtonWrapper } from "@/app/components/AsyncButtonWrapper/AsyncButtonWrapper";
 import LoadingSpinner from "@/app/components/AsyncButtonWrapper/LoadingSpinner/LoadingSpinner";
-import { ButtonOne } from "@/app/components/Buttons/Buttons";
+import { ButtonFour, ButtonOne } from "@/app/components/Buttons/Buttons";
 import ModernFileUploadBox from "@/app/components/FileUploadBox/ModernFileUploadBox/ModernFileUploadBox";
 import PageContentHeader, {
     IButton,
@@ -13,8 +13,12 @@ import PageContentHeader, {
 import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
 import SelectDropdown from "@/app/components/SelectDropdown/SelectDropdown";
 import TextInput from "@/app/components/TextInput/TextInput";
+import { useToast } from "@/app/context/ToastProvider";
+import { useUser } from "@/app/context/UserProvider";
 import { ICachedProfessionalHeadshot } from "@/app/interfaces/ICachedProfessionalHeadshot";
 import { headerFont } from "@/app/localFonts";
+import { compressImage } from "@/utils/file-upload/compress";
+import { uploadFile } from "@/utils/file-upload/upload";
 
 import styles from "./ProfessionalHeadshotPage.module.css";
 
@@ -36,6 +40,9 @@ type HeadshotAttire =
 const NEW_HEADSHOT_ID = "new";
 
 export default function ProfessionalHeadshotPage() {
+    const { dispatch } = useUser();
+    const toast = useToast();
+
     const [referenceImage, setReferenceImage] = useState<File | null>(null);
     const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
     const [backgroundDescription, setBackgroundDescription] = useState("");
@@ -49,6 +56,8 @@ export default function ProfessionalHeadshotPage() {
     const [cachedReferenceUrl, setCachedReferenceUrl] = useState<string | null>(null);
     const [cachedBackgroundUrl, setCachedBackgroundUrl] = useState<string | null>(null);
     const [uploadResetKey, setUploadResetKey] = useState(0);
+    const [imageModalOpen, setImageModalOpen] = useState(false);
+    const [useThisHeadshotLoading, setUseThisHeadshotLoading] = useState<boolean>(false);
 
     const hasBackgroundImage =
         !!backgroundImage || !!cachedBackgroundUrl;
@@ -158,15 +167,54 @@ export default function ProfessionalHeadshotPage() {
         window.history.back();
     }
 
+    async function handleDownload() {
+        if (!generatedUrl) return;
+
+        const response = await fetch(generatedUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = url;
+        const extension = generatedUrl.split(".").pop()?.split("?")[0] ?? "png";
+        link.download = `nukleio-headshot-${Date.now()}-${crypto.randomUUID()}.${extension}`;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    };
+
+    async function handleUseThisHeadshot() {
+        if (!generatedUrl) return;
+
+        try {
+            setUseThisHeadshotLoading(true);
+            const response = await fetch(generatedUrl);
+            const blob = await response.blob();
+            const extension = generatedUrl.split(".").pop()?.split("?")[0] ?? "png";
+            const imageFile = new File([blob], `nukleio-headshot-${Date.now()}-${crypto.randomUUID()}.${extension}`, { type: blob.type });
+            const compressed = await compressImage(imageFile);
+            const publicPortraitUrl = await uploadFile(compressed, "portraits");
+            dispatch({ type: "UPDATE_DOCUMENT", payload: { url: publicPortraitUrl, docType: "portrait_url" } });
+            toast.success("User portrait successfully updated.")
+        } catch {
+            toast.error("Failed to update user portrait.")
+        } finally {
+            setUseThisHeadshotLoading(false);
+        }
+    }
+
     const GenerateButton = <ButtonOne disabled={loading || !referenceImage} onClick={handleGenerate}>
         <div className={styles.generateButtonContent}>
-            <WandSparkles />
+            <WandSparkles size={20} />
             <span>Generate</span>
         </div>
     </ButtonOne>;
 
     const backButton: IButton = {
         name: "Back to Agents",
+        icon: MoveLeft,
         onClick: handleBackStep,
     };
 
@@ -355,12 +403,44 @@ export default function ProfessionalHeadshotPage() {
 
                             {generatedUrl && !loading && (
                                 <div className={styles.resultSection}>
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                        src={generatedUrl}
-                                        alt="Generated professional headshot"
-                                        className={styles.generatedImage}
-                                    />
+                                    <button
+                                        className={styles.imageContainer}
+                                        onClick={() => setImageModalOpen(true)}
+                                        type="button"
+                                    >
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
+                                            src={generatedUrl}
+                                            alt="Generated professional headshot"
+                                            className={styles.generatedImage}
+                                        />
+                                    </button>
+
+                                    <div className={styles.resultButtonsContainer}>
+                                        <ButtonOne className={styles.resultButton} onClick={handleDownload}>
+                                            <Download size={20} />Download
+                                        </ButtonOne>
+                                        <AsyncButtonWrapper
+                                            button={
+                                                <ButtonFour className={styles.resultButton}>
+                                                    <Check size={20} />Use This Headshot
+                                                </ButtonFour>
+                                            }
+                                            onClick={handleUseThisHeadshot}
+                                            isDisabled={useThisHeadshotLoading}
+                                        />
+                                    </div>
+
+                                    {imageModalOpen && (
+                                        <div className={styles.imageModal} onClick={() => setImageModalOpen(false)}>
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={generatedUrl}
+                                                alt="Full generated professional headshot"
+                                                className={styles.modalImage}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

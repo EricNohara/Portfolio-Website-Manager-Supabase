@@ -1,5 +1,6 @@
 "use client";
 
+import { MoveLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -333,8 +334,9 @@ export default function CoverLetterPage() {
     };
 
     const backToAgentsButton: IButton = {
-        name: "Back",
-        onClick: () => router.push("/user/aiAgents")
+        name: "Back to Agents",
+        onClick: () => router.push("/user/aiAgents"),
+        icon: MoveLeft
     }
 
     return (
@@ -437,7 +439,7 @@ export default function CoverLetterPage() {
                                     label="Job Description"
                                     name="jobDescriptionDump"
                                     type="textarea"
-                                    textAreaRows={16}
+                                    textAreaRows={14}
                                     value={jobDescriptionDump}
                                     isInInputForm={true}
                                     placeholder="Copy and paste the job description for your job posting..."
@@ -448,7 +450,7 @@ export default function CoverLetterPage() {
                                     label="Optional Writing Sample"
                                     name="writingSample"
                                     type="textarea"
-                                    textAreaRows={16}
+                                    textAreaRows={14}
                                     value={writingSample}
                                     isInInputForm={true}
                                     placeholder="Enter an optional writing sample for the agent to match its writing style to..."

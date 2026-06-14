@@ -1,5 +1,6 @@
 "use client";
 
+import { MoveLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -331,6 +332,7 @@ export default function ResumePage() {
     const backButton: IButton = {
         name: isFirstStep && !resumeUrl ? "Back to Agents" : "Back",
         onClick: resumeUrl ? resetFlow : handleBackStep,
+        icon: MoveLeft
     };
 
     // data needed in review step
