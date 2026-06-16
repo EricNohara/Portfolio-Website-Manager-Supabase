@@ -6,7 +6,11 @@ import { titleFont } from "@/app/localFonts";
 
 import styles from "./TitleLogo.module.css";
 
-export default function TitleLogo() {
+type TitleLogoProps = {
+    collapsed?: boolean
+}
+
+export default function TitleLogo({ collapsed = false }: TitleLogoProps) {
     const router = useRouter();
     const { isLoggedIn } = useAuth();
 
@@ -18,7 +22,7 @@ export default function TitleLogo() {
     return (
         <div className={`${styles.container} ${titleFont.className}`} onClick={handleClick}>
             <Image src="/images/navbar-logo.png" width={50} height={50} alt="Nukleio Logo" />
-            <h1>Nukleio</h1>
+            {!collapsed && <h1>Nukleio</h1>}
         </div >
     );
 }

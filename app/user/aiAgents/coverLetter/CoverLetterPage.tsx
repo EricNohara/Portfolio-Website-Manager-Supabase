@@ -1,6 +1,6 @@
 "use client";
 
-import { MoveLeft } from "lucide-react";
+import { MoveLeft, WandSparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -312,7 +312,8 @@ export default function CoverLetterPage() {
         onClick: handleGenerate,
         isAsync: true,
         disabled: loading,
-        isLoading: loading
+        isLoading: loading,
+        icon: WandSparkles
     };
 
     const backButton: IButton = {
@@ -331,6 +332,7 @@ export default function CoverLetterPage() {
             });
             setSelectedDraftName("");
         },
+        icon: MoveLeft
     };
 
     const backToAgentsButton: IButton = {
@@ -342,7 +344,7 @@ export default function CoverLetterPage() {
     return (
         <PageContentWrapper>
             <PageContentHeader
-                title={selectedDraftName ? selectedDraftName : "Cover Letter Generator"}
+                title={selectedDraftName ? selectedDraftName.split(":")[0] : "Cover Letter Generator"}
                 buttonOne={canAccess ? buttonOne : undefined}
                 buttonFour={draft.length > 0 ? backButton : backToAgentsButton}
                 className={styles.coverLetterPageContentContainer}
@@ -526,12 +528,13 @@ export default function CoverLetterPage() {
                                 label="Your Feedback"
                                 name="feedback"
                                 type="textarea"
-                                textAreaRows={9}
+                                textAreaRows={7}
                                 value={feedback}
                                 isInInputForm={true}
                                 placeholder="Enter your feedback"
                                 required
                                 onChange={(e) => setFeedback(e.target.value)}
+                                focusLabelColor="var(--btn-1)"
                             />
                         </div>
                     </div>

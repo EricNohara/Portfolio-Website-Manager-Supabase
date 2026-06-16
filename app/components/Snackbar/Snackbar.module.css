@@ -69,14 +69,14 @@
   background: transparent;
   border: none;
   border-radius: 10px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--page-txt-2);
   cursor: pointer;
   transition: 0.18s ease;
 }
 
 .close:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--page-txt-1);
+  background: color-mix(in srgb, var(--page-txt-1) 10%, transparent);
 }
 
 .success {
