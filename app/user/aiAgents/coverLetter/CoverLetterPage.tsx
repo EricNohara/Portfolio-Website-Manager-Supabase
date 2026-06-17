@@ -1,10 +1,12 @@
 "use client";
 
-import { MoveLeft, WandSparkles } from "lucide-react";
+import { Calendar, Download, Loader, LucideIcon, MoveLeft, WandSparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
+import { AsyncButtonWrapper } from "@/app/components/AsyncButtonWrapper/AsyncButtonWrapper";
 import LoadingSpinner from "@/app/components/AsyncButtonWrapper/LoadingSpinner/LoadingSpinner";
+import { ButtonOne } from "@/app/components/Buttons/Buttons";
 import MatchBreakdownChart from "@/app/components/Chart/MatchBreakdownChart";
 import LoadingMessageSpinner from "@/app/components/LoadingMessageSpinner/LoadingMessageSpinner";
 import PageContentHeader, { IButton } from "@/app/components/PageContentHeader/PageContentHeader";
@@ -16,6 +18,12 @@ import { useToast } from "@/app/context/ToastProvider";
 import { ICachedConversationListItem, ICachedCoverLetter, ISkillsMatchScore } from "@/app/interfaces/ICachedCoverLetter";
 
 import styles from "./CoverLetterPage.module.css";
+
+type InfoChip = {
+    name: string;
+    className: keyof typeof styles;
+    icon: LucideIcon
+}
 
 export default function CoverLetterPage() {
     const [jobTitle, setJobTitle] = useState<string>("");
@@ -29,6 +37,7 @@ export default function CoverLetterPage() {
     const [loading, setLoading] = useState<boolean>(false);
     const [mode, setMode] = useState<"initial" | "revision" | "cache">("initial");
     const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string>("");
+    const [revisionLoading, setRevisionLoading] = useState(false);
 
     // cached cover letter state
     const [cachedList, setCachedList] = useState<ICachedConversationListItem[]>([]);
@@ -209,14 +218,14 @@ export default function CoverLetterPage() {
         // allow paint before work starts
         setTimeout(async () => {
             if (draft.length > 0) {
-                setMode("revision");
-                setLoading(true);
-
                 if (!feedback.trim()) {
-                    toast.info("Please input feedback before revising.")
+                    toast.info("Cannot complete revision", "Please input feedback before revising.")
                     setLoading(false);
                     return;
                 }
+
+                setMode("revision");
+                setRevisionLoading(true);
 
                 // REVISION MODE: generates PDF, updates preview, downloads
                 try {
@@ -231,15 +240,46 @@ export default function CoverLetterPage() {
                     const data = await res.json();
                     if (!res.ok) throw new Error(data.errpr ?? "Error revising the draft");
                     const revisedDraft: string = data.revisedDraft;
+                    setDraft(revisedDraft);
+
+                    const savedRowRaw = data.cachedCoverLetter;
+                    const savedRow: ICachedCoverLetter | null = Array.isArray(savedRowRaw)
+                        ? savedRowRaw[0] ?? null
+                        : savedRowRaw ?? null;
 
                     // generate the pdf from the new draft
                     await generatePdfAndPreview(revisedDraft);
 
-                    toast.success("Success", "Successfully generated cover letter PDF with your revision.");
+                    if (savedRow) {
+                        setCoverLetterVersions((prev) => [...prev, savedRow]);
+                        setSelectedDraftName(savedRow.draft_name);
+
+                        setSkillsMatchScore({
+                            education: Number(savedRow.education_score),
+                            experience: Number(savedRow.experience_score),
+                            skills: Number(savedRow.skills_score),
+                            projects: Number(savedRow.projects_score),
+                            location: Number(savedRow.location_score),
+                            overall: Number(savedRow.overall_score),
+                            explanations: {
+                                education: savedRow.education_score_exp,
+                                experience: savedRow.experience_score_exp,
+                                skills: savedRow.skills_score_exp,
+                                projects: savedRow.projects_score_exp,
+                                location: savedRow.location_score_exp,
+                            },
+                        });
+                    } else {
+                        setSelectedDraftName(data.draftName);
+                    }
+
+                    setFeedback("");
+
+                    toast.success("Revision complete", "Review the revisions made to your cover letter.");
                 } catch {
-                    toast.error("Error", "Failed to revise cover letter. Please refresh the page and try again.");
+                    toast.error("Revision failed", "Please refresh the page and try again. Don't worry, you weren't charged credits!");
                 } finally {
-                    setLoading(false);
+                    setRevisionLoading(false);
                 }
             } else {
                 // GENERATION MODE
@@ -294,12 +334,9 @@ export default function CoverLetterPage() {
                         toast.error("Error loading PDF preview.")
                     }
 
-                    toast.success(
-                        "Success",
-                        "Generated a first draft of your cover letter."
-                    );
+                    toast.success("Generation complete", "Review the first draft of your cover letter.");
                 } catch {
-                    toast.error("Error", "Failed to generate cover letter. Please refresh the page and try again.");
+                    toast.error("Generation failed", "Please refresh the page and try again. Don't worry, you weren't charged any credits!");
                 } finally {
                     setLoading(false);
                 }
@@ -308,7 +345,7 @@ export default function CoverLetterPage() {
     };
 
     const buttonOne: IButton = {
-        name: draft.length > 0 ? "Revise Draft" : "Generate",
+        name: "Generate",
         onClick: handleGenerate,
         isAsync: true,
         disabled: loading,
@@ -341,18 +378,30 @@ export default function CoverLetterPage() {
         icon: MoveLeft
     }
 
+    const revisionInfoChip: InfoChip = revisionLoading
+        ? mode === "revision"
+            ? { name: "Revising", className: "revisingChip", icon: Loader }
+            : mode === "cache"
+                ? { name: "Loading draft", className: "loadingDraftChip", icon: Loader }
+                : { name: "Generating", className: "generatingChip", icon: Loader }
+        : feedback.trim()
+            ? { name: "Ready to revise", className: "readyToReviseChip", icon: WandSparkles }
+            : { name: "Ready to download", className: "readyToDownloadChip", icon: Download };
+
+    const RevisionInfoChipIcon = revisionInfoChip.icon;
+
     return (
         <PageContentWrapper>
             <PageContentHeader
                 title={selectedDraftName ? selectedDraftName.split(":")[0] : "Cover Letter Generator"}
-                buttonOne={canAccess ? buttonOne : undefined}
+                buttonOne={canAccess && (!draft || draft.length <= 0) ? buttonOne : undefined}
                 buttonFour={draft.length > 0 ? backButton : backToAgentsButton}
                 className={styles.coverLetterPageContentContainer}
             />
 
             <div className={styles.coverLetterPageContainer}>
                 {/* ------------------- LOADING UI ------------------- */}
-                {loading && (
+                {loading && !draft && (
                     <LoadingMessageSpinner
                         messages={
                             mode === "initial"
@@ -464,29 +513,57 @@ export default function CoverLetterPage() {
                 )}
 
                 {/* ------------------- REVISION UI ------------------- */}
-                {!loading && draft && sessionId && (
+                {draft && sessionId && (
                     <div className={styles.reviseContainer}>
-                        <div className={styles.pdfPreviewContainer}>
-                            {pdfPreviewUrl ? (
-                                <iframe
-                                    src={pdfPreviewUrl}
-                                    title="Cover Letter PDF Preview"
-                                    className={styles.pdfIframe}
-                                />
-                            ) : draft ? (
-                                <TextInput
-                                    label="Cover Letter Draft"
-                                    name="draft"
-                                    type="textarea"
-                                    textAreaRows={16}
-                                    value={draft}
-                                    isInInputForm={true}
-                                    onChange={() => { }}
-                                    disabled
-                                />
-                            ) : (
-                                <p>Error displaying cover letter draft.</p>
-                            )}
+                        <div className={styles.revisionLeftContainer}>
+                            <div className={styles.infoChipRow}>
+                                {
+                                    selectedDraftName && selectedDraftName.split(": ").length > 0 &&
+                                    <div className={styles.dateInfoChip}>
+                                        <Calendar size={16} />{selectedDraftName.split(": ")[1]}
+                                    </div>
+                                }
+
+                                <div className={`${styles.statusInfoChip} ${styles[revisionInfoChip.className]}`}>
+                                    <RevisionInfoChipIcon size={16} />
+                                    {revisionInfoChip.name}
+                                </div>
+                            </div>
+
+                            <div className={styles.pdfPreviewContainer}>
+                                {revisionLoading ? (
+                                    <div className={styles.pdfLoadingContainer}>
+                                        <LoadingMessageSpinner
+                                            messages={[
+                                                "Analyzing your feedback...",
+                                                "Revising draft...",
+                                                "Generating updated PDF...",
+                                                "Finalizing revision...",
+                                            ]}
+                                            interval={1000}
+                                        />
+                                    </div>
+                                ) : pdfPreviewUrl ? (
+                                    <iframe
+                                        src={pdfPreviewUrl}
+                                        title="Cover Letter PDF Preview"
+                                        className={styles.pdfIframe}
+                                    />
+                                ) : draft ? (
+                                    <TextInput
+                                        label="Cover Letter Draft"
+                                        name="draft"
+                                        type="textarea"
+                                        textAreaRows={26}
+                                        value={draft}
+                                        isInInputForm={true}
+                                        onChange={() => { }}
+                                        disabled
+                                    />
+                                ) : (
+                                    <p>Error displaying cover letter draft.</p>
+                                )}
+                            </div>
                         </div>
 
                         <div className={styles.reviseRightContainer}>
@@ -500,8 +577,8 @@ export default function CoverLetterPage() {
                                             label: v.draft_name
                                         })),
                                     ]}
-                                    loading={loading}
-                                    disabled={coverLetterVersions.length === 0}
+                                    loading={revisionLoading || loading}
+                                    disabled={revisionLoading || coverLetterVersions.length === 0}
                                     placeholder={
                                         loading
                                             ? "Loading revision versions..."
@@ -519,27 +596,36 @@ export default function CoverLetterPage() {
 
                             <div className={styles.jobMatchContainer}>
                                 <p className={styles.jobMatchLabel}>Job Match Breakdown</p>
-                                <MatchBreakdownChart
-                                    breakdown={skillsMatchScore}
-                                />
+                                <MatchBreakdownChart breakdown={skillsMatchScore} />
                             </div>
 
                             <TextInput
-                                label="Your Feedback"
+                                label="Revision Instructions"
                                 name="feedback"
                                 type="textarea"
-                                textAreaRows={7}
+                                textAreaRows={6}
                                 value={feedback}
                                 isInInputForm={true}
-                                placeholder="Enter your feedback"
+                                placeholder="Describe what you'd like changed..."
                                 required
                                 onChange={(e) => setFeedback(e.target.value)}
                                 focusLabelColor="var(--btn-1)"
+                                maxWords={200}
+                            />
+
+                            <AsyncButtonWrapper
+                                button={
+                                    <ButtonOne className={styles.reviseButton}>
+                                        <WandSparkles size={20} />Revise Draft
+                                    </ButtonOne>
+                                }
+                                onClick={handleGenerate}
+                                isDisabled={revisionLoading || !feedback.trim()}
                             />
                         </div>
                     </div>
                 )}
             </div>
-        </PageContentWrapper>
+        </PageContentWrapper >
     );
 }

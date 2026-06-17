@@ -82,6 +82,7 @@ html {
   /* charts */
   --success-color: #82ca9d;
   --fail-color: #f87777;
+  --warning-color: #f8b577;
 
   --settings-switch-bg: #dbdbdb;
 

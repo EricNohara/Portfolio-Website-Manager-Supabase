@@ -35,7 +35,7 @@ export function AsyncButtonWrapper({ button, onClick, isDisabled }: AsyncButtonW
     // clone the given button element and inject our props
     const wrappedButton = cloneElement(button, {
         onClick: handleClick,
-        disabled: button.props.disabled || isLoading,
+        disabled: button.props.disabled || isLoading || isDisabled,
         children: (
             <div className={styles.buttonContent}>
                 <span className={`${styles.contentWrapper} ${isLoading ? styles.invisible : ""}`}>{button.props.children}</span>

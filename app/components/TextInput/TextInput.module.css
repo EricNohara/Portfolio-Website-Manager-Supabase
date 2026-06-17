@@ -154,3 +154,20 @@
   color: var(--fail-color);
   font-weight: 700;
 }
+
+.wordCount {
+  font-size: 0.75rem;
+  color: var(--input-form-input-placeholder-txt);
+  transition: color 0.2s ease;
+}
+
+.wordCountOver {
+  color: var(--fail-color);
+  font-weight: bold;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
