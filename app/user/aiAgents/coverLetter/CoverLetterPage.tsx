@@ -17,6 +17,7 @@ import { hasTier, useTier } from "@/app/context/TierProvider";
 import { useToast } from "@/app/context/ToastProvider";
 import { ICachedConversationListItem, ICachedCoverLetter, ISkillsMatchScore } from "@/app/interfaces/ICachedCoverLetter";
 
+import CoverLetterLoadingPanel from "./CoverLetterLoadingPanel";
 import styles from "./CoverLetterPage.module.css";
 
 type InfoChip = {
@@ -389,6 +390,20 @@ export default function CoverLetterPage() {
             : { name: "Ready to download", className: "readyToDownloadChip", icon: Download };
 
     const RevisionInfoChipIcon = revisionInfoChip.icon;
+
+    // loading panel testing
+    return (
+        <PageContentWrapper>
+            <PageContentHeader
+                title={selectedDraftName ? selectedDraftName.split(":")[0] : "Cover Letter Generator"}
+                buttonOne={canAccess && (!draft || draft.length <= 0) ? buttonOne : undefined}
+                buttonFour={draft.length > 0 ? backButton : backToAgentsButton}
+                className={styles.coverLetterPageContentContainer}
+            />
+
+            <CoverLetterLoadingPanel type="generation" />
+        </PageContentWrapper>
+    );
 
     return (
         <PageContentWrapper>
