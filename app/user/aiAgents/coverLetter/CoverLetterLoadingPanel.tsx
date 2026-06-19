@@ -8,6 +8,9 @@ import {
     Quote,
     Clock,
     Briefcase,
+    FileText,
+    Pencil,
+    TypeOutline,
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -153,11 +156,15 @@ export default function CoverLetterLoadingPanel({
                         </div>
 
                         <div className={`${styles.floatIcon} ${styles.floatIconTwo}`}>
-                            <PenLine size={22} />
+                            <Pencil size={22} />
                         </div>
 
                         <div className={`${styles.floatIcon} ${styles.floatIconThree}`}>
-                            <FileCheck size={22} />
+                            <FileText size={22} />
+                        </div>
+
+                        <div className={`${styles.floatIcon} ${styles.floatIconFour}`}>
+                            <TypeOutline size={22} />
                         </div>
                     </div>
 

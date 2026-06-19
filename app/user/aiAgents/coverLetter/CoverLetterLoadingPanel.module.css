@@ -27,23 +27,30 @@
   height: 100%;
   min-height: 0;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: calc(var(--global-border-radius) - 2px);
+  border-radius: var(--global-border-radius);
   background:
     radial-gradient(
-      circle at 50% 26%,
+      circle at 50% 24%,
       rgba(55, 138, 251, 0.16),
-      transparent 34%
+      transparent 36%
     ),
     radial-gradient(
-      circle at 50% 43%,
-      rgba(124, 77, 255, 0.12),
-      transparent 44%
+      circle at 44% 50%,
+      rgba(124, 77, 255, 0.09),
+      transparent 46%
     ),
-    linear-gradient(180deg, rgba(4, 8, 18, 0.18), rgba(0, 0, 0, 0.18));
+    linear-gradient(
+      180deg,
+      rgba(248, 251, 255, 0.98),
+      rgba(238, 244, 255, 0.94)
+    );
+
+  border: 1px solid rgba(55, 138, 251, 0.12);
 
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    inset 0 0 80px rgba(0, 0, 0, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 0 80px rgba(55, 138, 251, 0.045),
+    0 12px 36px rgba(15, 23, 42, 0.06);
 
   display: flex;
   flex-direction: column;
@@ -61,13 +68,7 @@
   overflow-y: auto;
   flex-shrink: 0;
   border: 1px solid var(--page-box-border);
-  background:
-    radial-gradient(
-      circle at 20% 0%,
-      rgba(55, 138, 251, 0.08),
-      transparent 28%
-    ),
-    var(--page-box-bg);
+  background: var(--page-box-bg);
   border-radius: var(--global-border-radius);
   padding: 2rem;
   display: flex;
@@ -86,7 +87,7 @@
 }
 
 .documentImage {
-  width: 315px;
+  width: 350px;
   height: auto;
   object-fit: contain;
   animation: documentFloat 4s ease-in-out infinite;
@@ -97,8 +98,8 @@
 
 .documentBase {
   position: absolute;
-  bottom: 58px;
-  width: 270px;
+  bottom: 50px;
+  width: 250px;
   height: 62px;
   border-radius: 50%;
   background: rgba(20, 25, 45, 0.9);
@@ -113,16 +114,27 @@
 .documentBase::before {
   content: "";
   position: absolute;
-  inset: -45%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    transparent 240deg,
-    rgba(124, 77, 255, 0.95) 280deg,
-    var(--btn-1) 315deg,
-    transparent 360deg
+  left: 18px;
+  top: 35px;
+  width: 76px;
+  height: 12px;
+  border-radius: 999px;
+
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(55, 138, 251, 0.95) 24%,
+    rgba(124, 77, 255, 0.75) 56%,
+    transparent 50%
   );
-  animation: rotateBaseGlow 3.4s linear infinite;
+
+  filter: blur(5px);
+
+  box-shadow:
+    0 0 14px rgba(55, 138, 251, 0.95),
+    0 0 30px rgba(124, 77, 255, 0.65);
+
+  animation: documentBaseSweep 3s ease-in-out infinite;
 }
 
 .documentBase::after {
@@ -179,21 +191,27 @@
 }
 
 .floatIconOne {
-  top: 76px;
-  left: 74px;
+  top: 110px;
+  left: 65px;
   animation: floatIconOne 4s ease-in-out infinite;
 }
 
 .floatIconTwo {
-  left: 48px;
-  bottom: 98px;
+  left: 56px;
+  bottom: 108px;
   animation: floatIconTwo 4.8s ease-in-out infinite;
 }
 
 .floatIconThree {
-  right: 72px;
-  bottom: 108px;
+  right: 64px;
+  bottom: 130px;
   animation: floatIconThree 5.4s ease-in-out infinite;
+}
+
+.floatIconFour {
+  right: 50px;
+  top: 80px;
+  animation: floatIconFour 5.9s ease-in-out infinite;
 }
 
 .previewPanel h2 {
@@ -261,10 +279,11 @@
     #b66cff 78%,
     transparent
   );
+  filter: blur(5px);
   box-shadow:
     0 0 14px rgba(55, 138, 251, 0.95),
     0 0 28px rgba(124, 77, 255, 0.65);
-  animation: loadingSweep 1.4s ease-in-out infinite;
+  animation: loadingSweep 1.75s ease-in-out infinite;
   will-change: transform;
 }
 
@@ -278,18 +297,14 @@
 }
 
 .feedbackCard {
-  border: 1px solid rgba(255, 255, 255, 0.105);
   background:
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.065),
-      rgba(255, 255, 255, 0.025)
-    ),
-    rgba(9, 14, 28, 0.42);
+    linear-gradient(135deg, rgba(55, 138, 251, 0.06), rgba(124, 77, 255, 0.03)),
+    white;
+
+  border: 1px solid rgba(55, 138, 251, 0.12);
+
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
   border-radius: var(--global-border-radius);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 18px 40px rgba(0, 0, 0, 0.12);
 }
 
 .feedbackCard {
@@ -441,6 +456,64 @@
   animation: pulse 2s infinite;
 }
 
+/* DARK THEME */
+
+:global(.dark-theme) .previewInner {
+  background:
+    radial-gradient(
+      circle at 50% 26%,
+      rgba(55, 138, 251, 0.16),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 50% 43%,
+      rgba(124, 77, 255, 0.12),
+      transparent 44%
+    ),
+    linear-gradient(180deg, rgba(4, 8, 18, 0.18), rgba(0, 0, 0, 0.18));
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 80px rgba(0, 0, 0, 0.18);
+}
+
+:global(.dark-theme) .feedbackCard {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.065),
+      rgba(255, 255, 255, 0.025)
+    ),
+    rgba(9, 14, 28, 0.42);
+
+  border: 1px solid rgba(255, 255, 255, 0.105);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 18px 40px rgba(0, 0, 0, 0.12);
+}
+
+:global(.dark-theme) .documentBase {
+  background: rgba(20, 25, 45, 0.9);
+  border: 1px solid rgba(55, 138, 251, 0.3);
+
+  box-shadow:
+    inset 0 0 18px rgba(0, 0, 0, 0.55),
+    0 0 28px rgba(55, 138, 251, 0.25);
+}
+
+:global(.dark-theme) .documentBase::after {
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(55, 138, 251, 0.45),
+      transparent 62%
+    ),
+    rgba(10, 13, 26, 0.96);
+}
+
+/* ANIMATIONS */
+
 @keyframes documentFloat {
   0% {
     transform: translateY(0) rotate(-3deg);
@@ -497,13 +570,50 @@
   }
 }
 
-@keyframes rotateBaseGlow {
-  from {
-    transform: rotate(0deg);
+@keyframes floatIconFour {
+  0% {
+    transform: translate(0, 0) rotate(4deg);
   }
 
-  to {
-    transform: rotate(360deg);
+  25% {
+    transform: translate(-6px, -8px) rotate(-2deg);
+  }
+
+  50% {
+    transform: translate(10px, -12px) rotate(-6deg);
+  }
+
+  75% {
+    transform: translate(6px, 4px) rotate(2deg);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(4deg);
+  }
+}
+
+@keyframes documentBaseSweep {
+  0% {
+    transform: translateX(0) scaleX(0.75);
+    opacity: 0.45;
+  }
+
+  18% {
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: translateX(158px) scaleX(1.15);
+    opacity: 1;
+  }
+
+  82% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: translateX(0) scaleX(0.75);
+    opacity: 0.45;
   }
 }
 
