@@ -401,7 +401,7 @@ export default function CoverLetterPage() {
                 className={styles.coverLetterPageContentContainer}
             />
 
-            <CoverLetterLoadingPanel type="generation" />
+            <CoverLetterLoadingPanel type="generation" jobTitle="Software Engineer" companyName="Nukleio" />
         </PageContentWrapper>
     );
 

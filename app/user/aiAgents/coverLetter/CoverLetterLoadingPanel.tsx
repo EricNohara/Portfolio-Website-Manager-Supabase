@@ -22,6 +22,8 @@ type LoadingType = "generation" | "revision";
 interface CoverLetterLoadingPanelProps {
     type: LoadingType;
     feedback?: string;
+    companyName?: string;
+    jobTitle?: string;
 }
 
 const content = {
@@ -93,11 +95,35 @@ const content = {
 export default function CoverLetterLoadingPanel({
     type,
     feedback,
+    companyName,
+    jobTitle
 }: CoverLetterLoadingPanelProps) {
     const data = content[type];
     const QuoteIcon = data.quoteIcon;
 
     const [activeStep, setActiveStep] = useState(0);
+    const [isDarkTheme, setIsDarkTheme] = useState(false);
+
+    useEffect(() => {
+        const updateTheme = () => {
+            setIsDarkTheme(document.documentElement.classList.contains("dark-theme"));
+        };
+
+        updateTheme();
+
+        const observer = new MutationObserver(updateTheme);
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
+    const documentImageSrc = isDarkTheme
+        ? "/images/neon-document-dark.png"
+        : "/images/neon-document-light.png";
 
     useEffect(() => {
         setActiveStep(0);
@@ -133,6 +159,17 @@ export default function CoverLetterLoadingPanel({
         };
     }, [type, data.steps]);
 
+    const quoteText =
+        type === "generation"
+            ? jobTitle && companyName
+                ? `Using your profile, resume data, and job description to generate a tailored cover letter for the ${jobTitle} role at ${companyName}.`
+                : jobTitle
+                    ? `Using your profile, resume data, and job description to generate a tailored cover letter for the ${jobTitle} position.`
+                    : companyName
+                        ? `Using your profile, resume data, and job description to generate a tailored cover letter for opportunities at ${companyName}.`
+                        : data.quoteFallback
+            : feedback?.trim() || data.quoteFallback;
+
     return (
         <div className={styles.loadingLayout}>
             <section className={styles.previewPanel}>
@@ -143,7 +180,7 @@ export default function CoverLetterLoadingPanel({
                         <div className={styles.documentBase} />
 
                         <Image
-                            src="/images/neon-document.png"
+                            src={documentImageSrc}
                             alt="Cover Letter"
                             width={315}
                             height={315}
@@ -183,17 +220,19 @@ export default function CoverLetterLoadingPanel({
             </section >
 
             <aside className={styles.detailsPanel}>
-                <h3 className={styles.detailTitle}>{data.detailTitle}</h3>
+                <div className={styles.stepsContainer}>
+                    <h3 className={styles.detailTitle}>{data.detailTitle}</h3>
 
-                <div className={styles.feedbackCard}>
-                    <div className={styles.feedbackCardTitleContainer}>
-                        <div className={styles.cardIcon}>
-                            <QuoteIcon size={18} />
+                    <div className={styles.feedbackCard}>
+                        <div className={styles.feedbackCardTitleContainer}>
+                            <div className={styles.cardIcon}>
+                                <QuoteIcon size={18} />
+                            </div>
+                            <h4>{data.quoteTitle}</h4>
                         </div>
-                        <h4>{data.quoteTitle}</h4>
-                    </div>
 
-                    <p>{feedback?.trim() || data.quoteFallback}</p>
+                        <p>{quoteText}</p>
+                    </div>
                 </div>
 
                 <div className={styles.stepsContainer}>
@@ -211,16 +250,29 @@ export default function CoverLetterLoadingPanel({
                                         }`}
                                     key={step.title}
                                 >
-                                    <div
-                                        className={
-                                            isActive
-                                                ? styles.activeStepIcon
-                                                : isDone
-                                                    ? styles.doneStepIcon
-                                                    : styles.stepIcon
-                                        }
-                                    >
-                                        <Icon size={18} />
+                                    <div className={styles.timelineColumn}>
+                                        {index < data.steps.length - 1 && (
+                                            <div
+                                                className={`${styles.timelineLine} ${index === activeStep - 1
+                                                    ? styles.activeTimelineLine
+                                                    : index < activeStep - 1
+                                                        ? styles.doneTimelineLine
+                                                        : styles.pendingTimelineLine
+                                                    }`}
+                                            />
+                                        )}
+
+                                        <div
+                                            className={
+                                                isActive
+                                                    ? styles.activeStepIcon
+                                                    : isDone
+                                                        ? styles.doneStepIcon
+                                                        : styles.stepIcon
+                                            }
+                                        >
+                                            <Icon size={18} />
+                                        </div>
                                     </div>
 
                                     <div className={styles.stepText}>
