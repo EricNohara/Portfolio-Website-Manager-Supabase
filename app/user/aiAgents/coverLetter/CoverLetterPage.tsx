@@ -8,7 +8,6 @@ import { AsyncButtonWrapper } from "@/app/components/AsyncButtonWrapper/AsyncBut
 import LoadingSpinner from "@/app/components/AsyncButtonWrapper/LoadingSpinner/LoadingSpinner";
 import { ButtonOne } from "@/app/components/Buttons/Buttons";
 import MatchBreakdownChart from "@/app/components/Chart/MatchBreakdownChart";
-import LoadingMessageSpinner from "@/app/components/LoadingMessageSpinner/LoadingMessageSpinner";
 import PageContentHeader, { IButton } from "@/app/components/PageContentHeader/PageContentHeader";
 import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
 import SelectDropdown from "@/app/components/SelectDropdown/SelectDropdown";
@@ -391,20 +390,6 @@ export default function CoverLetterPage() {
 
     const RevisionInfoChipIcon = revisionInfoChip.icon;
 
-    // loading panel testing
-    return (
-        <PageContentWrapper>
-            <PageContentHeader
-                title={selectedDraftName ? selectedDraftName.split(":")[0] : "Cover Letter Generator"}
-                buttonOne={canAccess && (!draft || draft.length <= 0) ? buttonOne : undefined}
-                buttonFour={draft.length > 0 ? backButton : backToAgentsButton}
-                className={styles.coverLetterPageContentContainer}
-            />
-
-            <CoverLetterLoadingPanel type="generation" jobTitle="Software Engineer" companyName="Nukleio" />
-        </PageContentWrapper>
-    );
-
     return (
         <PageContentWrapper>
             <PageContentHeader
@@ -415,33 +400,11 @@ export default function CoverLetterPage() {
             />
 
             <div className={styles.coverLetterPageContainer}>
-                {/* ------------------- LOADING UI ------------------- */}
-                {loading && !draft && (
-                    <LoadingMessageSpinner
-                        messages={
-                            mode === "initial"
-                                ? [
-                                    "Fetching user data...",
-                                    "Fetching job information...",
-                                    "Fetching company information...",
-                                    "Analyzing writing sample...",
-                                    "Generating first draft...",
-                                    "Evaluating draft...",
-                                    "Revising content...",
-                                    "Executing feedback loop...",
-                                    "Formatting output...",
-                                ]
-                                : mode === "revision" ? [
-                                    "Analyzing your feedback...",
-                                    "Revising draft...",
-                                    "Evaluating improvements...",
-                                    "Generating PDF...",
-                                    "Finalizing output...",
-                                ] : ["Loading from cache..."]
-                        }
-                        interval={mode === "initial" ? 3000 : 1000}
-                    />
-                )}
+                {/* ------------------- GENERATION LOADING UI ------------------- */}
+                {loading && !draft && <CoverLetterLoadingPanel type="generation" jobTitle={jobTitle} companyName={companyName} />}
+
+                {/* ------------------- REVISION LOADING UI ------------------- */}
+                {revisionLoading && draft && sessionId && (<CoverLetterLoadingPanel type="revision" feedback={feedback} />)}
 
                 {/* tier loading UI */}
                 {tierLoading && <LoadingSpinner />}
@@ -528,7 +491,7 @@ export default function CoverLetterPage() {
                 )}
 
                 {/* ------------------- REVISION UI ------------------- */}
-                {draft && sessionId && (
+                {!revisionLoading && draft && sessionId && (
                     <div className={styles.reviseContainer}>
                         <div className={styles.revisionLeftContainer}>
                             <div className={styles.infoChipRow}>
@@ -546,19 +509,7 @@ export default function CoverLetterPage() {
                             </div>
 
                             <div className={styles.pdfPreviewContainer}>
-                                {revisionLoading ? (
-                                    <div className={styles.pdfLoadingContainer}>
-                                        <LoadingMessageSpinner
-                                            messages={[
-                                                "Analyzing your feedback...",
-                                                "Revising draft...",
-                                                "Generating updated PDF...",
-                                                "Finalizing revision...",
-                                            ]}
-                                            interval={1000}
-                                        />
-                                    </div>
-                                ) : pdfPreviewUrl ? (
+                                {pdfPreviewUrl ? (
                                     <iframe
                                         src={pdfPreviewUrl}
                                         title="Cover Letter PDF Preview"

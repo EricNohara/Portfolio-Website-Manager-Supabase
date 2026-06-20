@@ -128,8 +128,8 @@ export default function CoverLetterLoadingPanel({
     useEffect(() => {
         setActiveStep(0);
 
-        const baseDuration = type === "generation" ? 52000 : 36000;
-        const randomOffset = Math.floor(Math.random() * 18000);
+        const baseDuration = type === "generation" ? 18000 : 12000;
+        const randomOffset = Math.floor(Math.random() * 6000);
         const totalDuration = baseDuration + randomOffset;
 
         const stepCount = data.steps.length;
