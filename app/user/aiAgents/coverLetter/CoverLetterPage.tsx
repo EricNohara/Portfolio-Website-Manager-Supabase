@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Download, Loader, LucideIcon, MoveLeft, WandSparkles } from "lucide-react";
+import { Bot, Calendar, Download, Loader, LucideIcon, MoveLeft, WandSparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -393,10 +393,11 @@ export default function CoverLetterPage() {
     return (
         <PageContentWrapper>
             <PageContentHeader
-                title={selectedDraftName ? selectedDraftName.split(":")[0] : "Cover Letter Generator"}
+                title={selectedDraftName ? selectedDraftName.split(":")[0] : "Cover Letter Agent"}
                 buttonOne={canAccess && (!draft || draft.length <= 0) ? buttonOne : undefined}
                 buttonFour={draft.length > 0 ? backButton : backToAgentsButton}
                 className={styles.coverLetterPageContentContainer}
+                icon={Bot}
             />
 
             <div className={styles.coverLetterPageContainer}>

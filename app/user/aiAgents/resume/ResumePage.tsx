@@ -1,6 +1,6 @@
 "use client";
 
-import { MoveLeft } from "lucide-react";
+import { Bot, MoveLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -404,10 +404,11 @@ export default function ResumePage() {
     return (
         <PageContentWrapper>
             <PageContentHeader
-                title="Resume Generator"
+                title="Resume Agent"
                 buttonOne={canAccess ? primaryButton : undefined}
                 buttonFour={backButton}
                 className={styles.resumePageContentContainer}
+                icon={Bot}
             />
 
             <div className={styles.resumePageContainer}>

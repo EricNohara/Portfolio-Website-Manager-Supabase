@@ -114,7 +114,6 @@ No known issues.
 ## Eventual Work Items
 
 - Add AI feature for generating text for descriptions
-- Add resume AI generation feature
 - Allow for other file upload types (e.g. video for premium users)
 - Add a community store for purchasing templates
 - Migrate public API backend to external application

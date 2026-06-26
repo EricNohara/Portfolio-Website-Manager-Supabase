@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, Download, MoveLeft, WandSparkles } from "lucide-react";
+import { Bot, Check, Download, MoveLeft, WandSparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 
 import { AsyncButtonWrapper } from "@/app/components/AsyncButtonWrapper/AsyncButtonWrapper";
@@ -221,9 +221,10 @@ export default function ProfessionalHeadshotPage() {
     return (
         <PageContentWrapper>
             <PageContentHeader
-                title="Professional Headshot Generator"
+                title="Professional Headshot Agent"
                 buttonFour={backButton}
                 className={styles.headshotPageContentContainer}
+                icon={Bot}
             />
 
             <div className={styles.pageContentContainer}>

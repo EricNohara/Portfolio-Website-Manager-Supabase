@@ -20,15 +20,23 @@ export interface IButton {
 
 export interface IPageContentHeaderProps {
     title: string;
+    icon?: LucideIcon;
     buttonOne?: IButton;
     buttonFour?: IButton | null;
     className?: string;
 }
 
-export default function PageContentHeader({ title, buttonOne, buttonFour, className }: IPageContentHeaderProps) {
+export default function PageContentHeader({ title, icon: Icon, buttonOne, buttonFour, className }: IPageContentHeaderProps) {
     return (
         <div className={`${styles.container} ${className ?? ""}`}>
-            <h1 className={`${styles.title} ${headerFont.className}`}>{title}</h1>
+            <div className={styles.titleContainer}>
+                {Icon && (
+                    <span className={styles.titleIconWrapper}>
+                        <Icon size={28} />
+                    </span>
+                )}
+                <h1 className={`${styles.title} ${headerFont.className}`}>{title}</h1>
+            </div>
             <div className={styles.buttons}>
                 {buttonFour && (
                     (buttonFour.isAsync ?? false) ? (

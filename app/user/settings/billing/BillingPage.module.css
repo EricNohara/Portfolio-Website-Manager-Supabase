@@ -33,3 +33,11 @@
   justify-content: center;
   padding-top: 2rem;
 }
+
+.noMargin {
+  margin-bottom: 0 !important;
+}
+
+.intervalDropdown {
+  width: 15rem !important;
+}

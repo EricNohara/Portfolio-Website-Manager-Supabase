@@ -1,5 +1,6 @@
 "use client";
 
+import { User } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import PageContentHeader from "@/app/components/PageContentHeader/PageContentHeader";
@@ -41,7 +42,7 @@ export default function UserInfoPage() {
 
     return (
         <PageContentWrapper>
-            <PageContentHeader title="User Information" buttonOne={buttonOne} buttonFour={buttonFour} />
+            <PageContentHeader title="User Information" buttonOne={buttonOne} buttonFour={buttonFour} icon={User} />
             <EditUserForm
                 formId={formId}
                 isEditing={isEditing}

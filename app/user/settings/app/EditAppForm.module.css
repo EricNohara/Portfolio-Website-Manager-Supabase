@@ -83,3 +83,7 @@
   background-color: var(--settings-input-bg);
   color: white;
 }
+
+.noMargin {
+  margin-bottom: 0 !important;
+}

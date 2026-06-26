@@ -1,6 +1,6 @@
 "use client";
 
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, GraduationCap } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -322,7 +322,7 @@ export default function EducationPage() {
 
     return (
         <PageContentWrapper>
-            <PageContentHeader title="Education" buttonOne={buttonOne} />
+            <PageContentHeader title="Education" buttonOne={buttonOne} icon={GraduationCap} />
             <Table
                 columns={columns}
                 rows={rows}

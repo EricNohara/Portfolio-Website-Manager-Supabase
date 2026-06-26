@@ -1,5 +1,6 @@
 "use client";
 
+import { File } from "lucide-react";
 import { useState } from "react";
 
 import FileDisplayBox from "@/app/components/FileDisplayBox/FileDisplayBox";
@@ -127,7 +128,7 @@ export default function DocumentsPage() {
 
   return (
     <PageContentWrapper>
-      <PageContentHeader title="Documents" buttonOne={shouldRenderButton() ? buttonOne : undefined} />
+      <PageContentHeader title="Documents" buttonOne={shouldRenderButton() ? buttonOne : undefined} icon={File} />
       <div className={styles.fileUploadBoxContainer}>
         {
           state.portrait_url && !isEditing.portrait_url ?

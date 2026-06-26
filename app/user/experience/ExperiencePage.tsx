@@ -1,5 +1,6 @@
 "use client";
 
+import { Briefcase } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -250,7 +251,7 @@ export default function ExperiencePage() {
 
     return (
         <PageContentWrapper>
-            <PageContentHeader title="Work Experiences" buttonOne={buttonOne} />
+            <PageContentHeader title="Work Experiences" buttonOne={buttonOne} icon={Briefcase} />
             <Table
                 columns={columns}
                 rows={rows}

@@ -55,3 +55,7 @@
 .textInput:focus {
   border-color: var(--page-txt-1) !important;
 }
+
+.noMargin {
+  margin-bottom: 0 !important;
+}

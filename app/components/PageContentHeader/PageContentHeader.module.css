@@ -3,7 +3,9 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 2rem 0;
+  padding: 2rem 0 1rem 0;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--page-box-border);
 }
 
 .title {
@@ -24,4 +26,22 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.titleIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--btn-1);
+  border: 1px solid var(--btn-1);
+  border-radius: var(--global-border-radius);
+  flex-shrink: 0;
 }

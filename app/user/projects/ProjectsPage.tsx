@@ -1,5 +1,6 @@
 "use client";
 
+import { Rocket } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useRef, useEffect, useState } from "react";
 
@@ -270,7 +271,7 @@ export default function ProjectsPage() {
 
     return (
         <PageContentWrapper>
-            <PageContentHeader title="Projects" buttonOne={buttonOne} />
+            <PageContentHeader title="Projects" buttonOne={buttonOne} icon={Rocket} />
             <div className={styles.container} ref={containerRef}>
                 {state.projects.map((project, i) =>
                     <ProjectCard

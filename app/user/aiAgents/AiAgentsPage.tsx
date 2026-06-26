@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Camera, Check, FileText, Flame, HeartHandshake, Info, MessageCircleQuestion, Sparkles, UserRound } from "lucide-react";
+import { ArrowRight, Bot, Camera, Check, FileText, Flame, HeartHandshake, Info, MessageCircleQuestion, Sparkles, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { ButtonFour, ButtonOne } from "@/app/components/Buttons/Buttons";
@@ -68,7 +68,7 @@ export default function AiAgentsPage() {
 
     return (
         <PageContentWrapper>
-            <PageContentHeader title="AI Agents" buttonOne={moreAboutButton} />
+            <PageContentHeader title="AI Agents" buttonOne={moreAboutButton} icon={Bot} />
             <div className={styles.aiAgentsPageContainer}>
                 <div className={styles.agentsGrid}>
                     {agents.map((agent) => {

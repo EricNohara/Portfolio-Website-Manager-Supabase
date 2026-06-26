@@ -3,7 +3,8 @@
 import { Braces, Crown, Landmark } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-import { ButtonFour, ButtonOne } from "@/app/components/Buttons/Buttons";
+import { ButtonOne } from "@/app/components/Buttons/Buttons";
+import SelectDropdown from "@/app/components/SelectDropdown/SelectDropdown";
 import SubscriptionCard from "@/app/components/SubscriptionCard/SubscriptionCard";
 import { useTier } from "@/app/context/TierProvider";
 import { useToast } from "@/app/context/ToastProvider";
@@ -168,36 +169,17 @@ export default function BillingPage() {
                         Manage billing
                     </ButtonOne>
 
-                    {
-                        selectedInterval === "monthly" ?
-                            <ButtonOne
-                                onClick={() => setSelectedInterval("monthly")}
-                                disabled={actionLoading !== null}
-                            >
-                                Monthly
-                            </ButtonOne> :
-                            <ButtonFour
-                                onClick={() => setSelectedInterval("monthly")}
-                                disabled={actionLoading !== null}
-                            >
-                                Monthly
-                            </ButtonFour>
-                    }
-                    {
-                        selectedInterval === "yearly" ?
-                            <ButtonOne
-                                onClick={() => setSelectedInterval("yearly")}
-                                disabled={actionLoading !== null}
-                            >
-                                Yearly
-                            </ButtonOne> :
-                            <ButtonFour
-                                onClick={() => setSelectedInterval("yearly")}
-                                disabled={actionLoading !== null}
-                            >
-                                Yearly
-                            </ButtonFour>
-                    }
+                    <SelectDropdown
+                        value={selectedInterval}
+                        options={[
+                            { value: "monthly", label: "Monthly Rates" },
+                            { value: "yearly", label: "Yearly Rates" },
+                        ]}
+                        onChange={(value) => setSelectedInterval(value as Interval)}
+                        disabled={actionLoading !== null}
+                        ariaLabel="Billing interval"
+                        className={styles.intervalDropdown}
+                    />
                 </div>
             </div>
 

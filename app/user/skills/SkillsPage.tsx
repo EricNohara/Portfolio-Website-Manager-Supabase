@@ -1,5 +1,6 @@
 "use client";
 
+import { Brain } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -216,7 +217,7 @@ export default function SkillsPage() {
 
     return (
         <PageContentWrapper>
-            <PageContentHeader title="Skills" buttonOne={buttonOne} />
+            <PageContentHeader title="Skills" buttonOne={buttonOne} icon={Brain} />
             <Table
                 columns={columns}
                 rows={rows}

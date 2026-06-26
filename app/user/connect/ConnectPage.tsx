@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCcw } from "lucide-react";
+import { KeyRound, RefreshCcw } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 
@@ -224,7 +224,7 @@ export default function ConnectPage() {
 
     return (
         <PageContentWrapper>
-            <PageContentHeader title="API Keys" buttonOne={buttonOne} buttonFour={buttonFour} />
+            <PageContentHeader title="API Keys" buttonOne={buttonOne} buttonFour={buttonFour} icon={KeyRound} />
             <Table
                 columns={columns}
                 rows={rows}
