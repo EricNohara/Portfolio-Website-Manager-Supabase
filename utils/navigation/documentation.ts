@@ -4,7 +4,7 @@ export const DOCUMENTATION_PATHS = {
   product: "/product",
   docs: "/docs",
   pricing: "/pricing",
-  contact: "/legal/contact",
+  contact: "/contact",
   privacy: "/legal/privacy",
   terms: "/legal/terms",
   apiKeys: "/docs/creating-api-keys",
