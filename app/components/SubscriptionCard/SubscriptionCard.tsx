@@ -5,7 +5,7 @@ import { titleFont, headerFont } from "@/app/localFonts";
 import styles from "./SubscriptionCard.module.css";
 import LoadableButtonContent from "../AsyncButtonWrapper/LoadableButtonContent/LoadableButtonContent";
 import { ButtonOne } from "../Buttons/Buttons";
-
+import DocumentationLink from "../DocumentationLink/DocumentationLink";
 
 type Tier = "free" | "developer" | "premium";
 type Interval = "monthly" | "yearly";
@@ -85,7 +85,7 @@ export default function SubscriptionCard(
 
             <div className={styles.divider} />
 
-            <a className={styles.moreInfo} href="/documentation/pricing">More information</a>
+            <DocumentationLink page="pricing" className={styles.moreInfo}>More Information</DocumentationLink>
 
             <ButtonOne onClick={handleClick} disabled={buttonDisabled}>
                 <LoadableButtonContent isLoading={isLoading} buttonLabel={buttonLabel} />

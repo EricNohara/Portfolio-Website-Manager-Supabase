@@ -21,6 +21,8 @@
   padding: 0 0.75rem;
   transition: 0.2s ease;
   border-radius: var(--global-border-radius);
+  text-decoration: none;
+  font-size: 0.85rem;
 }
 
 .button:hover {

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ButtonFour, ButtonOne } from "@/app/components/Buttons/Buttons";
 import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
 import { titleFont } from "@/app/localFonts";
+import { createDocumentationUrl } from "@/utils/navigation/documentation";
 
 import styles from "./AiAgents.module.css";
 import PageContentHeader, { IButton } from "../../components/PageContentHeader/PageContentHeader";
@@ -61,10 +62,16 @@ export default function AiAgentsPage() {
 
     const moreAboutButton: IButton = {
         name: "More About the Agents",
-        // change this later to have own doc page
-        onClick: () => router.push("/documentation/product"),
+        onClick: () => {
+            window.location.assign(
+                createDocumentationUrl(
+                    "product",
+                    window.location.href
+                )
+            );
+        },
         icon: Info,
-    }
+    };
 
     return (
         <PageContentWrapper>

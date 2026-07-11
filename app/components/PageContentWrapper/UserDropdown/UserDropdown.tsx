@@ -51,12 +51,42 @@ export default function UserDropdown() {
     };
 
     const buttons: IButtonProp[] = [
-        { name: "Account", icon: User, route: "/user/settings/user" },
-        { name: "Settings", icon: Settings, route: "/user/settings/app" },
-        { name: "Documentation", icon: BookText, route: "/documentation/doc" },
-        { name: "Help", icon: CircleQuestionMark, route: "/documentation/contact" },
-        { name: "Upgrade Account", icon: Crown, route: "/user/settings/billing" },
-        { name: "Log Out", icon: Power, action: handleSignOut },
+        {
+            type: "route",
+            name: "Account",
+            icon: User,
+            route: "/user/settings/user",
+        },
+        {
+            type: "route",
+            name: "Settings",
+            icon: Settings,
+            route: "/user/settings/app",
+        },
+        {
+            type: "documentation",
+            name: "Documentation",
+            icon: BookText,
+            documentationPage: "docs",
+        },
+        {
+            type: "documentation",
+            name: "Help",
+            icon: CircleQuestionMark,
+            documentationPage: "contact",
+        },
+        {
+            type: "route",
+            name: "Upgrade Account",
+            icon: Crown,
+            route: "/user/settings/billing",
+        },
+        {
+            type: "action",
+            name: "Log Out",
+            icon: Power,
+            action: handleSignOut,
+        },
     ];
 
     return (

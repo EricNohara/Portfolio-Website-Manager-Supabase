@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { getCurrentYear } from "@/utils/general/formatDate";
 
-import { ButtonOne, ButtonTwo } from "./components/Buttons/Buttons";
+import { ButtonOne } from "./components/Buttons/Buttons";
+import DocumentationLink from "./components/DocumentationLink/DocumentationLink";
 import Navigation from "./components/Navigation/Navigation";
 import { useAuth } from "./context/AuthProvider";
 import styles from "./LandingPage.module.css";
@@ -55,13 +55,17 @@ export default function LandingPage() {
         </div>
         <div className={styles.ctaButtonsContainer}>
           <ButtonOne onClick={handleSignUp}>Get Started Free</ButtonOne>
-          <ButtonTwo onClick={() => router.push("/documentation/doc")}>Read Docs</ButtonTwo>
+          <DocumentationLink className={styles.readDocsButton} page="docs">Read Docs</DocumentationLink>
         </div>
         <footer className={styles.footer}>
           <div className={styles.footerContent}>
             <p>Copyright &copy; {getCurrentYear()} Nukleio, All Rights Reserved.</p>
-            <Link className={styles.footerLink} href="/policy/privacy">Privacy Policy</Link>
-            <Link className={styles.footerLink} href="/policy/tos">Terms of Service</Link>
+            <DocumentationLink className={styles.footerLink} page="privacy">
+              Privacy Policy
+            </DocumentationLink>
+            <DocumentationLink className={styles.footerLink} page="terms">
+              Terms of Service
+            </DocumentationLink>
           </div>
         </footer>
       </div>

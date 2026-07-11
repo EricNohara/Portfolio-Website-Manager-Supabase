@@ -4,10 +4,11 @@ import React, { useEffect, useState } from "react";
 
 import LoadableButtonContent from "@/app/components/AsyncButtonWrapper/LoadableButtonContent/LoadableButtonContent";
 import { ButtonOne, ButtonFour } from "@/app/components/Buttons/Buttons";
+import SelectDropdown from "@/app/components/SelectDropdown/SelectDropdown";
 import Switch from "@/app/components/Switch/Switch";
 import { useToast } from "@/app/context/ToastProvider";
 import { headerFont } from "@/app/localFonts";
-import { applyTheme, getStoredTheme, Theme, setStoredTheme } from "@/utils/general/theme";
+import { applyTheme, getStoredTheme, Theme, setStoredTheme, BorderRadius, getStoredBorderRadius, applyBorderRadius, setStoredBorderRadius } from "@/utils/general/theme";
 
 import styles from "./EditAppForm.module.css";
 
@@ -15,6 +16,7 @@ interface IAppSettings {
     isDarkMode: boolean;
     isHighContrastMode: boolean;
     language: string;
+    borderRadius: BorderRadius;
 }
 
 interface ILanguage {
@@ -26,6 +28,7 @@ const DEFAULT_APP_SETTINGS: IAppSettings = {
     isDarkMode: false,
     isHighContrastMode: false,
     language: "English",
+    borderRadius: "balanced"
 };
 
 const LANGUAGES: ILanguage[] = [
@@ -36,30 +39,48 @@ const LANGUAGES: ILanguage[] = [
     { value: "Japanese", label: "日本語" },
 ];
 
+const BORDER_RADIUS_OPTIONS = [
+    { value: "sharp", label: "Sharp" },
+    { value: "balanced", label: "Balanced" },
+    { value: "rounded", label: "Rounded" },
+];
+
 export default function EditAppForm() {
     const [formData, setFormData] = useState<IAppSettings>(DEFAULT_APP_SETTINGS);
+    const [initialData, setInitialData] = useState<IAppSettings>(DEFAULT_APP_SETTINGS);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const toast = useToast();
 
     // Initialize from localStorage (or current DOM class)
     useEffect(() => {
-        const stored = getStoredTheme();
+        const storedTheme = getStoredTheme();
+        const storedRadius = getStoredBorderRadius();
+
         const domIsDark = document.documentElement.classList.contains("dark-theme");
+        const isDarkMode = storedTheme ? storedTheme === "dark" : domIsDark;
+        const borderRadius = storedRadius ?? "balanced";
 
-        const isDark = stored ? stored === "dark" : domIsDark;
+        applyTheme(isDarkMode ? "dark" : "light");
+        applyBorderRadius(borderRadius);
 
-        setFormData((prev) => ({
-            ...prev,
-            isDarkMode: isDark,
-        }));
+        const nextSettings: IAppSettings = {
+            ...DEFAULT_APP_SETTINGS,
+            isDarkMode,
+            borderRadius,
+        };
+
+        setFormData(nextSettings);
+        setInitialData(nextSettings);
     }, []);
 
-    const handleToggle = (key: keyof IAppSettings) => {
+    const handleToggle = (key: "isDarkMode" | "isHighContrastMode") => {
         setFormData((prev) => {
-            const next = { ...prev, [key]: !prev[key] };
+            const next = {
+                ...prev,
+                [key]: !prev[key],
+            };
 
-            // If user toggles dark mode, apply immediately + persist
             if (key === "isDarkMode") {
                 const theme: Theme = next.isDarkMode ? "dark" : "light";
                 applyTheme(theme);
@@ -70,12 +91,34 @@ export default function EditAppForm() {
         });
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const { name, value } = e.target;
+    const handleLanguageChange = (value: string) => {
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            language: value,
         }));
+    };
+
+    const handleBorderRadiusChange = (value: string) => {
+        const borderRadius = value as BorderRadius;
+
+        setFormData((prev) => ({
+            ...prev,
+            borderRadius,
+        }));
+
+        applyBorderRadius(borderRadius);
+        setStoredBorderRadius(borderRadius);
+    };
+
+    const handleCancel = () => {
+        setFormData(initialData);
+        setIsEditing(false);
+        setIsLoading(false);
+
+        applyTheme(initialData.isDarkMode ? "dark" : "light");
+        applyBorderRadius(initialData.borderRadius);
+        setStoredTheme(initialData.isDarkMode ? "dark" : "light");
+        setStoredBorderRadius(initialData.borderRadius);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -83,11 +126,13 @@ export default function EditAppForm() {
         setIsLoading(true);
 
         try {
-            // await updateAppSettings(formData)
+            setInitialData(formData);
+
             toast.success(
                 "Success",
-                "To be implemented. No settings have been changed as none are implemented yet."
+                "App settings updated successfully."
             );
+
             setIsEditing(false);
         } catch {
             toast.error("Error", "Error updating your app settings.");
@@ -108,16 +153,7 @@ export default function EditAppForm() {
                 <div className={styles.buttons}>
                     {isEditing ? (
                         <>
-                            <ButtonFour
-                                onClick={() => {
-                                    setFormData(DEFAULT_APP_SETTINGS);
-                                    setIsEditing(false);
-
-                                    // Optional: if cancel resets, also reset theme
-                                    applyTheme("light");
-                                    setStoredTheme("light");
-                                }}
-                            >
+                            <ButtonFour onClick={handleCancel}>
                                 Cancel
                             </ButtonFour>
                             <ButtonOne type="submit" disabled={isLoading}>
@@ -147,19 +183,28 @@ export default function EditAppForm() {
 
                 <div className={styles.settingItem}>
                     <label className={`${styles.label} ${headerFont.className}`}>Language</label>
-                    <select
-                        name="language"
+
+                    <SelectDropdown
                         value={formData.language}
-                        onChange={handleChange}
+                        options={LANGUAGES}
+                        onChange={handleLanguageChange}
                         disabled={!isEditing}
-                        className={headerFont.className}
-                    >
-                        {LANGUAGES.map((lang, idx) => (
-                            <option value={lang.value} key={idx}>
-                                {lang.label}
-                            </option>
-                        ))}
-                    </select>
+                        ariaLabel="Language"
+                    />
+                </div>
+
+                <div className={styles.settingItem}>
+                    <label className={`${styles.label} ${headerFont.className}`}>
+                        Corner Style
+                    </label>
+
+                    <SelectDropdown
+                        value={formData.borderRadius}
+                        options={BORDER_RADIUS_OPTIONS}
+                        onChange={handleBorderRadiusChange}
+                        disabled={!isEditing}
+                        ariaLabel="Corner Style"
+                    />
                 </div>
             </div>
         </form>

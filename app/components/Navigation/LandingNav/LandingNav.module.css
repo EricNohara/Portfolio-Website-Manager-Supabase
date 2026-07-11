@@ -12,14 +12,22 @@
   gap: 4rem;
 }
 
-.landingLinks > li > a {
+.landingLinks > li > a,
+.landingLinks > li > button {
+  padding: 0;
+  border: none;
+  background: none;
   text-decoration: none;
+  font: inherit;
   font-size: 1.1rem;
+  line-height: inherit;
   color: white;
-  transition: 0.2s ease;
+  transition: color 0.2s ease;
+  cursor: pointer;
 }
 
-.landingLinks > li > a:hover {
+.landingLinks > li > a:hover,
+.landingLinks > li > button:hover {
   color: var(--home-txt-3);
 }
 
