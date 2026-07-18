@@ -5,7 +5,7 @@ export default function LogoLink() {
     return (
         <Link href="/">
             <Image
-                src="/images/navbar-logo.png"
+                src="/icons/favicon-v2.svg"
                 width={50}
                 height={50}
                 alt="Nukleio Logo"

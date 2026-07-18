@@ -21,7 +21,7 @@ export default function TitleLogo({ collapsed = false }: TitleLogoProps) {
 
     return (
         <div className={`${styles.container} ${titleFont.className}`} onClick={handleClick}>
-            <Image src="/images/navbar-logo.png" width={50} height={50} alt="Nukleio Logo" />
+            <Image src="/icons/favicon-v2.svg" width={50} height={50} alt="Nukleio Logo" />
             {!collapsed && <h1>Nukleio</h1>}
         </div >
     );
