@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import React from "react";
 
+import AuthBackground from "@/app/components/AuthBackground/AuthBackground";
 import Navigation from "@/app/components/Navigation/Navigation";
 import TitleLogo from "@/app/components/TitleLogo/TitleLogo";
 import { titleFont, headerFont } from "@/app/localFonts";
@@ -21,13 +21,7 @@ export default function SignUpPage() {
 
       {/* Right side (background image with nav) */}
       <div className={styles.rightPanel}>
-        <Image
-          src="/images/login-signup-graphic.svg"
-          alt="Login Signup Graphic"
-          fill
-          priority
-          className={styles.backgroundImage}
-        />
+        <AuthBackground />
         <div className={styles.navWrapper}>
           <Navigation />
         </div>

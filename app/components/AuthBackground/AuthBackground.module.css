@@ -1,0 +1,342 @@
+.background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  min-width: 0;
+  min-height: 22rem;
+  overflow: hidden;
+  isolation: isolate;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 50% 48%,
+      rgba(45, 113, 190, 0.34),
+      transparent 31%
+    ),
+    linear-gradient(180deg, #060b1b 0%, #0b1831 48%, #1f3c67 100%);
+}
+
+.starField,
+.cloudLayer,
+.vignette {
+  position: absolute;
+  inset: 0;
+}
+
+.starField {
+  z-index: 1;
+  opacity: 0.72;
+  background-image:
+    radial-gradient(circle at 8% 62%, #6ecfff 0 1px, transparent 1.8px),
+    radial-gradient(circle at 14% 84%, #8ee5c3 0 1px, transparent 1.8px),
+    radial-gradient(circle at 22% 35%, #4aa7ff 0 1.2px, transparent 2px),
+    radial-gradient(circle at 29% 68%, #ffffff 0 0.8px, transparent 1.6px),
+    radial-gradient(circle at 38% 18%, #5cb7ff 0 1px, transparent 1.8px),
+    radial-gradient(circle at 43% 78%, #71d7d1 0 1.1px, transparent 2px),
+    radial-gradient(circle at 54% 12%, #378afb 0 1px, transparent 1.8px),
+    radial-gradient(circle at 59% 69%, #ffffff 0 0.8px, transparent 1.6px),
+    radial-gradient(circle at 67% 29%, #79d4e7 0 1.2px, transparent 2.2px),
+    radial-gradient(circle at 72% 82%, #5e9ef6 0 1px, transparent 1.8px),
+    radial-gradient(circle at 82% 16%, #378afb 0 0.9px, transparent 1.7px),
+    radial-gradient(circle at 88% 57%, #8ee5c3 0 1px, transparent 1.8px),
+    radial-gradient(circle at 94% 38%, #4ba8ff 0 1px, transparent 1.8px);
+  animation: starTwinkle 5.5s ease-in-out infinite alternate;
+}
+
+.orbitStage {
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  z-index: 3;
+  width: min(82%, 48rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+
+.orbit {
+  --orbit-color: rgba(70, 166, 255, 0.58);
+  --orbit-glow: rgba(65, 154, 255, 0.55);
+  --orbit-tilt: 0deg;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  border: 1px solid var(--orbit-color);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0.45rem rgba(55, 138, 251, 0.11),
+    inset 0 0 0.5rem rgba(55, 138, 251, 0.07);
+  transform: translate(-50%, -50%) rotate(var(--orbit-tilt));
+  animation: orbitShimmer 5s ease-in-out infinite alternate;
+}
+
+.orbitOne {
+  --orbit-color: rgba(95, 183, 255, 0.62);
+  --orbit-glow: rgba(76, 168, 255, 0.85);
+  --orbit-tilt: -17deg;
+
+  width: 98%;
+  height: 56%;
+}
+
+.orbitTwo {
+  --orbit-color: rgba(111, 220, 198, 0.42);
+  --orbit-glow: rgba(128, 232, 200, 0.78);
+  --orbit-tilt: 15deg;
+
+  width: 89%;
+  height: 47%;
+  animation-delay: -1.75s;
+}
+
+.orbitThree {
+  --orbit-color: rgba(72, 136, 229, 0.3);
+  --orbit-glow: rgba(83, 155, 249, 0.72);
+  --orbit-tilt: 52deg;
+
+  width: 76%;
+  height: 42%;
+  animation-delay: -3.25s;
+}
+
+.orbitParticle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 3px;
+  height: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 50%;
+  background: #b9f4ff;
+  box-shadow:
+    0 0 0.35rem 0.12rem var(--orbit-glow),
+    0 0 1rem 0.3rem var(--orbit-glow);
+  offset-path: ellipse(50% 50% at 50% 50%);
+  offset-rotate: 0deg;
+  animation: orbitTravel 15s linear infinite;
+}
+
+.orbitParticleOne {
+  animation-duration: 40s;
+}
+
+.orbitParticleTwo {
+  width: 4px;
+  height: 4px;
+  animation-duration: 25s;
+  animation-delay: -7s;
+  animation-direction: reverse;
+}
+
+.orbitParticleThree {
+  width: 2px;
+  height: 2px;
+  animation-duration: 30s;
+  animation-delay: -12s;
+}
+
+.iconAura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 42%;
+  opacity: 0.82;
+  background: radial-gradient(
+    circle,
+    rgba(64, 155, 245, 0.5),
+    rgba(52, 135, 223, 0.14) 47%,
+    transparent 72%
+  );
+  filter: blur(1.25rem);
+  transform: translate(-50%, -50%);
+  animation: iconGlow 4s ease-in-out infinite alternate;
+}
+
+.iconWrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1000;
+  display: block;
+  width: 31%;
+  aspect-ratio: 1;
+  color: #5db6ef;
+  filter: drop-shadow(0 0 0.35rem rgba(126, 230, 214, 0.62))
+    drop-shadow(0 0 1.25rem rgba(55, 138, 251, 0.72));
+  transform: translate(-50%, -50%);
+}
+
+.cloudLayer {
+  z-index: 2;
+  overflow: hidden;
+}
+
+.cloud {
+  position: absolute;
+  top: var(--cloud-top);
+  display: block;
+  width: var(--cloud-size);
+  opacity: 1;
+  filter: none;
+  will-change: transform;
+  animation-duration: var(--cloud-duration);
+  animation-delay: var(--cloud-delay);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.cloud.right {
+  left: calc(var(--cloud-size) * -1.25);
+  animation-name: cloudDriftRight;
+}
+
+.cloud.left {
+  right: calc(var(--cloud-size) * -1.25);
+  animation-name: cloudDriftLeft;
+}
+
+.cloudImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  transform-origin: center;
+}
+
+.cloud.mirrored .cloudImage {
+  transform: scaleX(-1);
+}
+
+.cloud.far {
+  z-index: 0;
+}
+
+.cloud.middle {
+  z-index: 1;
+}
+
+.cloud.near {
+  z-index: 2;
+}
+
+@keyframes starTwinkle {
+  from {
+    opacity: 0.42;
+  }
+
+  to {
+    opacity: 0.82;
+  }
+}
+
+@keyframes orbitTravel {
+  from {
+    offset-distance: 0%;
+  }
+
+  to {
+    offset-distance: 100%;
+  }
+}
+
+@keyframes orbitShimmer {
+  from {
+    opacity: 0.58;
+    filter: brightness(0.82);
+  }
+
+  to {
+    opacity: 1;
+    filter: brightness(1.14);
+  }
+}
+
+@keyframes iconGlow {
+  from {
+    opacity: 0.62;
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+
+  to {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.18);
+  }
+}
+
+@keyframes cloudDriftRight {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(100vw + var(--cloud-size) * 2.5), 0, 0);
+  }
+}
+
+@keyframes cloudDriftLeft {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(calc(-100vw - var(--cloud-size) * 2.5), 0, 0);
+  }
+}
+
+@media (max-width: 760px) {
+  .orbitStage {
+    top: 48%;
+    width: min(105%, 38rem);
+  }
+
+  .iconWrapper {
+    width: 34%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starField,
+  .orbit,
+  .orbitParticle,
+  .iconAura,
+  .iconWrapper,
+  .cloud {
+    animation: none;
+  }
+
+  .cloud:nth-child(1) {
+    left: -2%;
+  }
+
+  .cloud:nth-child(2) {
+    left: 70%;
+  }
+
+  .cloud:nth-child(3) {
+    left: 30%;
+  }
+
+  .cloud:nth-child(4) {
+    left: 76%;
+  }
+
+  .cloud:nth-child(5) {
+    left: -8%;
+  }
+
+  .cloud:nth-child(6) {
+    left: 42%;
+  }
+
+  .cloud:nth-child(7) {
+    left: 68%;
+  }
+
+  .cloud:nth-child(8) {
+    left: 16%;
+  }
+}
