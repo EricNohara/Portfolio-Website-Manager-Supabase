@@ -34,7 +34,7 @@ const agents = [
         href: "/user/aiAgents/resume",
         description: "Professional and ATS-optimized for any job.",
         icon: UserRound,
-        color: "purple",
+        color: "bluegreen",
         features: [
             "ATS optimization",
             "Smart experience highlighting",
@@ -43,7 +43,7 @@ const agents = [
         ],
     },
     {
-        title: "Professional Headshot Agent",
+        title: "Headshot Agent",
         href: "/user/aiAgents/professionalHeadshot",
         description: "Professional and personalized AI headshots.",
         icon: Camera,
@@ -65,7 +65,7 @@ export default function AiAgentsPage() {
         onClick: () => {
             window.location.assign(
                 createDocumentationUrl(
-                    "product",
+                    "aiAgents",
                     window.location.href
                 )
             );

@@ -8,6 +8,7 @@ export const DOCUMENTATION_PATHS = {
   privacy: "/legal/privacy",
   terms: "/legal/terms",
   apiKeys: "/docs/creating-api-keys",
+  aiAgents: "/product#generative-ai-agents",
 } as const;
 
 export type DocumentationPage = keyof typeof DOCUMENTATION_PATHS;
