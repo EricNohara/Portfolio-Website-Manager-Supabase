@@ -1,5 +1,8 @@
+"use client";
+
 import { LucideIcon } from "lucide-react";
 
+import { useLanguage } from "@/app/context/LanguageProvider";
 import { headerFont } from "@/app/localFonts";
 
 import styles from "./PageContentHeader.module.css";
@@ -27,6 +30,8 @@ export interface IPageContentHeaderProps {
 }
 
 export default function PageContentHeader({ title, icon: Icon, buttonOne, buttonFour, className }: IPageContentHeaderProps) {
+    const { t } = useLanguage();
+
     return (
         <div className={`${styles.container} ${className ?? ""}`}>
             <div className={styles.titleContainer}>
@@ -35,7 +40,7 @@ export default function PageContentHeader({ title, icon: Icon, buttonOne, button
                         <Icon size={28} />
                     </span>
                 )}
-                <h1 className={`${styles.title} ${headerFont.className}`}>{title}</h1>
+                <h1 className={`${styles.title} ${headerFont.className}`}>{t(title)}</h1>
             </div>
             <div className={styles.buttons}>
                 {buttonFour && (
@@ -51,8 +56,8 @@ export default function PageContentHeader({ title, icon: Icon, buttonOne, button
                                     {buttonFour.icon && <buttonFour.icon size={20} />}
                                     {
                                         buttonFour.isLoading ?
-                                            <LoadableButtonContent isLoading={buttonFour.isLoading} buttonLabel={buttonFour.name} />
-                                            : buttonFour.name
+                                            <LoadableButtonContent isLoading={buttonFour.isLoading} buttonLabel={t(buttonFour.name)} />
+                                            : t(buttonFour.name)
                                     }
                                 </ButtonFour>
                             }
@@ -67,7 +72,7 @@ export default function PageContentHeader({ title, icon: Icon, buttonOne, button
                             className={styles.button}
                         >
                             {buttonFour.icon && <buttonFour.icon size={20} />}
-                            {buttonFour.name}
+                            {t(buttonFour.name)}
                         </ButtonFour>
                     )
                 )}
@@ -85,8 +90,8 @@ export default function PageContentHeader({ title, icon: Icon, buttonOne, button
 
                                     {
                                         buttonOne.isLoading ?
-                                            <LoadableButtonContent isLoading={buttonOne.isLoading} buttonLabel={buttonOne.name} />
-                                            : buttonOne.name
+                                            <LoadableButtonContent isLoading={buttonOne.isLoading} buttonLabel={t(buttonOne.name)} />
+                                            : t(buttonOne.name)
                                     }
                                 </ButtonOne>
                             }
@@ -101,7 +106,7 @@ export default function PageContentHeader({ title, icon: Icon, buttonOne, button
                             className={styles.button}
                         >
                             {buttonOne.icon && <buttonOne.icon size={20} />}
-                            {buttonOne.name}
+                            {t(buttonOne.name)}
                         </ButtonOne>
                     )
                 )}

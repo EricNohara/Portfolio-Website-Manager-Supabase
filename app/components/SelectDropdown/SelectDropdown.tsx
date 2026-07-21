@@ -2,6 +2,8 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
+import { useLanguage } from "@/app/context/LanguageProvider";
+
 import styles from "./SelectDropdown.module.css";
 import AnimatedChevronIcon from "../AnimatedIcons/AnimatedChevronIcon";
 
@@ -34,6 +36,7 @@ export default function SelectDropdown({
     className,
     ariaLabel,
 }: Props) {
+    const { t } = useLanguage();
     const [open, setOpen] = useState(false);
 
     const rootRef = useRef<HTMLDivElement | null>(null);
@@ -67,7 +70,7 @@ export default function SelectDropdown({
     }, []);
 
     const displayText =
-        loading ? "Loading…" : selected?.label ?? placeholder;
+        loading ? t("Loading…") : selected?.label ?? t(placeholder);
 
     const handleToggle = () => {
         if (isDisabled) return;

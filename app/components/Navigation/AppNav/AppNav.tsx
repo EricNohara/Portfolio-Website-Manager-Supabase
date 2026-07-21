@@ -4,6 +4,7 @@ import { House, File, Briefcase, GraduationCap, Rocket, Brain, Settings, User, K
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { useLanguage } from "@/app/context/LanguageProvider";
 import { headerFont } from "@/app/localFonts";
 
 import styles from "./AppNav.module.css";
@@ -33,6 +34,7 @@ const navItems: INavItem[] = [
 export default function AppNav() {
     const router = useRouter();
     const pathname = usePathname();
+    const { t } = useLanguage();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [hasMounted, setHasMounted] = useState(false);
 
@@ -66,11 +68,11 @@ export default function AppNav() {
                 key={item.path}
                 onClick={() => handleClick(item)}
                 className={`${styles.navButton} ${isActive ? styles.activeNavButton : ""} ${headerFont.className}`}
-                title={visuallyCollapsed ? item.label : undefined}
-                aria-label={item.label}
+                title={visuallyCollapsed ? t(item.label) : undefined}
+                aria-label={t(item.label)}
             >
                 <Icon className={styles.navIcon} />
-                <span className={styles.navLabel}>{item.label}</span>
+                <span className={styles.navLabel}>{t(item.label)}</span>
             </button>
         );
     };
@@ -80,8 +82,8 @@ export default function AppNav() {
             <button
                 className={styles.collapseButton}
                 onClick={toggleCollapsed}
-                aria-label={visuallyCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                title={visuallyCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                aria-label={t(visuallyCollapsed ? "Expand sidebar" : "Collapse sidebar")}
+                title={t(visuallyCollapsed ? "Expand sidebar" : "Collapse sidebar")}
             >
                 {visuallyCollapsed ? <ChevronRight /> : <ChevronLeft />}
             </button>
@@ -99,11 +101,11 @@ export default function AppNav() {
                     onClick={() => router.push("/user/settings/app")}
                     className={`${styles.navButton} ${headerFont.className} ${pathname.includes("/user/settings") ? styles.activeNavButton : ""
                         }`}
-                    title={visuallyCollapsed ? "Settings" : undefined}
-                    aria-label="Settings"
+                    title={visuallyCollapsed ? t("Settings") : undefined}
+                    aria-label={t("Settings")}
                 >
                     <Settings className={styles.navIcon} />
-                    <span className={styles.navLabel}>Settings</span>
+                    <span className={styles.navLabel}>{t("Settings")}</span>
                 </button>
             </div>
         </nav>

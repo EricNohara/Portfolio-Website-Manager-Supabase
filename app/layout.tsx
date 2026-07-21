@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import BodyWrapper from "./components/BodyWrapper/BodyWrapper";
 import ThemeInit from "./components/ThemeInit";
 import { AuthProvider } from "./context/AuthProvider";
+import { LanguageProvider } from "./context/LanguageProvider";
 import { TierProvider } from "./context/TierProvider";
 import { ToastProvider } from "./context/ToastProvider";
 import { UserProvider } from "./context/UserProvider";
@@ -34,19 +35,21 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeInit />
-        <AuthProvider>
-          <UserProvider>
-            <ToastProvider>
-              <TierProvider>
-                <BodyWrapper>
-                  {children}
-                  <SpeedInsights />
-                  <Analytics />
-                </BodyWrapper>
-              </TierProvider>
-            </ToastProvider>
-          </UserProvider>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <UserProvider>
+              <ToastProvider>
+                <TierProvider>
+                  <BodyWrapper>
+                    {children}
+                    <SpeedInsights />
+                    <Analytics />
+                  </BodyWrapper>
+                </TierProvider>
+              </ToastProvider>
+            </UserProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html >
   );

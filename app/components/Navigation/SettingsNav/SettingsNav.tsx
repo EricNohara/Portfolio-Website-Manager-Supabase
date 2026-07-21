@@ -1,6 +1,9 @@
+"use client";
+
 import { AppWindow, DollarSign, KeySquare, LucideIcon, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { useLanguage } from "@/app/context/LanguageProvider";
 import { headerFont } from "@/app/localFonts";
 
 import styles from "./SettingsNav.module.css";
@@ -24,6 +27,7 @@ const settingsLinks: ISettingsLink[] = [
 
 export default function SettingsNav({ activeSetting }: ISettingsNavProps) {
     const router = useRouter();
+    const { t } = useLanguage();
 
     return (
         <nav className={styles.settingsNav}>
@@ -36,7 +40,7 @@ export default function SettingsNav({ activeSetting }: ISettingsNavProps) {
                             onClick={() => router.push(link.route)}
                         >
                             <link.icon />
-                            {link.name}
+                            {t(link.name)}
                         </li>
                     )
                 }
