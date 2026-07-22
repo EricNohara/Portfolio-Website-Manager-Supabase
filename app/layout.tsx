@@ -26,11 +26,37 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/icons/favicon-v2.ico" sizes="any" />
         <link rel="icon" href="/icons/favicon-v2.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
-        <link rel="manifest" href="/site.webmanifest" crossOrigin="use-credentials" />
-        <link rel="preload" href="/fonts/baseFont.woff2" as="font" type="font/woff2" crossOrigin="" />
-        <link rel="preload" href="/fonts/titleFont.woff2" as="font" type="font/woff2" crossOrigin="" />
-        <link rel="preload" href="/fonts/headerFont.woff2" as="font" type="font/woff2" crossOrigin="" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/icons/apple-touch-icon.png"
+        />
+        <link
+          rel="manifest"
+          href="/site.webmanifest"
+          crossOrigin="use-credentials"
+        />
+        <link
+          rel="preload"
+          href="/fonts/baseFont.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin=""
+        />
+        <link
+          rel="preload"
+          href="/fonts/titleFont.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin=""
+        />
+        <link
+          rel="preload"
+          href="/fonts/headerFont.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin=""
+        />
         <meta name="theme-color" content="#FFFFFF"></meta>
       </head>
       <body>
@@ -51,6 +77,6 @@ export default function RootLayout({
           </AuthProvider>
         </LanguageProvider>
       </body>
-    </html >
+    </html>
   );
 }

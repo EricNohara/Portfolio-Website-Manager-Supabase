@@ -36,46 +36,57 @@ function randomBetween(random: () => number, minimum: number, maximum: number) {
 
 function createHarmonics(random: () => number): Harmonic[] {
   return Array.from({ length: 6 }, (_, index) => ({
-    amplitude: randomBetween(random, 0.004, 0.012) / (1 + index * 0.1),
+    amplitude: randomBetween(random, 0.005, 0.015) / (1 + index * 0.1),
     cycles: randomBetween(random, 0.6, 2.4) + index * 0.14,
     phase: randomBetween(random, 0, TWO_PI),
-    speed: randomBetween(random, 1, 0.8) * (random() > 0.5 ? 1 : -1),
+    speed: randomBetween(random, 0.8, 0.5) * (random() > 0.5 ? 1 : -1),
   }));
 }
 
 function getWaveHeight(position: number, time: number, harmonics: Harmonic[]) {
   const referenceShape =
-    0.39
-    + 0.115 * gaussian(position, 0.11, 0.115)
-    - 0.075 * gaussian(position, 0.28, 0.1)
-    + 0.036 * gaussian(position, 0.345, 0.055)
-    - 0.07 * gaussian(position, 0.43, 0.105)
-    + 0.105 * gaussian(position, 0.55, 0.13)
-    - 0.2 * gaussian(position, 0.81, 0.16)
-    + 0.02 * gaussian(position, 1.03, 0.18);
+    0.39 +
+    0.115 * gaussian(position, 0.11, 0.115) -
+    0.075 * gaussian(position, 0.28, 0.1) +
+    0.036 * gaussian(position, 0.345, 0.055) -
+    0.07 * gaussian(position, 0.43, 0.105) +
+    0.105 * gaussian(position, 0.55, 0.13) -
+    0.2 * gaussian(position, 0.81, 0.16) +
+    0.02 * gaussian(position, 1.03, 0.18);
 
   const edgeFalloff = 0.68 + Math.sin(Math.PI * position) * 0.32;
-  const fineMotion = harmonics.reduce((total, harmonic) => (
-    total
-    + harmonic.amplitude
-    * Math.sin(TWO_PI * harmonic.cycles * position + harmonic.phase + time * harmonic.speed)
-  ), 0);
+  const fineMotion = harmonics.reduce(
+    (total, harmonic) =>
+      total +
+      harmonic.amplitude *
+        Math.sin(
+          TWO_PI * harmonic.cycles * position +
+            harmonic.phase +
+            time * harmonic.speed
+        ),
+    0
+  );
   const crestMotion =
-    0.018
-    * gaussian(position, 0.29, 0.18)
-    * Math.sin(time * 0.28 + harmonics[0].phase)
-    + 0.026
-    * gaussian(position, 0.81, 0.22)
-    * Math.sin(time * 0.21 + harmonics[1].phase)
-    + 0.01 * Math.sin(time * 0.17 + harmonics[2].phase);
+    0.018 *
+      gaussian(position, 0.29, 0.18) *
+      Math.sin(time * 0.28 + harmonics[0].phase) +
+    0.026 *
+      gaussian(position, 0.81, 0.22) *
+      Math.sin(time * 0.21 + harmonics[1].phase) +
+    0.01 * Math.sin(time * 0.17 + harmonics[2].phase);
 
   return Math.min(
     0.57,
-    Math.max(0.11, referenceShape + fineMotion * edgeFalloff + crestMotion),
+    Math.max(0.11, referenceShape + fineMotion * edgeFalloff + crestMotion)
   );
 }
 
-function buildWavePaths(width: number, height: number, time: number, harmonics: Harmonic[]) {
+function buildWavePaths(
+  width: number,
+  height: number,
+  time: number,
+  harmonics: Harmonic[]
+) {
   const pointCount = Math.max(48, Math.ceil(width / 24));
   const points = Array.from({ length: pointCount + 1 }, (_, index) => {
     const position = index / pointCount;
@@ -109,15 +120,17 @@ function buildWavePaths(width: number, height: number, time: number, harmonics: 
   return { areaBelowLine, line };
 }
 
-function createAuroraGradient(context: CanvasRenderingContext2D, width: number) {
+function createAuroraGradient(
+  context: CanvasRenderingContext2D,
+  width: number
+) {
   const gradient = context.createLinearGradient(0, 0, width, 0);
-  gradient.addColorStop(0, "#8a5cf5");
-  gradient.addColorStop(0.11, "#5264ee");
-  gradient.addColorStop(0.29, "#0872f3");
+  gradient.addColorStop(0, "#0875b8");
+  gradient.addColorStop(0.2, "#11d7d2");
+  gradient.addColorStop(0.4, "#0089c7");
   gradient.addColorStop(0.56, "#095bd9");
-  gradient.addColorStop(0.7, "#0089c7");
-  gradient.addColorStop(0.83, "#11d7d2");
-  gradient.addColorStop(1, "#0875b8");
+  gradient.addColorStop(0.7, "#0872f3");
+  gradient.addColorStop(1, "#5264ee");
   return gradient;
 }
 
@@ -127,7 +140,7 @@ function drawGlowStroke(
   gradient: CanvasGradient,
   lineWidth: number,
   opacity: number,
-  blur: number,
+  blur: number
 ) {
   context.save();
   context.globalCompositeOperation = "lighter";
@@ -152,9 +165,13 @@ export default function AuroraBorealisBackground() {
 
     if (!canvas || !context || !glowContext) return undefined;
 
-    const random = createRandom(Date.now() + Math.floor(Math.random() * 100000));
+    const random = createRandom(
+      Date.now() + Math.floor(Math.random() * 100000)
+    );
     const harmonics = createHarmonics(random);
-    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const reducedMotionQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    );
     const startedAt = performance.now();
 
     let animationFrame = 0;
@@ -167,9 +184,16 @@ export default function AuroraBorealisBackground() {
     const render = (timestamp: number) => {
       if (!width || !height || !glowWidth || !glowHeight) return;
 
-      const elapsed = reducedMotionQuery.matches ? 0 : (timestamp - startedAt) / 1000;
+      const elapsed = reducedMotionQuery.matches
+        ? 0
+        : (timestamp - startedAt) / 1000;
       const mainPaths = buildWavePaths(width, height, elapsed, harmonics);
-      const glowPaths = buildWavePaths(glowWidth, glowHeight, elapsed, harmonics);
+      const glowPaths = buildWavePaths(
+        glowWidth,
+        glowHeight,
+        elapsed,
+        harmonics
+      );
       const mainGradient = createAuroraGradient(context, width);
       const glowGradient = createAuroraGradient(glowContext, glowWidth);
 
@@ -182,27 +206,10 @@ export default function AuroraBorealisBackground() {
         glowPaths.line,
         glowGradient,
         glowHeight * 0.38,
-        0.065,
-        Math.max(8, glowHeight * 0.07),
+        0.4,
+        Math.max(10, glowHeight * 0.07)
       );
       glowContext.restore();
-
-      drawGlowStroke(
-        glowContext,
-        glowPaths.line,
-        glowGradient,
-        Math.max(3, glowHeight * 0.02),
-        0.23,
-        Math.max(7, glowHeight * 0.045),
-      );
-      drawGlowStroke(
-        glowContext,
-        glowPaths.line,
-        glowGradient,
-        Math.max(1.5, glowHeight * 0.007),
-        0.2,
-        Math.max(3, glowHeight * 0.018),
-      );
 
       context.clearRect(0, 0, width, height);
       context.drawImage(glowCanvas, 0, 0, width, height);
@@ -224,7 +231,10 @@ export default function AuroraBorealisBackground() {
 
       if (!width || !height) return;
 
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, MAX_PIXEL_RATIO);
+      const pixelRatio = Math.min(
+        window.devicePixelRatio || 1,
+        MAX_PIXEL_RATIO
+      );
       canvas.width = Math.round(width * pixelRatio);
       canvas.height = Math.round(height * pixelRatio);
       context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
@@ -252,7 +262,8 @@ export default function AuroraBorealisBackground() {
     };
 
     const startAnimation = () => {
-      if (animationFrame || document.hidden || reducedMotionQuery.matches) return;
+      if (animationFrame || document.hidden || reducedMotionQuery.matches)
+        return;
       animationFrame = window.requestAnimationFrame(animate);
     };
 
@@ -281,7 +292,10 @@ export default function AuroraBorealisBackground() {
       stopAnimation();
       resizeObserver.disconnect();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      reducedMotionQuery.removeEventListener("change", handleMotionPreferenceChange);
+      reducedMotionQuery.removeEventListener(
+        "change",
+        handleMotionPreferenceChange
+      );
     };
   }, []);
 
