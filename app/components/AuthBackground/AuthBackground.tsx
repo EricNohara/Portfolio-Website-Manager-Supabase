@@ -42,32 +42,23 @@ type CloudStyle = CSSProperties & {
 };
 
 const CLOUD_ASSETS: CloudAsset[] = [
-  { height: 252, src: "/images/clouds/cloud-variant-01.png", width: 445 },
-  { height: 164, src: "/images/clouds/cloud-variant-02.png", width: 298 },
-  { height: 156, src: "/images/clouds/cloud-variant-03.png", width: 389 },
-  { height: 251, src: "/images/clouds/cloud-variant-04.png", width: 339 },
-  { height: 184, src: "/images/clouds/cloud-variant-05.png", width: 330 },
-  { height: 143, src: "/images/clouds/cloud-variant-06.png", width: 391 },
-  { height: 233, src: "/images/clouds/cloud-variant-07.png", width: 412 },
-  { height: 170, src: "/images/clouds/cloud-variant-08.png", width: 300 },
-  { height: 132, src: "/images/clouds/cloud-variant-09.png", width: 388 },
-  { height: 184, src: "/images/clouds/cloud-variant-10.png", width: 378 },
-  { height: 155, src: "/images/clouds/cloud-variant-11.png", width: 279 },
-  { height: 143, src: "/images/clouds/cloud-variant-12.png", width: 411 },
-  { height: 190, src: "/images/clouds/cloud-variant-13.png", width: 482 },
-  { height: 142, src: "/images/clouds/cloud-variant-14.png", width: 273 },
-  { height: 154, src: "/images/clouds/cloud-variant-15.png", width: 421 },
+  { height: 252, src: "/images/clouds/cloud-variant-01.svg", width: 445 },
+  { height: 164, src: "/images/clouds/cloud-variant-02.svg", width: 298 },
+  { height: 156, src: "/images/clouds/cloud-variant-03.svg", width: 389 },
+  { height: 251, src: "/images/clouds/cloud-variant-04.svg", width: 339 },
+  { height: 184, src: "/images/clouds/cloud-variant-05.svg", width: 330 },
+  { height: 143, src: "/images/clouds/cloud-variant-06.svg", width: 391 },
 ];
 
 const clouds: CloudConfig[] = [
-  { delay: -18, depth: "far", duration: 108, size: 13, top: "9%" },
-  { delay: -64, depth: "far", duration: 92, size: 16, top: "36%" },
-  { delay: -15, depth: "middle", duration: 76, size: 21, top: "24%" },
-  { delay: -49, depth: "middle", duration: 68, size: 24, top: "57%" },
-  { delay: -8, depth: "near", duration: 58, size: 40, top: "77%" },
-  { delay: -31, depth: "near", duration: 52, size: 52, top: "84%" },
-  { delay: -20, depth: "near", duration: 64, size: 46, top: "89%" },
-  { delay: -47, depth: "near", duration: 56, size: 58, top: "93%" },
+  { delay: -18, depth: "far", duration: 108, size: 5, top: "9%" },
+  { delay: -64, depth: "far", duration: 92, size: 6, top: "36%" },
+  { delay: -15, depth: "middle", duration: 76, size: 15, top: "24%" },
+  { delay: -49, depth: "middle", duration: 68, size: 18, top: "57%" },
+  { delay: -8, depth: "near", duration: 58, size: 32, top: "77%" },
+  { delay: -31, depth: "near", duration: 52, size: 37, top: "84%" },
+  { delay: -20, depth: "near", duration: 64, size: 40, top: "89%" },
+  { delay: -47, depth: "near", duration: 56, size: 75, top: "93%" },
 ];
 
 function pickCloudAsset(seed: number) {
@@ -95,7 +86,9 @@ function Cloud({
 
   return (
     <span
-      className={`${styles.cloud} ${styles[depth]} ${styles[direction]} ${isMirrored ? styles.mirrored : ""}`}
+      className={`${styles.cloud} ${styles[depth]} ${styles[direction]} ${
+        isMirrored ? styles.mirrored : ""
+      }`}
       style={style}
     >
       <Image
@@ -111,7 +104,9 @@ function Cloud({
   );
 }
 
-export default function AuthBackground({ className = "" }: AuthBackgroundProps) {
+export default function AuthBackground({
+  className = "",
+}: AuthBackgroundProps) {
   const [cloudSeed, setCloudSeed] = useState<number | null>(null);
 
   useEffect(() => {
@@ -124,13 +119,19 @@ export default function AuthBackground({ className = "" }: AuthBackgroundProps) 
 
       <div className={styles.orbitStage}>
         <span className={`${styles.orbit} ${styles.orbitOne}`}>
-          <span className={`${styles.orbitParticle} ${styles.orbitParticleOne}`} />
+          <span
+            className={`${styles.orbitParticle} ${styles.orbitParticleOne}`}
+          />
         </span>
         <span className={`${styles.orbit} ${styles.orbitTwo}`}>
-          <span className={`${styles.orbitParticle} ${styles.orbitParticleTwo}`} />
+          <span
+            className={`${styles.orbitParticle} ${styles.orbitParticleTwo}`}
+          />
         </span>
         <span className={`${styles.orbit} ${styles.orbitThree}`}>
-          <span className={`${styles.orbitParticle} ${styles.orbitParticleThree}`} />
+          <span
+            className={`${styles.orbitParticle} ${styles.orbitParticleThree}`}
+          />
         </span>
 
         <span className={styles.iconAura} />
@@ -140,13 +141,14 @@ export default function AuthBackground({ className = "" }: AuthBackgroundProps) 
       </div>
 
       <div className={styles.cloudLayer}>
-        {cloudSeed !== null && clouds.map((cloud, index) => (
-          <Cloud
-            key={`${cloud.depth}-${index}`}
-            assetSeed={cloudSeed + index}
-            {...cloud}
-          />
-        ))}
+        {cloudSeed !== null &&
+          clouds.map((cloud, index) => (
+            <Cloud
+              key={`${cloud.depth}-${index}`}
+              assetSeed={cloudSeed + index}
+              {...cloud}
+            />
+          ))}
       </div>
 
       <div className={styles.vignette} />
