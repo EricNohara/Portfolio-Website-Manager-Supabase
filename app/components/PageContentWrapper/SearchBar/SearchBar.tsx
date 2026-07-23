@@ -1,6 +1,6 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useMemo } from "react";
 
@@ -40,6 +40,7 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
     const [query, setQuery] = useState<string>("");
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const [activeIndex, setActiveIndex] = useState<number>(-1);
+    const [isSearchActive, setIsSearchActive] = useState<boolean>(false);
     const { state } = useUser();
     const router = useRouter();
 
@@ -154,13 +155,21 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
         });
     };
 
+    const closeSearch = () => {
+        setQuery("");
+        setShowDropdown(false);
+        setIsSearchActive(false);
+        setActiveIndex(-1);
+        inputRef.current?.blur();
+        onFocusChange?.(false);
+    };
+
     // handle keyboard navigation
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Escape") {
-            setShowDropdown(false);
-            setQuery("");
-            setActiveIndex(-1);
-            inputRef.current?.blur();
+            e.preventDefault();
+            closeSearch();
+            return;
         }
 
         if (!showDropdown || filtered.length === 0) return;
@@ -170,16 +179,21 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
 
             if (!keyHoldRef.current) {
                 moveActiveIndex(e.key);
+
                 keyHoldRef.current = setInterval(() => {
                     moveActiveIndex(e.key);
                 }, 150);
             }
         } else if (e.key === "Enter") {
             e.preventDefault();
-            if (activeIndex >= 0 && activeIndex < filtered.length) {
-                handleSelect(filtered[activeIndex].path);
-            } else if (filtered.length > 0) {
-                handleSelect(filtered[0].path);
+
+            const target =
+                activeIndex >= 0 && activeIndex < filtered.length
+                    ? filtered[activeIndex]
+                    : filtered[0];
+
+            if (target) {
+                handleSelect(target.path);
             }
         }
     };
@@ -221,10 +235,21 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
         }
     }, [activeIndex]);
 
-    const handleFocus = () => onFocusChange?.(true);
-    const handleBlur = () => {
-        // give a tiny delay so click on dropdown items works
-        setTimeout(() => onFocusChange?.(false), 100);
+    const handleFocus = () => {
+        setIsSearchActive(true);
+        onFocusChange?.(true);
+    };
+
+    const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+        const wrapper = event.currentTarget;
+
+        // Delay allows dropdown item clicks to complete first.
+        setTimeout(() => {
+            if (!wrapper.contains(document.activeElement)) {
+                setIsSearchActive(false);
+                onFocusChange?.(false);
+            }
+        }, 100);
     };
 
     return (
@@ -249,6 +274,23 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
                     onKeyDown={handleKeyDown}
                     onKeyUp={handleKeyUp}
                 />
+
+                {
+                    isSearchActive &&
+                    <div className={styles.searchControls}>
+                        <button
+                            type="button"
+                            className={styles.closeButton}
+                            aria-label="Close search"
+                            onMouseDown={(event) => event.preventDefault()}
+                            onClick={closeSearch}
+                        >
+                            <X size={14} />
+                        </button>
+
+                        <kbd className={styles.escapeKey}>ESC</kbd>
+                    </div>
+                }
             </form>
 
             {showDropdown && filtered.length > 0 && (

@@ -69,3 +69,43 @@
   background-color: var(--popup-hover);
   transition: 0.1s ease;
 }
+
+.searchControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  color: var(--page-txt-2);
+  background: none;
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+  cursor: pointer;
+  transition: 150ms ease;
+}
+
+.closeButton:hover {
+  color: var(--page-txt-1);
+  background: var(--page-box-border);
+}
+
+.escapeKey {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  color: var(--page-txt-2);
+  background: none;
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+  font-family: inherit;
+  font-size: 0.75rem;
+  line-height: 1;
+  letter-spacing: 0.05em;
+}
