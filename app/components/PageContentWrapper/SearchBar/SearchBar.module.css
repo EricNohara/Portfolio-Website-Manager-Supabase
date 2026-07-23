@@ -55,19 +55,104 @@
 }
 
 .dropdownItem {
-  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: 0.1s ease;
+  border-radius: var(--global-border-radius);
+  transition: background-color 150ms ease;
+}
+
+.dropdownItem:hover,
+.activeItem {
+  background: rgba(55, 137, 251, 0.1);
+}
+
+.suggestionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0.5rem;
+  border: 1px solid;
   border-radius: var(--global-border-radius);
 }
 
-.dropdownItem:hover {
-  background: var(--popup-hover);
+.suggestionIcon_home {
+  color: #8ee5c3;
+  border-color: #8ee5c3;
+  background: rgba(54, 189, 216, 0.25);
 }
 
-.dropdownItem.activeItem {
-  background-color: var(--popup-hover);
-  transition: 0.1s ease;
+.suggestionIcon_user {
+  color: #67dcc1;
+  border-color: #67dcc1;
+  background: rgb(54, 190, 216, 0.25);
+}
+
+.suggestionIcon_document {
+  color: #42cfca;
+  border-color: #42cfca;
+  background: rgba(66, 207, 202, 0.25);
+}
+
+.suggestionIcon_experience {
+  color: #36bed8;
+  border-color: #36bed8;
+  background: rgba(54, 189, 216, 0.25);
+}
+
+.suggestionIcon_education {
+  color: #5d78ff;
+  border-color: #5d78ff;
+  background: rgba(93, 120, 255, 0.25);
+}
+
+.suggestionIcon_course {
+  color: #378afb;
+  border-color: #378afb;
+  background: rgba(55, 137, 251, 0.25);
+}
+
+.suggestionIcon_project {
+  color: #527bf5;
+  border-color: #527bf5;
+  background: rgba(82, 123, 245, 0.25);
+}
+
+.suggestionIcon_skill {
+  color: #6c70ed;
+  border-color: #6c70ed;
+  background: rgba(108, 112, 237, 0.25);
+}
+
+.suggestionIcon_apiKey {
+  color: #5873f7;
+  border-color: #5873f7;
+  background: rgb(88, 115, 247, 0.25);
+}
+
+.suggestionIcon_settings {
+  color: #3d70fb;
+  border-color: #3d70fb;
+  background: rgba(61, 112, 251, 0.25);
+}
+
+.suggestionIcon_agent {
+  color: #81bcff;
+  border-color: #81bcff;
+  background: rgba(129, 188, 255, 0.25);
+}
+
+.suggestionLabel {
+  overflow: hidden;
+  color: var(--page-txt-1);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .searchControls {

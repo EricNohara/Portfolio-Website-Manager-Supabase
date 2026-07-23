@@ -1,6 +1,6 @@
 "use client";
 
-import { House, File, Briefcase, GraduationCap, Rocket, Brain, Settings, User, KeyRound, Bot, ChevronLeft, ChevronRight } from "lucide-react";
+import { House, File, Briefcase, GraduationCap, Rocket, Brain, Settings, KeyRound, Bot, ChevronLeft, ChevronRight, UserRound } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -21,7 +21,7 @@ interface INavItem {
 
 const navItems: INavItem[] = [
     { label: "Home", path: "/user", icon: House, },
-    { label: "User Info", path: "/user/userInfo", icon: User },
+    { label: "User Info", path: "/user/userInfo", icon: UserRound },
     { label: "Documents", path: "/user/documents", icon: File },
     { label: "Experience", path: "/user/experience", icon: Briefcase },
     { label: "Education", path: "/user/education", icon: GraduationCap, regExpPath: /^\/user\/education\/\d+\/course$/ },

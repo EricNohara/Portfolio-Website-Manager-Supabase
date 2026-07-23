@@ -1,6 +1,21 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import {
+    Bot,
+    GraduationCap,
+    Home,
+    KeyRound,
+    Search,
+    Settings,
+    UserRound,
+    X,
+    LucideIcon,
+    File,
+    Briefcase,
+    LibraryBig,
+    Rocket,
+    Brain
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef, useMemo } from "react";
 
@@ -8,32 +23,163 @@ import { useUser } from "@/app/context/UserProvider";
 
 import styles from "./SearchBar.module.css";
 
+type SuggestionKind =
+    | "home"
+    | "user"
+    | "document"
+    | "experience"
+    | "education"
+    | "course"
+    | "project"
+    | "skill"
+    | "apiKey"
+    | "settings"
+    | "agent";
+
 interface ISuggestion {
     label: string,
-    path: string
+    path: string,
+    kind: SuggestionKind;
 }
 
 interface ISearchBarProps {
     onFocusChange?: (active: boolean) => void;
 }
 
+const SUGGESTION_META: Record<
+    SuggestionKind,
+    {
+        icon: LucideIcon;
+        label: string;
+    }
+> = {
+    home: {
+        icon: Home,
+        label: "Page",
+    },
+    user: {
+        icon: UserRound,
+        label: "User",
+    },
+    document: {
+        icon: File,
+        label: "Document",
+    },
+    experience: {
+        icon: Briefcase,
+        label: "Experience",
+    },
+    education: {
+        icon: GraduationCap,
+        label: "Education",
+    },
+    course: {
+        icon: LibraryBig,
+        label: "Course",
+    },
+    project: {
+        icon: Rocket,
+        label: "Project",
+    },
+    skill: {
+        icon: Brain,
+        label: "Skill",
+    },
+    apiKey: {
+        icon: KeyRound,
+        label: "API key",
+    },
+    settings: {
+        icon: Settings,
+        label: "Settings",
+    },
+    agent: {
+        icon: Bot,
+        label: "AI agent",
+    },
+};
+
 const DEFAULT_SUGGESTIONS: ISuggestion[] = [
-    { label: "Home Page", path: "/user" },
-    { label: "User Info", path: "/user/userInfo" },
-    { label: "Documents Page", path: "/user/documents" },
-    { label: "Profile Picture", path: "/user/documents" },
-    { label: "Resume", path: "/user/documents" },
-    { label: "Transcript", path: "/user/documents" },
-    { label: "Experience Page", path: "/user/experience" },
-    { label: "Education Page", path: "/user/education" },
-    { label: "Projects Page", path: "/user/projects" },
-    { label: "Skills Page", path: "/user/skills" },
-    { label: "Connect Page", path: "/user/connect" },
-    { label: "API Keys", path: "/user/connect" },
-    { label: "User Settings", path: "/user/settings/user" },
-    { label: "App Settings", path: "/user/settings/app" },
-    { label: "AI Agents", path: "/user/aiAgents" },
-    { label: "Cover Letter", path: "/user/aiAgents/coverLetter" }
+    {
+        label: "Home",
+        path: "/user",
+        kind: "home",
+    },
+    {
+        label: "User Info",
+        path: "/user/userInfo",
+        kind: "user",
+    },
+    {
+        label: "Documents",
+        path: "/user/documents",
+        kind: "document",
+    },
+    {
+        label: "Profile Picture",
+        path: "/user/documents",
+        kind: "document",
+    },
+    {
+        label: "Resume",
+        path: "/user/documents",
+        kind: "document",
+    },
+    {
+        label: "Transcript",
+        path: "/user/documents",
+        kind: "document",
+    },
+    {
+        label: "Experience",
+        path: "/user/experience",
+        kind: "experience",
+    },
+    {
+        label: "Education",
+        path: "/user/education",
+        kind: "education",
+    },
+    {
+        label: "Projects",
+        path: "/user/projects",
+        kind: "project",
+    },
+    {
+        label: "Skills",
+        path: "/user/skills",
+        kind: "skill",
+    },
+    {
+        label: "Connect",
+        path: "/user/connect",
+        kind: "apiKey",
+    },
+    {
+        label: "API Keys",
+        path: "/user/connect",
+        kind: "apiKey",
+    },
+    {
+        label: "User Settings",
+        path: "/user/settings/user",
+        kind: "settings",
+    },
+    {
+        label: "App Settings",
+        path: "/user/settings/app",
+        kind: "settings",
+    },
+    {
+        label: "AI Agents",
+        path: "/user/aiAgents",
+        kind: "agent",
+    },
+    {
+        label: "Cover Letter",
+        path: "/user/aiAgents/coverLetter",
+        kind: "agent",
+    },
 ];
 
 export default function SearchBar({ onFocusChange }: ISearchBarProps) {
@@ -59,44 +205,50 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
         const skills = state?.skills ?? [];
         const apiKeys = state?.api_keys ?? [];
 
-        experiences.forEach((exp, index) => {
+        experiences.forEach((experience, index) => {
             dynamicSuggestions.push({
-                label: `Experience: ${exp.company}`,
+                label: experience.company,
+                kind: "experience",
                 path: `/user/experience?index=${index}`,
             });
         });
 
-        education.forEach((edu, index) => {
+        education.forEach((educationItem, index) => {
             dynamicSuggestions.push({
-                label: `Education: ${edu.institution}`,
+                label: educationItem.institution,
+                kind: "education",
                 path: `/user/education?index=${index}`,
             });
 
-            (edu.courses ?? []).forEach((course, courseIndex) => {
+            (educationItem.courses ?? []).forEach((course, courseIndex) => {
                 dynamicSuggestions.push({
-                    label: `Course: ${course.name} (${edu.institution})`,
-                    path: `/user/education/${edu.id}/course?index=${courseIndex}`,
+                    label: course.name,
+                    kind: "course",
+                    path: `/user/education/${educationItem.id}/course?index=${courseIndex}`,
                 });
             });
         });
 
         projects.forEach((project, index) => {
             dynamicSuggestions.push({
-                label: `Project: ${project.name}`,
+                label: project.name,
+                kind: "project",
                 path: `/user/projects?index=${index}`,
             });
         });
 
         skills.forEach((skill, index) => {
             dynamicSuggestions.push({
-                label: `Skill: ${skill.name}`,
+                label: skill.name,
+                kind: "skill",
                 path: `/user/skills?index=${index}`,
             });
         });
 
         apiKeys.forEach((key, index) => {
             dynamicSuggestions.push({
-                label: `Connection: ${key.description}`,
+                label: key.description,
+                kind: "apiKey",
                 path: `/user/connect?index=${index}`,
             });
         });
@@ -104,16 +256,24 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
         const all = [...DEFAULT_SUGGESTIONS, ...dynamicSuggestions];
         const seen = new Set<string>();
         return all.filter((s) => {
-            const k = s.label.toLowerCase();
+            const k = `${s.kind}:${s.label}`.toLowerCase();
             if (seen.has(k)) return false;
             seen.add(k);
             return true;
         });
     }, [state]);
 
-    const filtered = suggestions.filter((item) =>
-        item.label.toLowerCase().includes(query.toLowerCase())
-    );
+    const filtered = suggestions.filter((item) => {
+        const normalizedQuery = query.trim().toLowerCase();
+        const category = SUGGESTION_META[item.kind].label;
+
+        return [
+            item.label,
+            category,
+        ].some((value) =>
+            value?.toLowerCase().includes(normalizedQuery)
+        );
+    });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -296,16 +456,30 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
             {showDropdown && filtered.length > 0 && (
                 <ul className={styles.dropdown}>
                     <div className={styles.dropdownScroll}>
-                        {filtered.map((item, index) => (
-                            <li
-                                key={index}
-                                ref={(el) => { itemRefs.current[index] = el; }}
-                                className={`${styles.dropdownItem} ${index === activeIndex ? styles.activeItem : ""}`}
-                                onClick={() => handleSelect(item.path)}
-                            >
-                                {item.label}
-                            </li>
-                        ))}
+                        {filtered.map((item, index) => {
+                            const suggestionMeta = SUGGESTION_META[item.kind];
+                            const SuggestionIcon = suggestionMeta.icon;
+
+                            return (
+                                <li
+                                    key={`${item.kind}-${item.path}-${item.label}`}
+                                    ref={(element) => {
+                                        itemRefs.current[index] = element;
+                                    }}
+                                    className={`${styles.dropdownItem} ${index === activeIndex ? styles.activeItem : ""
+                                        }`}
+                                    onClick={() => handleSelect(item.path)}
+                                >
+                                    <span className={`${styles.suggestionIcon} ${styles[`suggestionIcon_${item.kind}`]}`}>
+                                        <SuggestionIcon size={20} />
+                                    </span>
+
+                                    <span className={styles.suggestionLabel}>
+                                        {item.label}
+                                    </span>
+                                </li>
+                            );
+                        })}
                     </div>
                 </ul>
             )}
