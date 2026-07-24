@@ -113,6 +113,7 @@ No known issues.
   - Better tables
   - Better input forms
   - Better misc screens
+  - Add onboarding to home screen when there is no data to display (no connections)
 
 ## Eventual Work Items
 
