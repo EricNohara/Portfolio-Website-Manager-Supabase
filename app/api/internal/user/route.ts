@@ -5,7 +5,7 @@ import IUser from "@/app/interfaces/IUser";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { refreshCachedUserInfo } from "@/utils/cachedUserInfo/refreshCachedUserInfo";
 import parseURL from "@/utils/general/parseURL";
-import { createServiceRoleClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/server";
 
 export async function GET(_req: NextRequest): Promise<NextResponse> {
   try {
@@ -30,7 +30,7 @@ export async function GET(_req: NextRequest): Promise<NextResponse> {
     console.error(error.message);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -54,14 +54,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json(
       { message: "User successfully created" },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (err) {
     const error = err as Error;
     console.error(error.message);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -89,14 +89,14 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
     console.error(error.message);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
 // user only able to delete its own account and only if it is logged in
 export async function DELETE(_req: NextRequest): Promise<NextResponse> {
-  const serviceRoleSupabase = createServiceRoleClient();
+  const serviceRoleSupabase = createAdminClient();
 
   try {
     // authenticate user
@@ -154,7 +154,7 @@ export async function DELETE(_req: NextRequest): Promise<NextResponse> {
     console.error(error.message);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

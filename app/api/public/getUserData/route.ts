@@ -2,7 +2,7 @@
 import { after, NextRequest, NextResponse } from "next/server";
 
 import { parseApiKey, signApiKeySecret } from "@/utils/auth/apiKeys";
-import { createServiceRoleClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/server";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
@@ -25,11 +25,10 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   let statusCode: number = 500;
   let apiKey: string | undefined;
   let keyId: string | null = null;
-  let supabase: Awaited<ReturnType<typeof createServiceRoleClient>> | null =
-    null;
+  let supabase: Awaited<ReturnType<typeof createAdminClient>> | null = null;
 
   try {
-    supabase = await createServiceRoleClient();
+    supabase = await createAdminClient();
 
     // get the api key from the authorization header
     apiKey = req.headers.get("Authorization")?.split(" ")[1];
@@ -37,7 +36,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       statusCode = 401;
       return NextResponse.json(
         { message: "Unauthorized" },
-        { status: statusCode, headers: CORS_HEADERS },
+        { status: statusCode, headers: CORS_HEADERS }
       );
     }
 
@@ -47,7 +46,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       statusCode = 401;
       return NextResponse.json(
         { message: "Invalid API key format" },
-        { status: statusCode, headers: CORS_HEADERS },
+        { status: statusCode, headers: CORS_HEADERS }
       );
     }
 
@@ -70,7 +69,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       statusCode = 401;
       return NextResponse.json(
         { message: "Unauthorized" },
-        { status: statusCode, headers: CORS_HEADERS },
+        { status: statusCode, headers: CORS_HEADERS }
       );
     }
 
@@ -87,7 +86,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       after(async () => {
         try {
           if (!supabase) {
-            supabase = createServiceRoleClient();
+            supabase = createAdminClient();
           }
           const respondedAt = new Date().toISOString();
           const userAgent = req.headers.get("user-agent") || "unknown";
@@ -111,7 +110,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       {
         status: statusCode,
         headers: CORS_HEADERS,
-      },
+      }
     );
   } catch (err) {
     const error = err as Error;
@@ -123,7 +122,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       {
         status: statusCode,
         headers: CORS_HEADERS,
-      },
+      }
     );
   }
 }

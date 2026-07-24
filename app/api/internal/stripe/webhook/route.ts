@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
 import { stripe } from "@/utils/stripe/stripe";
-import { createServiceRoleClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -11,7 +11,7 @@ function toIso(unix: number | null | undefined) {
 }
 
 async function getUserIdForCustomer(customerId: string) {
-  const admin = createServiceRoleClient();
+  const admin = createAdminClient();
 
   const { data, error } = await admin
     .from("subscriptions")
@@ -22,7 +22,7 @@ async function getUserIdForCustomer(customerId: string) {
   if (!error && data?.user_id) return data.user_id;
 
   const customer = (await stripe.customers.retrieve(
-    customerId,
+    customerId
   )) as Stripe.Customer;
   const userId =
     typeof customer.metadata?.user_id === "string"
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(
       rawBody,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET!,
+      process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err) {
     const error = err as Error;
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     });
   }
 
-  const admin = createServiceRoleClient();
+  const admin = createAdminClient();
 
   try {
     switch (event.type) {
@@ -72,7 +72,7 @@ export async function POST(req: Request) {
             "No userId for customer:",
             customerId,
             "event:",
-            event.type,
+            event.type
           );
           return new NextResponse("ok", { status: 200 });
         }
@@ -120,7 +120,7 @@ export async function POST(req: Request) {
               stripe_customer_id: customerId,
               updated_at: new Date().toISOString(),
             },
-            { onConflict: "user_id" },
+            { onConflict: "user_id" }
           );
 
           if (error) throw error;

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { refreshCachedUserInfo } from "@/utils/cachedUserInfo/refreshCachedUserInfo";
 import parseURL from "@/utils/general/parseURL";
-import { createServiceRoleClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/server";
 
 export const config = {
   api: {
@@ -20,7 +20,7 @@ const ALLOWED_BUCKETS = [
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const serviceRoleSupabase = createServiceRoleClient();
+    const serviceRoleSupabase = createAdminClient();
     const { user, supabase, response } = await getAuthenticatedUser();
     if (!user) return response;
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ) {
       return NextResponse.json(
         { message: "Only image files allowed" },
-        { status: 400 },
+        { status: 400 }
       );
     } else if (
       (bucketName === "resumes" || bucketName === "transcripts") &&
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ) {
       return NextResponse.json(
         { message: "Only PDF files allowed" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -131,12 +131,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
       return NextResponse.json(
         { publicURL: publicURL.publicUrl },
-        { status: 201 },
+        { status: 201 }
       );
     } else {
       return NextResponse.json(
         { publicURL: publicURL.publicUrl },
-        { status: 201 },
+        { status: 201 }
       );
     }
   } catch (err) {
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
-    const serviceRoleSupabase = createServiceRoleClient();
+    const serviceRoleSupabase = createAdminClient();
     const { user, supabase, response } = await getAuthenticatedUser();
     if (!user) return response;
 
@@ -182,8 +182,8 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
         parsedBucket === "portraits"
           ? { portrait_url: null }
           : parsedBucket === "resumes"
-            ? { resume_url: null }
-            : { transcript_url: null };
+          ? { resume_url: null }
+          : { transcript_url: null };
 
       const { error: updateError } = await supabase
         .from("users")

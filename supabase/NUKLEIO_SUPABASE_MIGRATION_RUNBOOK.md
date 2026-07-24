@@ -25,27 +25,9 @@ Vercel production deployment ─────> Hosted Supabase Production
 
 Use separate Supabase credentials for each environment.
 
-### Local `.env.local`
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=<DEV_SUPABASE_URL>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<DEV_ANON_KEY>
-SUPABASE_SERVICE_ROLE_KEY=<DEV_SERVICE_ROLE_KEY>
-```
-
 ### Vercel Preview environment
 
 Configure the same **development** Supabase URL and keys under Vercel's Preview environment variables.
-
-### Vercel Production environment
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=<PRODUCTION_SUPABASE_URL>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<PRODUCTION_ANON_KEY>
-SUPABASE_SERVICE_ROLE_KEY=<PRODUCTION_SERVICE_ROLE_KEY>
-```
-
-Never place the service-role key in browser code or prefix it with `NEXT_PUBLIC_`.
 
 ---
 
@@ -661,60 +643,7 @@ Never assume every migration is cleanly reversible.
 
 ---
 
-## 15. Open-source repository rules
-
-It is acceptable for these files to be public:
-
-```text
-supabase/migrations/
-supabase/config.toml
-supabase/seed.sql
-supabase/functions/
-```
-
-Before committing, verify they contain no:
-
-- Supabase service-role keys
-- database connection strings
-- database passwords
-- Supabase access tokens
-- OAuth secrets
-- Stripe secrets
-- SMTP credentials
-- private signing keys
-- real customer records
-- private Storage URLs containing signed tokens
-
-Use placeholders and environment variables for secrets.
-
-Suggested repository structure:
-
-```text
-nukleio/
-├── app/
-├── src/
-├── supabase/
-│   ├── migrations/
-│   ├── functions/
-│   ├── seed.sql
-│   └── config.toml
-├── .env.example
-└── .gitignore
-```
-
-Example `.env.example`:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-```
-
-The `.env.example` file should include names only, not real values.
-
----
-
-## 16. Recommended Git policy
+## 15. Recommended Git policy
 
 - One migration per logical database change.
 - Use descriptive migration names.
@@ -738,7 +667,7 @@ remove_legacy_resume_column
 
 ---
 
-## 17. Changes not fully managed by database migrations
+## 16. Changes not fully managed by database migrations
 
 Some Supabase project configuration may require separate deployment or manual setup:
 
@@ -765,7 +694,7 @@ That file can describe which settings exist in development and production while 
 
 ---
 
-## 18. Pre-production checklist
+## 17. Pre-production checklist
 
 Before every production database update:
 
@@ -784,7 +713,7 @@ Before every production database update:
 
 ---
 
-## 19. Post-production checklist
+## 18. Post-production checklist
 
 After applying migrations:
 
@@ -800,7 +729,7 @@ After applying migrations:
 
 ---
 
-## 20. Official references
+## 19. Official references
 
 - Supabase database migrations:  
   https://supabase.com/docs/guides/deployment/database-migrations

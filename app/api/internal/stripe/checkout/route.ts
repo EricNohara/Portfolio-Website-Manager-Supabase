@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { stripe } from "@/utils/stripe/stripe";
-import { createClient, createServiceRoleClient } from "@/utils/supabase/server";
+import { createClient, createAdminClient } from "@/utils/supabase/server";
 
 type Body = { priceId: string };
 
@@ -50,14 +50,14 @@ export async function POST(req: NextRequest) {
       stripeCustomerId = customer.id;
 
       // Use service-role client for upsert (RLS-safe)
-      const admin = createServiceRoleClient();
+      const admin = createAdminClient();
       const { error: upsertErr } = await admin.from("subscriptions").upsert(
         {
           user_id: user.id,
           stripe_customer_id: stripeCustomerId,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: "user_id" },
+        { onConflict: "user_id" }
       );
 
       if (upsertErr) {
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(
         { url: portal.url, mode: "portal" },
-        { status: 200 },
+        { status: 200 }
       );
     }
 
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     console.error("checkout error", error);
     return NextResponse.json(
       { error: error?.message ?? "Server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
