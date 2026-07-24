@@ -2,7 +2,11 @@ import { createServerClient } from "@supabase/ssr";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
+import { allowSelfSignedCertificatesInDevelopment } from "./devTls";
+
 export async function createClient() {
+  allowSelfSignedCertificatesInDevelopment();
+
   const cookieStore = await cookies();
 
   // Create a server's supabase client with newly configured cookie,
@@ -32,6 +36,8 @@ export async function createClient() {
 }
 
 export function createServiceRoleClient() {
+  allowSelfSignedCertificatesInDevelopment();
+
   return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY!

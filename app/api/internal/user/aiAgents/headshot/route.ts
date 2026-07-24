@@ -62,13 +62,13 @@ function isHeadshotAttire(value: unknown): value is HeadshotAttire {
 
 function hasOnlyAllowedKeys(
   obj: Record<string, unknown>,
-  allowedKeys: string[],
+  allowedKeys: string[]
 ): boolean {
   return Object.keys(obj).every((key) => allowedKeys.includes(key));
 }
 
 function isReviseProfessionalHeadshotBody(
-  body: unknown,
+  body: unknown
 ): body is ReviseProfessionalHeadshotBody {
   if (!body || typeof body !== "object") return false;
 
@@ -116,7 +116,7 @@ export async function GET(_req: NextRequest) {
 
     const { data, error } = await supabase.rpc(
       "get_latest_cached_professional_headshots",
-      { p_user_id: user.id },
+      { p_user_id: user.id }
     );
 
     if (error) {
@@ -129,7 +129,7 @@ export async function GET(_req: NextRequest) {
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
           error:
             "Server misconfigured: missing PROFESSIONAL_HEADSHOT_AGENT_BASE_URL",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -170,21 +170,21 @@ export async function POST(req: NextRequest) {
     if (!(referenceImage instanceof File)) {
       return NextResponse.json(
         { error: "Missing reference image." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (!referenceImage.type.startsWith("image/")) {
       return NextResponse.json(
         { error: "Reference file must be an image." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (backgroundImage !== null && !(backgroundImage instanceof File)) {
       return NextResponse.json(
         { error: "Background image must be a file." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -194,7 +194,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "Background file must be an image." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -204,7 +204,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "Invalid background description." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -237,7 +237,7 @@ export async function POST(req: NextRequest) {
 
     if (referenceUploadError) {
       throw new Error(
-        `Reference image upload failed: ${referenceUploadError.message}`,
+        `Reference image upload failed: ${referenceUploadError.message}`
       );
     }
 
@@ -263,7 +263,7 @@ export async function POST(req: NextRequest) {
 
       if (backgroundUploadError) {
         throw new Error(
-          `Background image upload failed: ${backgroundUploadError.message}`,
+          `Background image upload failed: ${backgroundUploadError.message}`
         );
       }
 
@@ -305,7 +305,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: data?.error ?? "Professional headshot generation failed" },
-        { status: 502 },
+        { status: 502 }
       );
     }
 
@@ -339,14 +339,14 @@ export async function POST(req: NextRequest) {
         backgroundUrl: backgroundUrl ?? null,
         validation,
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.error(error);
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -365,7 +365,7 @@ export async function PUT(req: NextRequest) {
           error:
             "Server misconfigured: missing PROFESSIONAL_HEADSHOT_AGENT_BASE_URL",
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -374,7 +374,7 @@ export async function PUT(req: NextRequest) {
     if (!isReviseProfessionalHeadshotBody(body)) {
       return NextResponse.json(
         { error: "Invalid request body." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -398,7 +398,7 @@ export async function PUT(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: data?.error ?? "Professional headshot revision failed" },
-        { status: 502 },
+        { status: 502 }
       );
     }
 
@@ -422,14 +422,14 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(
       { id: cacheId, url: generatedUrl, validation },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.error(error);
 
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

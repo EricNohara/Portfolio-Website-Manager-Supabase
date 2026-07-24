@@ -1,7 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { allowSelfSignedCertificatesInDevelopment } from "./devTls";
+
 export async function updateSession(request: NextRequest) {
+  allowSelfSignedCertificatesInDevelopment();
+
   let supabaseResponse = NextResponse.next({
     request,
   });
@@ -34,3 +38,4 @@ export async function updateSession(request: NextRequest) {
 
   return supabaseResponse;
 }
+

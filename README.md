@@ -106,10 +106,13 @@ No known issues.
 ## Next Steps
 
 - Add payment method and memberships
-- Support more languages through new libraries (Python, Java, C#, etc.)
-- Documentation page for API + code integrations
 - Add ads to website
 - Test with live users
+- UI touch ups
+  - Better loading screens (headshot agent, other agents, other loading screens)
+  - Better tables
+  - Better input forms
+  - Better misc screens
 
 ## Eventual Work Items
 

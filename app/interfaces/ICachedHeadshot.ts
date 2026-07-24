@@ -1,4 +1,4 @@
-export interface ICachedProfessionalHeadshot {
+export interface ICachedHeadshot {
   id: string;
   user_id: string;
   generated_url: string;
