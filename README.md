@@ -52,6 +52,7 @@ No known issues.
 
 ## Next Steps
 
+- Add fixes to AUDIT.md
 - Add payment method and memberships
 - Add ads to website
 - Test with live users
