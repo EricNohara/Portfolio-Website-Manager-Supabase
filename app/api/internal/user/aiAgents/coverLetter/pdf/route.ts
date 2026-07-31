@@ -4,9 +4,6 @@ import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { requireTier } from "@/utils/auth/requireTier";
 import { generateCoverLetterPdf } from "@/utils/coverLetter/generateCoverLetterPdf";
 
-/**
- * PUT -> calls agent /revise -> returns PDF bytes
- */
 export async function POST(req: NextRequest) {
   const { user, response } = await getAuthenticatedUser();
   if (!user) return response;
@@ -22,7 +19,7 @@ export async function POST(req: NextRequest) {
     if (typeof draft !== "string" || draft.trim().length === 0) {
       return NextResponse.json(
         { error: "No draft provided to generate PDF from." },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -41,7 +38,7 @@ export async function POST(req: NextRequest) {
     console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

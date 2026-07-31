@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { ICachedCoverLetter } from "@/app/interfaces/ICachedCoverLetter";
+import { IUserInfoInternal } from "@/app/interfaces/IUserInfoInternal";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { requireTier } from "@/utils/auth/requireTier";
 import { createClient } from "@/utils/supabase/server";
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
     // Case 1: list view (latest draft per conversation)
     if (mode === "list") {
       const { data, error } = await supabase.rpc(
-        "get_latest_cached_cover_letters",
+        "get_latest_cached_cover_letters"
       );
 
       if (error) {
@@ -53,7 +54,7 @@ export async function GET(req: NextRequest) {
       const items = (data ?? []).sort(
         // eslint-disable-next-line
         (a: any, b: any) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
 
       return NextResponse.json({ items }, { status: 200 });
@@ -63,7 +64,7 @@ export async function GET(req: NextRequest) {
     if (sessionId) {
       const { data, error } = await supabase.rpc(
         "get_cached_cover_letters_by_session",
-        { p_session_id: sessionId },
+        { p_session_id: sessionId }
       );
 
       if (error) {
@@ -75,22 +76,113 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Invalid query params." },
-      { status: 400 },
+      { status: 400 }
     );
   } catch (err) {
     console.error(err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
-/**
- * POST -> calls agent /generate -> returns JSON
- */
+// Types for cover letter agent
+type CoverLetterUserInfo = {
+  email: string;
+  name?: string;
+  bio?: string;
+  phone_number?: string;
+  current_address?: string;
+  current_position?: string;
+  current_company?: string;
+
+  skills?: string[];
+
+  experiences?: {
+    company: string;
+    job_title: string;
+    job_description: string;
+  }[];
+
+  projects?: {
+    name: string;
+    tech?: string[];
+    description: string;
+  }[];
+
+  education?: {
+    degree: string;
+    fields_of_study?: string[];
+    institution: string;
+    courses?: string[];
+  }[];
+};
+
+type CoverLetterGenerateRequest = {
+  jobTitle: string;
+  companyName: string;
+  jobDescriptionDump: string;
+  writingSample?: string;
+};
+
+type CoverLetterAgentPayload = CoverLetterGenerateRequest & {
+  userId: string;
+  userInfo: CoverLetterUserInfo;
+};
+
+// Helper function
+function mapUserInfoForCoverLetter(
+  userInfo: IUserInfoInternal
+): CoverLetterUserInfo {
+  return {
+    email: userInfo.email,
+    ...(userInfo.name ? { name: userInfo.name } : {}),
+    ...(userInfo.bio ? { bio: userInfo.bio } : {}),
+    ...(userInfo.phone_number ? { phone_number: userInfo.phone_number } : {}),
+    ...(userInfo.current_address
+      ? { current_address: userInfo.current_address }
+      : {}),
+    ...(userInfo.current_position
+      ? { current_position: userInfo.current_position }
+      : {}),
+    ...(userInfo.current_company
+      ? { current_company: userInfo.current_company }
+      : {}),
+
+    skills: userInfo.skills.map((skill) => skill.name),
+
+    experiences: userInfo.experiences.map((experience) => ({
+      company: experience.company,
+      job_title: experience.job_title,
+      job_description: experience.job_description ?? "",
+    })),
+
+    projects: userInfo.projects.map((project) => ({
+      name: project.name,
+      description: project.description,
+      tech: [
+        ...(project.languages_used ?? []),
+        ...(project.frameworks_used ?? []),
+        ...(project.technologies_used ?? []),
+      ],
+    })),
+
+    education: userInfo.education.map((education) => ({
+      degree: education.degree,
+      institution: education.institution,
+      fields_of_study: [
+        ...(education.majors ?? []),
+        ...(education.minors ?? []),
+      ],
+      courses: education.courses.map((course) => course.name),
+    })),
+  };
+}
+
+// Cover letter generations
 export async function POST(req: NextRequest) {
-  const { user, response } = await getAuthenticatedUser();
+  const { user, supabase, response } = await getAuthenticatedUser();
   if (!user) return response;
 
   // gate this feature
@@ -101,21 +193,66 @@ export async function POST(req: NextRequest) {
     if (!AGENT_BASE) {
       return NextResponse.json(
         { error: "Server misconfigured: missing COVER_LETTER_AGENT_BASE_URL" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
-    const body = await req.json();
+    const body = (await req.json()) as CoverLetterGenerateRequest;
 
-    const payload = {
-      ...body,
+    if (
+      !body.jobTitle?.trim() ||
+      !body.companyName?.trim() ||
+      !body.jobDescriptionDump?.trim()
+    ) {
+      return NextResponse.json(
+        { error: "Missing required inputs." },
+        { status: 400 }
+      );
+    }
+
+    // build request with cleaned user info
+    const { data: internalUserInfo, error: userInfoError } = await supabase.rpc(
+      "get_user_info_internal",
+      {
+        p_user_id: user.id,
+      }
+    );
+
+    if (userInfoError) {
+      console.error("User info RPC failed:", userInfoError);
+
+      return NextResponse.json(
+        { error: "Unable to retrieve user information." },
+        { status: 500 }
+      );
+    }
+
+    if (!internalUserInfo) {
+      return NextResponse.json(
+        { error: "User information was not found." },
+        { status: 404 }
+      );
+    }
+
+    const userInfo = mapUserInfoForCoverLetter(
+      internalUserInfo as IUserInfoInternal
+    );
+
+    const agentPayload: CoverLetterAgentPayload = {
       userId: user.id,
+      userInfo,
+      jobTitle: body.jobTitle.trim(),
+      companyName: body.companyName.trim(),
+      jobDescriptionDump: body.jobDescriptionDump.trim(),
+      ...(body.writingSample?.trim()
+        ? { writingSample: body.writingSample.trim() }
+        : {}),
     };
 
     const agentRes = await fetch(`${AGENT_BASE}/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(agentPayload),
     });
 
     const data = await agentRes.json().catch(() => null);
@@ -123,7 +260,7 @@ export async function POST(req: NextRequest) {
     if (!agentRes.ok) {
       return NextResponse.json(
         { error: data?.error ?? "Cover letter generation failed" },
-        { status: 502 },
+        { status: 502 }
       );
     }
 
@@ -134,7 +271,6 @@ export async function POST(req: NextRequest) {
     const writingSample = data?.writingSample ?? null;
     const skillsMatchScore = data?.skillsMatchScore ?? null;
 
-    const supabase = await createClient();
     let sessionId: string | null = null;
 
     // store the generation as a session
@@ -158,10 +294,10 @@ export async function POST(req: NextRequest) {
 
     // cache the cover letter generation only if a session insert occurred
     if (sessionId && skillsMatchScore) {
-      const payload: ICachedCoverLetter = {
+      const cachedCoverLetterPayload: ICachedCoverLetter = {
         user_id: user.id,
-        job_title: body.jobTitle,
-        company_name: body.companyName,
+        job_title: agentPayload.jobTitle,
+        company_name: agentPayload.companyName,
         session_id: sessionId,
         draft_name: `First Draft: ${getNowFormatted()}`,
         education_score: skillsMatchScore.education,
@@ -180,7 +316,7 @@ export async function POST(req: NextRequest) {
 
       const { error } = await supabase
         .from("cached_cover_letters")
-        .insert(payload);
+        .insert(cachedCoverLetterPayload);
 
       if (error) throw new Error(`DB insert failed: ${error.message}`);
     }
@@ -191,14 +327,12 @@ export async function POST(req: NextRequest) {
     console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
 
-/**
- * PUT -> calls agent /revise -> returns PDF bytes
- */
+// Cover letter revisions
 export async function PUT(req: NextRequest) {
   const { user, response } = await getAuthenticatedUser();
   if (!user) return response;
@@ -211,7 +345,7 @@ export async function PUT(req: NextRequest) {
     if (!AGENT_BASE) {
       return NextResponse.json(
         { error: "Server misconfigured: missing COVER_LETTER_AGENT_BASE_URL" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -237,7 +371,7 @@ export async function PUT(req: NextRequest) {
     if (!agentRes.ok) {
       return NextResponse.json(
         { error: data?.error ?? "Cover letter generation failed" },
-        { status: 502 },
+        { status: 502 }
       );
     }
 
@@ -247,7 +381,7 @@ export async function PUT(req: NextRequest) {
     if (!revisedDraft.trim() || !draftName.trim()) {
       return NextResponse.json(
         { error: "An error occurred while revising the draft" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -260,7 +394,7 @@ export async function PUT(req: NextRequest) {
         p_session_id: sessionId,
         p_draft_name: `${draftName}: ${getNowFormatted()}`,
         p_revised_draft: revisedDraft,
-      },
+      }
     );
 
     if (rpcError) {
@@ -274,13 +408,13 @@ export async function PUT(req: NextRequest) {
         sessionId,
         cachedCoverLetter: savedRow,
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
