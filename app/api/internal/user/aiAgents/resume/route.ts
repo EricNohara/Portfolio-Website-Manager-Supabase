@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { IUserInfoInternal } from "@/app/interfaces/IUserInfoInternal";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { requireTier } from "@/utils/auth/requireTier";
 import { createClient } from "@/utils/supabase/server";
@@ -30,6 +31,77 @@ type GenerateResumeWithAiBody = {
 };
 
 type RequestBody = GenerateResumeBody | GenerateResumeWithAiBody;
+
+type ResumeUserInfo = {
+  email: string;
+  name?: string;
+  bio?: string;
+  phone_number?: string;
+  current_address?: string;
+  current_position?: string;
+  current_company?: string;
+  github_url?: string;
+  linkedin_url?: string;
+  portrait_url?: string;
+  resume_url?: string;
+  transcript_url?: string;
+  facebook_url?: string;
+  instagram_url?: string;
+  x_url?: string;
+  skills: {
+    name: string;
+    proficiency?: number;
+    years_of_experience?: number;
+  }[];
+  experiences: {
+    company: string;
+    job_title: string;
+    date_start: string;
+    date_end?: string;
+    job_description: string;
+  }[];
+  projects: {
+    name: string;
+    date_start: string;
+    date_end: string;
+    languages_used?: string[];
+    frameworks_used?: string[];
+    technologies_used?: string[];
+    description: string;
+    github_url?: string;
+    demo_url?: string;
+  }[];
+  education: {
+    degree: string;
+    majors: string[];
+    minors: string[];
+    gpa?: string;
+    institution: string;
+    awards: string[];
+    year_start: number;
+    year_end?: number;
+    courses: {
+      name: string;
+      grade?: string;
+      description?: string;
+    }[];
+  }[];
+};
+
+type ResumeSelectionIds = {
+  educationIds?: string[];
+  experienceIds?: string[];
+  courseIds?: string[];
+  projectIds?: string[];
+  skillIds?: string[];
+};
+
+type ResumeAgentPayload = {
+  userId: string;
+  userInfo: ResumeUserInfo;
+  templateId?: string;
+  targetJobs?: string[];
+};
 
 // type guard functions
 function isString(value: unknown): value is string {
@@ -110,6 +182,110 @@ function isGenerateResumeWithAiBody(
   return true;
 }
 
+function filterByIds<T extends { id: string }>(
+  items: T[],
+  ids?: string[],
+): T[] {
+  if (ids === undefined) return items;
+
+  const selectedIds = new Set(ids);
+  return items.filter((item) => selectedIds.has(item.id));
+}
+
+function mapUserInfoForResume(
+  userInfo: IUserInfoInternal,
+  selections: ResumeSelectionIds = {},
+): ResumeUserInfo {
+  return {
+    email: userInfo.email,
+    ...(userInfo.name ? { name: userInfo.name } : {}),
+    ...(userInfo.bio ? { bio: userInfo.bio } : {}),
+    ...(userInfo.phone_number ? { phone_number: userInfo.phone_number } : {}),
+    ...(userInfo.current_address
+      ? { current_address: userInfo.current_address }
+      : {}),
+    ...(userInfo.current_position
+      ? { current_position: userInfo.current_position }
+      : {}),
+    ...(userInfo.current_company
+      ? { current_company: userInfo.current_company }
+      : {}),
+    ...(userInfo.github_url ? { github_url: userInfo.github_url } : {}),
+    ...(userInfo.linkedin_url ? { linkedin_url: userInfo.linkedin_url } : {}),
+    ...(userInfo.portrait_url ? { portrait_url: userInfo.portrait_url } : {}),
+    ...(userInfo.resume_url ? { resume_url: userInfo.resume_url } : {}),
+    ...(userInfo.transcript_url
+      ? { transcript_url: userInfo.transcript_url }
+      : {}),
+    ...(userInfo.facebook_url ? { facebook_url: userInfo.facebook_url } : {}),
+    ...(userInfo.instagram_url
+      ? { instagram_url: userInfo.instagram_url }
+      : {}),
+    ...(userInfo.x_url ? { x_url: userInfo.x_url } : {}),
+
+    skills: filterByIds(userInfo.skills, selections.skillIds).map((skill) => ({
+      name: skill.name,
+      ...(skill.proficiency !== null ? { proficiency: skill.proficiency } : {}),
+      ...(skill.years_of_experience !== null
+        ? { years_of_experience: skill.years_of_experience }
+        : {}),
+    })),
+
+    experiences: filterByIds(
+      userInfo.experiences,
+      selections.experienceIds,
+    ).map((experience) => ({
+      company: experience.company,
+      job_title: experience.job_title,
+      date_start: experience.date_start ?? "",
+      ...(experience.date_end ? { date_end: experience.date_end } : {}),
+      job_description: experience.job_description ?? "",
+    })),
+
+    projects: filterByIds(userInfo.projects, selections.projectIds).map(
+      (project) => ({
+        name: project.name,
+        date_start: project.date_start,
+        date_end: project.date_end,
+        ...(project.languages_used
+          ? { languages_used: project.languages_used }
+          : {}),
+        ...(project.frameworks_used
+          ? { frameworks_used: project.frameworks_used }
+          : {}),
+        ...(project.technologies_used
+          ? { technologies_used: project.technologies_used }
+          : {}),
+        description: project.description,
+        ...(project.github_url ? { github_url: project.github_url } : {}),
+        ...(project.demo_url ? { demo_url: project.demo_url } : {}),
+      }),
+    ),
+
+    education: filterByIds(userInfo.education, selections.educationIds).map(
+      (education) => ({
+        degree: education.degree,
+        majors: education.majors,
+        minors: education.minors,
+        ...(education.gpa !== null ? { gpa: String(education.gpa) } : {}),
+        institution: education.institution,
+        awards: education.awards,
+        year_start: education.year_start ?? 0,
+        ...(education.year_end !== null
+          ? { year_end: education.year_end }
+          : {}),
+        courses: filterByIds(education.courses, selections.courseIds).map(
+          (course) => ({
+            name: course.name,
+            ...(course.grade ? { grade: course.grade } : {}),
+            ...(course.description ? { description: course.description } : {}),
+          }),
+        ),
+      }),
+    ),
+  };
+}
+
 /**
  * GET: list all cached resumes (metadata only)
  * Cached resumes should only be available to premium users - one shot generations should not be saved
@@ -148,7 +324,7 @@ export async function GET(_req: NextRequest) {
  * POST -> calls agent /generate -> returns JSON
  */
 export async function POST(req: NextRequest) {
-  const { user, response } = await getAuthenticatedUser();
+  const { user, supabase, response } = await getAuthenticatedUser();
   if (!user) return response;
 
   // gate this feature
@@ -165,6 +341,8 @@ export async function POST(req: NextRequest) {
 
     const rawBody: unknown = await req.json();
 
+    console.log(rawBody);
+
     if (!rawBody || typeof rawBody !== "object") {
       return NextResponse.json(
         { error: "Invalid request body." },
@@ -173,8 +351,6 @@ export async function POST(req: NextRequest) {
     }
 
     const generationType = (rawBody as Record<string, unknown>).generationType;
-
-    console.log(rawBody);
 
     if (!isGenerationType(generationType)) {
       return NextResponse.json(
@@ -200,16 +376,65 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const payload = {
-      ...(rawBody as RequestBody),
-      userId: user.id,
-    };
+    const body = rawBody as RequestBody;
+
+    const { data: internalUserInfo, error: userInfoError } = await supabase.rpc(
+      "get_user_info_internal",
+      {
+        p_user_id: user.id,
+      },
+    );
+
+    if (userInfoError) {
+      console.error("User info RPC failed:", userInfoError);
+      return NextResponse.json(
+        { error: "Unable to retrieve user information." },
+        { status: 500 },
+      );
+    }
+
+    if (!internalUserInfo) {
+      return NextResponse.json(
+        { error: "User information was not found." },
+        { status: 404 },
+      );
+    }
+
+    const userInfo = internalUserInfo as IUserInfoInternal;
+    let payload: ResumeAgentPayload;
+
+    if (generationType === "generate") {
+      const generateBody = body as GenerateResumeBody;
+      payload = {
+        userId: user.id,
+        userInfo: mapUserInfoForResume(userInfo, generateBody),
+        ...(generateBody.templateId
+          ? { templateId: generateBody.templateId }
+          : {}),
+      };
+    } else {
+      const generateAiBody = body as GenerateResumeWithAiBody;
+      payload = {
+        userId: user.id,
+        userInfo: mapUserInfoForResume(userInfo),
+        ...(generateAiBody.templateId
+          ? { templateId: generateAiBody.templateId }
+          : {}),
+        ...(generateAiBody.targetJobs
+          ? { targetJobs: generateAiBody.targetJobs }
+          : {}),
+      };
+    }
+
+    console.log(payload);
 
     const agentRes = await fetch(`${AGENT_BASE}/${generationType}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
+    console.log(agentRes);
 
     const data = await agentRes.json().catch(() => null);
     const url: string | null = data?.resumeUrl ?? null;
@@ -223,7 +448,6 @@ export async function POST(req: NextRequest) {
 
     // insert into cached_resumes table
     const cachedResumeId = randomUUID();
-    const supabase = await createClient();
 
     const cachedResumePayload = {
       id: cachedResumeId,
