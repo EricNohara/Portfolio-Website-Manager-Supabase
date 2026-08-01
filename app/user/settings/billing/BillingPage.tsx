@@ -80,14 +80,6 @@ export default function BillingPage() {
     const [actionLoading, setActionLoading] = useState<null | "checkout" | "portal">(null);
     const [selectedInterval, setSelectedInterval] = useState<Interval>("monthly");
 
-    // refresh tier after checkout
-    useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get("checkout") || params.get("portal")) {
-            refresh();
-        }
-    }, [refresh]);
-
     useEffect(() => {
         const loadSubscription = async () => {
             setLoading(true);
@@ -98,7 +90,25 @@ export default function BillingPage() {
                     );
                 }
 
-                const res = await fetch("/api/internal/user/subscription", { method: "GET" });
+                const params = new URLSearchParams(window.location.search);
+                const sessionId = params.get("session_id");
+
+                if (params.get("checkout") === "success" && sessionId) {
+                    await postJson<{ ok: true }>("/api/internal/stripe/checkout/confirm", {
+                        sessionId,
+                    });
+                    await refresh();
+
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete("checkout");
+                    url.searchParams.delete("session_id");
+                    window.history.replaceState({}, "", url);
+                }
+
+                const res = await fetch("/api/internal/user/subscription", {
+                    method: "GET",
+                    cache: "no-store",
+                });
                 const data = (await res.json()) as SubscriptionStatus & {
                     error?: string;
                     message?: string;
@@ -121,7 +131,7 @@ export default function BillingPage() {
         };
 
         loadSubscription();
-    }, [toast]);
+    }, [refresh, toast]);
 
     const startCheckout = async (tier: Exclude<Tier, "free">, interval: Interval) => {
         setActionLoading("checkout");

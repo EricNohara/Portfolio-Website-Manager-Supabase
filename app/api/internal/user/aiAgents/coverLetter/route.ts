@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     // Case 1: list view (latest draft per conversation)
     if (mode === "list") {
       const { data, error } = await supabase.rpc(
-        "get_latest_cached_cover_letters"
+        "get_latest_cached_cover_letters",
       );
 
       if (error) {
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       const items = (data ?? []).sort(
         // eslint-disable-next-line
         (a: any, b: any) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       );
 
       return NextResponse.json({ items }, { status: 200 });
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
     if (sessionId) {
       const { data, error } = await supabase.rpc(
         "get_cached_cover_letters_by_session",
-        { p_session_id: sessionId }
+        { p_session_id: sessionId },
       );
 
       if (error) {
@@ -76,13 +76,13 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Invalid query params." },
-      { status: 400 }
+      { status: 400 },
     );
   } catch (err) {
     console.error(err);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -131,9 +131,58 @@ type CoverLetterAgentPayload = CoverLetterGenerateRequest & {
   userInfo: CoverLetterUserInfo;
 };
 
+type JobInfo = {
+  job_title: string;
+  work_mode?: "remote" | "hybrid" | "onsite";
+  locations?: string[];
+  qualifications?: string[];
+  responsibilities?: string[];
+  technologies?: string[];
+  company: {
+    name: string;
+    industry?: string;
+    company_summary?: string;
+  };
+  hiring_team?: {
+    name?: string;
+  }[];
+};
+
+type WritingAnalysis = {
+  avgSentenceLength: number;
+  avgSyllablesPerWord: number;
+  fleschKincaidGrade: number;
+  punctuationComplexity: number;
+  textStandard: number;
+  tone: {
+    formality: "formal" | "casual" | "professional" | "conversational";
+    confidence: "tentative" | "assertive" | "persuasive";
+    sentiment: "positive" | "neutral" | "negative";
+  };
+  sentencePatterns: {
+    structure: "simple" | "compound" | "complex" | "mixed";
+    variedPacing: "low" | "medium" | "high";
+  };
+  cohesion: {
+    paragraphLength: "short" | "medium" | "long";
+    connectors: string[];
+  };
+};
+
+type CoverLetterAgentRevisionPayload = {
+  userInfo: CoverLetterUserInfo;
+  session: {
+    jobData: JobInfo;
+    writingAnalysis: WritingAnalysis | null;
+    writingSample: string | null;
+    currentDraft: string;
+  };
+  feedback: string;
+};
+
 // Helper function
 function mapUserInfoForCoverLetter(
-  userInfo: IUserInfoInternal
+  userInfo: IUserInfoInternal,
 ): CoverLetterUserInfo {
   return {
     email: userInfo.email,
@@ -193,7 +242,7 @@ export async function POST(req: NextRequest) {
     if (!AGENT_BASE) {
       return NextResponse.json(
         { error: "Server misconfigured: missing COVER_LETTER_AGENT_BASE_URL" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -206,7 +255,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "Missing required inputs." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -215,7 +264,7 @@ export async function POST(req: NextRequest) {
       "get_user_info_internal",
       {
         p_user_id: user.id,
-      }
+      },
     );
 
     if (userInfoError) {
@@ -223,19 +272,19 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(
         { error: "Unable to retrieve user information." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     if (!internalUserInfo) {
       return NextResponse.json(
         { error: "User information was not found." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     const userInfo = mapUserInfoForCoverLetter(
-      internalUserInfo as IUserInfoInternal
+      internalUserInfo as IUserInfoInternal,
     );
 
     const agentPayload: CoverLetterAgentPayload = {
@@ -260,7 +309,7 @@ export async function POST(req: NextRequest) {
     if (!agentRes.ok) {
       return NextResponse.json(
         { error: data?.error ?? "Cover letter generation failed" },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -327,14 +376,14 @@ export async function POST(req: NextRequest) {
     console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 // Cover letter revisions
 export async function PUT(req: NextRequest) {
-  const { user, response } = await getAuthenticatedUser();
+  const { user, supabase, response } = await getAuthenticatedUser();
   if (!user) return response;
 
   // gate this feature
@@ -345,11 +394,14 @@ export async function PUT(req: NextRequest) {
     if (!AGENT_BASE) {
       return NextResponse.json(
         { error: "Server misconfigured: missing COVER_LETTER_AGENT_BASE_URL" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
-    const body = await req.json();
+    const body = (await req.json()) as {
+      sessionId?: string;
+      feedback?: string;
+    };
 
     const sessionId: string = body?.sessionId ?? "";
     if (!sessionId.trim()) {
@@ -360,18 +412,76 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Missing feedback" }, { status: 400 });
     }
 
+    const { data: internalUserInfo, error: userInfoError } = await supabase.rpc(
+      "get_user_info_internal",
+      {
+        p_user_id: user.id,
+      },
+    );
+
+    if (userInfoError) {
+      console.error("User info RPC failed:", userInfoError);
+      return NextResponse.json(
+        { error: "Unable to retrieve user information." },
+        { status: 500 },
+      );
+    }
+
+    if (!internalUserInfo) {
+      return NextResponse.json(
+        { error: "User information was not found." },
+        { status: 404 },
+      );
+    }
+
+    const { data: sessionData, error: sessionError } = await supabase
+      .from("cover_letter_sessions")
+      .select("job_data, writing_analysis, writing_sample, current_draft")
+      .eq("id", sessionId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (sessionError) {
+      console.error("Cover letter session lookup failed:", sessionError);
+      return NextResponse.json(
+        { error: "Unable to retrieve the cover letter session." },
+        { status: 500 },
+      );
+    }
+
+    if (!sessionData) {
+      return NextResponse.json(
+        { error: "Cover letter session was not found." },
+        { status: 404 },
+      );
+    }
+
+    const agentPayload: CoverLetterAgentRevisionPayload = {
+      userInfo: mapUserInfoForCoverLetter(
+        internalUserInfo as IUserInfoInternal,
+      ),
+      session: {
+        jobData: sessionData.job_data as JobInfo,
+        writingAnalysis:
+          (sessionData.writing_analysis as WritingAnalysis | null) ?? null,
+        writingSample: sessionData.writing_sample ?? null,
+        currentDraft: sessionData.current_draft,
+      },
+      feedback: feedback.trim(),
+    };
+
     const agentRes = await fetch(`${AGENT_BASE}/revise`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: user.id, sessionId, feedback }),
+      body: JSON.stringify(agentPayload),
     });
 
     const data = await agentRes.json().catch(() => null);
 
     if (!agentRes.ok) {
       return NextResponse.json(
-        { error: data?.error ?? "Cover letter generation failed" },
-        { status: 502 }
+        { error: data?.error ?? "Cover letter revision failed" },
+        { status: 502 },
       );
     }
 
@@ -381,20 +491,18 @@ export async function PUT(req: NextRequest) {
     if (!revisedDraft.trim() || !draftName.trim()) {
       return NextResponse.json(
         { error: "An error occurred while revising the draft" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     // insert into cached_cover_letters table
-    const supabase = await createClient();
-
     const { data: savedRow, error: rpcError } = await supabase.rpc(
       "save_cover_letter_revision",
       {
         p_session_id: sessionId,
         p_draft_name: `${draftName}: ${getNowFormatted()}`,
         p_revised_draft: revisedDraft,
-      }
+      },
     );
 
     if (rpcError) {
@@ -408,13 +516,13 @@ export async function PUT(req: NextRequest) {
         sessionId,
         cachedCoverLetter: savedRow,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
