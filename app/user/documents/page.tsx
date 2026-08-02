@@ -49,7 +49,10 @@ export default function DocumentsPage() {
     try {
       if (!url || !docType) throw new Error("Invalid url or doc type");
 
-      const res = await fetch(`/api/internal/storage?publicURL=${url}`, { method: "DELETE" });
+      const res = await fetch(
+        `/api/internal/storage?publicURL=${encodeURIComponent(url)}`,
+        { method: "DELETE" },
+      );
 
       if (res.status !== 204) {
         const data = await res.json();

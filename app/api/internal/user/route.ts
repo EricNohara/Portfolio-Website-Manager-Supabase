@@ -4,7 +4,9 @@ import { IProject } from "@/app/interfaces/IProject";
 import IUser from "@/app/interfaces/IUser";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { refreshCachedUserInfo } from "@/utils/cachedUserInfo/refreshCachedUserInfo";
-import parseURL from "@/utils/general/parseURL";
+import parseURL, {
+  isStorageObjectOwnedByUser,
+} from "@/utils/general/parseURL";
 import { createAdminClient } from "@/utils/supabase/server";
 
 export async function GET(_req: NextRequest): Promise<NextResponse> {
@@ -136,7 +138,18 @@ export async function DELETE(_req: NextRequest): Promise<NextResponse> {
 
     for (const url of publicURLs) {
       if (!url || url === "") continue;
-      const { parsedBucket, parsedFilename } = parseURL(url);
+      // Every URL in this list came from a DB row scoped to the authenticated
+      // user. The path namespace check prevents a poisoned URL field from
+      // turning account deletion into a cross-tenant storage delete.
+      const storageObject = parseURL(url);
+      if (
+        !storageObject ||
+        !isStorageObjectOwnedByUser(storageObject.parsedFilename, user.id)
+      ) {
+        continue;
+      }
+
+      const { parsedBucket, parsedFilename } = storageObject;
       const { error } = await serviceRoleSupabase.storage
         .from(parsedBucket)
         .remove([parsedFilename]);
