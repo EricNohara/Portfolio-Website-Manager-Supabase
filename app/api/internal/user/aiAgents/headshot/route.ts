@@ -4,7 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { requireTier } from "@/utils/auth/requireTier";
-import { createClient } from "@/utils/supabase/server";
+import {
+  createAdminClient,
+  createClient,
+} from "@/utils/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -223,12 +226,13 @@ export async function POST(req: NextRequest) {
         : null;
 
     const supabase = await createClient();
+    const storageAdmin = createAdminClient();
 
     const referenceImageId = randomUUID();
     const referenceExtension = getImageExtension(referenceImage);
     const referenceStoragePath = `inputs/${user.id}/reference-${referenceImageId}.${referenceExtension}`;
 
-    const { error: referenceUploadError } = await supabase.storage
+    const { error: referenceUploadError } = await storageAdmin.storage
       .from(STORAGE_BUCKET)
       .upload(referenceStoragePath, referenceImage, {
         contentType: referenceImage.type,
@@ -254,7 +258,7 @@ export async function POST(req: NextRequest) {
       const backgroundExtension = getImageExtension(backgroundImage);
       const backgroundStoragePath = `inputs/${user.id}/background-${backgroundImageId}.${backgroundExtension}`;
 
-      const { error: backgroundUploadError } = await supabase.storage
+      const { error: backgroundUploadError } = await storageAdmin.storage
         .from(STORAGE_BUCKET)
         .upload(backgroundStoragePath, backgroundImage, {
           contentType: backgroundImage.type,
