@@ -2,7 +2,17 @@ import { randomUUID } from "crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
+import {
+  AiGenerationCharge,
+  AiGenerationRequestError,
+  chargeAiGeneration,
+  DuplicateAiGenerationError,
+  refundAiGeneration,
+} from "@/utils/aiCredits/generation";
+import { InsufficientAiCreditsError } from "@/utils/aiCredits/service";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
+import { getUserSubscriptionTier } from "@/utils/auth/getUserSubscriptionTier";
 import { requireTier } from "@/utils/auth/requireTier";
 import {
   createAdminClient,
@@ -115,12 +125,13 @@ export async function GET(_req: NextRequest) {
   if (!gate.ok) return gate.response;
 
   try {
-    const supabase = await createClient();
+    const admin = createAdminClient();
 
-    const { data, error } = await supabase.rpc(
-      "get_latest_cached_professional_headshots",
-      { p_user_id: user.id }
-    );
+    const { data, error } = await admin
+      .from("cached_professional_headshots")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
@@ -148,8 +159,7 @@ export async function POST(req: NextRequest) {
   const { user, response } = await getAuthenticatedUser();
   if (!user) return response;
 
-  const gate = await requireTier(user.id, "premium");
-  if (!gate.ok) return gate.response;
+  let charge: AiGenerationCharge | null = null;
 
   try {
     if (!AGENT_BASE) {
@@ -225,6 +235,15 @@ export async function POST(req: NextRequest) {
         ? backgroundDescriptionRaw.trim()
         : null;
 
+    const isPremium = (await getUserSubscriptionTier(user.id)) === "premium";
+
+    charge = await chargeAiGeneration(
+      req,
+      user.id,
+      "headshot_generate",
+      AI_CREDIT_COSTS.headshot.generate,
+    );
+
     const supabase = await createClient();
     const storageAdmin = createAdminClient();
 
@@ -297,9 +316,6 @@ export async function POST(req: NextRequest) {
     const generatedUrl: string | null = data?.publicUrl ?? null;
     const validation = data?.validation ?? null;
 
-    console.log(data);
-
-    // look here
     if (
       !agentRes.ok ||
       !data ||
@@ -307,32 +323,35 @@ export async function POST(req: NextRequest) {
       !generatedUrl ||
       !validation
     ) {
-      return NextResponse.json(
-        { error: data?.error ?? "Professional headshot generation failed" },
-        { status: 502 }
+      throw new AiGenerationRequestError(
+        data?.error ?? "Professional headshot generation failed",
+        502,
       );
     }
 
-    const cachedProfessionalHeadshotId = randomUUID();
+    let cachedProfessionalHeadshotId: string | null = null;
 
-    const cachePayload = {
-      id: cachedProfessionalHeadshotId,
-      user_id: user.id,
-      generated_url: generatedUrl,
-      reference_url: referenceUrl,
-      background_url: backgroundUrl ?? null,
-      background_description: backgroundDescription,
-      attire: attireRaw,
-      layout: layoutRaw,
-      validation,
-    };
+    if (isPremium) {
+      cachedProfessionalHeadshotId = randomUUID();
+      const cachePayload = {
+        id: cachedProfessionalHeadshotId,
+        user_id: user.id,
+        generated_url: generatedUrl,
+        reference_url: referenceUrl,
+        background_url: backgroundUrl ?? null,
+        background_description: backgroundDescription,
+        attire: attireRaw,
+        layout: layoutRaw,
+        validation,
+      };
 
-    const { error: cacheError } = await supabase
-      .from("cached_professional_headshots")
-      .insert(cachePayload);
+      const { error: cacheError } = await storageAdmin
+        .from("cached_professional_headshots")
+        .insert(cachePayload);
 
-    if (cacheError) {
-      throw new Error(`Cache insert failed: ${cacheError.message}`);
+      if (cacheError) {
+        throw new Error(`Cache insert failed: ${cacheError.message}`);
+      }
     }
 
     return NextResponse.json(
@@ -346,6 +365,35 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    if (charge) {
+      try {
+        await refundAiGeneration(user.id, charge);
+      } catch (refundError) {
+        console.error("Headshot credit refund failed:", refundError);
+      }
+    }
+
+    if (error instanceof InsufficientAiCreditsError) {
+      return NextResponse.json(
+        { error: error.message, code: "INSUFFICIENT_AI_CREDITS" },
+        { status: 402 },
+      );
+    }
+
+    if (error instanceof DuplicateAiGenerationError) {
+      return NextResponse.json(
+        { error: error.message, code: "DUPLICATE_AI_GENERATION" },
+        { status: 409 },
+      );
+    }
+
+    if (error instanceof AiGenerationRequestError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
+    }
+
     console.error(error);
 
     return NextResponse.json(
@@ -361,6 +409,8 @@ export async function PUT(req: NextRequest) {
 
   const gate = await requireTier(user.id, "premium");
   if (!gate.ok) return gate.response;
+
+  let charge: AiGenerationCharge | null = null;
 
   try {
     if (!AGENT_BASE) {
@@ -382,6 +432,13 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    charge = await chargeAiGeneration(
+      req,
+      user.id,
+      "headshot_revise",
+      AI_CREDIT_COSTS.headshot.revise,
+    );
+
     const agentRes = await fetch(`${AGENT_BASE}/revise`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -400,13 +457,13 @@ export async function PUT(req: NextRequest) {
       !generatedUrl ||
       !validation
     ) {
-      return NextResponse.json(
-        { error: data?.error ?? "Professional headshot revision failed" },
-        { status: 502 }
+      throw new AiGenerationRequestError(
+        data?.error ?? "Professional headshot revision failed",
+        502,
       );
     }
 
-    const supabase = await createClient();
+    const admin = createAdminClient();
     const cacheId = randomUUID();
 
     const cachePayload = {
@@ -416,7 +473,7 @@ export async function PUT(req: NextRequest) {
       validation,
     };
 
-    const { error } = await supabase
+    const { error } = await admin
       .from("cached_professional_headshots")
       .insert(cachePayload);
 
@@ -429,6 +486,35 @@ export async function PUT(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
+    if (charge) {
+      try {
+        await refundAiGeneration(user.id, charge);
+      } catch (refundError) {
+        console.error("Headshot revision credit refund failed:", refundError);
+      }
+    }
+
+    if (error instanceof InsufficientAiCreditsError) {
+      return NextResponse.json(
+        { error: error.message, code: "INSUFFICIENT_AI_CREDITS" },
+        { status: 402 },
+      );
+    }
+
+    if (error instanceof DuplicateAiGenerationError) {
+      return NextResponse.json(
+        { error: error.message, code: "DUPLICATE_AI_GENERATION" },
+        { status: 409 },
+      );
+    }
+
+    if (error instanceof AiGenerationRequestError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
+    }
+
     console.error(error);
 
     return NextResponse.json(

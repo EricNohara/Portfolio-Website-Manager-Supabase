@@ -41,3 +41,156 @@
 .intervalDropdown {
   width: 15rem !important;
 }
+
+.creditsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 2rem;
+}
+
+.sectionHeading h2,
+.creditPanel h3 {
+  margin: 0;
+  color: var(--page-txt-1);
+}
+
+.sectionHeading p {
+  margin: 0.5rem 0 0;
+  color: var(--page-txt-2);
+}
+
+.creditSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.creditSummaryCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 1.25rem;
+  color: var(--page-txt-2);
+  background: var(--page-box-bg);
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+}
+
+.creditSummaryCard strong {
+  grid-column: 1 / -1;
+  font-size: 2rem;
+  color: var(--page-txt-1);
+}
+
+.totalCreditCard {
+  border-color: var(--btn-1);
+}
+
+.creditDetailsGrid {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.75fr) minmax(420px, 1.5fr);
+  gap: 1rem;
+}
+
+.creditPanel {
+  min-width: 0;
+  padding: 1.25rem;
+  background: var(--page-box-bg);
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+}
+
+.costList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0;
+  margin: 1rem 0 0;
+  list-style: none;
+}
+
+.costList li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--page-txt-2);
+}
+
+.costList strong {
+  color: var(--page-txt-1);
+  white-space: nowrap;
+}
+
+.historyTableWrapper {
+  max-height: 18rem;
+  margin-top: 1rem;
+  overflow: auto;
+}
+
+.historyTable {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--page-txt-1);
+}
+
+.historyTable th,
+.historyTable td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--page-box-border);
+}
+
+.historyTable th {
+  position: sticky;
+  top: 0;
+  color: var(--page-txt-2);
+  background: var(--page-box-bg);
+}
+
+.positiveDelta {
+  color: var(--success-color);
+  font-weight: 700;
+}
+
+.negativeDelta {
+  color: var(--fail-color);
+  font-weight: 700;
+}
+
+.emptyHistory {
+  color: var(--page-txt-2);
+  font-style: italic;
+}
+
+@media (max-width: 1000px) {
+  .plans {
+    flex-direction: column;
+  }
+
+  .creditDetailsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .formHeader,
+  .buttons {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .creditSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .intervalDropdown {
+    width: 100% !important;
+  }
+}

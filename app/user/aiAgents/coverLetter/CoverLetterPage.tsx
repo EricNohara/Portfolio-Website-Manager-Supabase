@@ -15,6 +15,7 @@ import TextInput from "@/app/components/TextInput/TextInput";
 import { hasTier, useTier } from "@/app/context/TierProvider";
 import { useToast } from "@/app/context/ToastProvider";
 import { ICachedConversationListItem, ICachedCoverLetter, ISkillsMatchScore } from "@/app/interfaces/ICachedCoverLetter";
+import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
 
 import CoverLetterLoadingPanel from "./CoverLetterLoadingPanel";
 import styles from "./CoverLetterPage.module.css";
@@ -49,7 +50,7 @@ export default function CoverLetterPage() {
     const router = useRouter();
 
     const { tier, loading: tierLoading } = useTier();
-    const canAccess = hasTier(tier, "premium");
+    const isPremium = hasTier(tier, "premium");
 
     // Cleanup blob URLs (avoid memory leaks)
     useEffect(() => {
@@ -60,7 +61,7 @@ export default function CoverLetterPage() {
 
     // fetch cached list on mount
     useEffect(() => {
-        if (!canAccess || tierLoading) return;
+        if (!isPremium || tierLoading) return;
 
         let cancelled = false;
 
@@ -85,7 +86,7 @@ export default function CoverLetterPage() {
         return () => {
             cancelled = true;
         };
-    }, [canAccess, tierLoading, toast]);
+    }, [isPremium, tierLoading, toast]);
 
     // load a cached draft into revision ui
     const loadSession = async (sessionId: string) => {
@@ -235,10 +236,17 @@ export default function CoverLetterPage() {
                         feedback
                     }
                     const res = await fetch("/api/internal/user/aiAgents/coverLetter",
-                        { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }
+                        {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Idempotency-Key": crypto.randomUUID(),
+                            },
+                            body: JSON.stringify(payload),
+                        }
                     );
                     const data = await res.json();
-                    if (!res.ok) throw new Error(data.errpr ?? "Error revising the draft");
+                    if (!res.ok) throw new Error(data.error ?? "Error revising the draft");
                     const revisedDraft: string = data.revisedDraft;
                     setDraft(revisedDraft);
 
@@ -315,7 +323,10 @@ export default function CoverLetterPage() {
 
                     const res = await fetch("/api/internal/user/aiAgents/coverLetter", {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Idempotency-Key": crypto.randomUUID(),
+                        },
                         body: JSON.stringify(payload),
                     });
 
@@ -323,7 +334,7 @@ export default function CoverLetterPage() {
                     if (!res.ok) throw new Error(data.error);
 
                     setDraft(data.currentDraft);
-                    setSessionId(data.sessionId);
+                    setSessionId(data.sessionId ?? "");
                     setSkillsMatchScore(data.skillsMatchScore);
                     setFeedback("");
 
@@ -394,7 +405,7 @@ export default function CoverLetterPage() {
         <PageContentWrapper>
             <PageContentHeader
                 title={selectedDraftName ? selectedDraftName.split(":")[0] : "Cover Letter Agent"}
-                buttonOne={canAccess && (!draft || draft.length <= 0) ? buttonOne : undefined}
+                buttonOne={!draft || draft.length <= 0 ? buttonOne : undefined}
                 buttonFour={draft.length > 0 ? backButton : backToAgentsButton}
                 className={styles.coverLetterPageContentContainer}
                 icon={Bot}
@@ -410,39 +421,38 @@ export default function CoverLetterPage() {
                 {/* tier loading UI */}
                 {tierLoading && <LoadingSpinner />}
 
-                {/* upgrade UI */}
-                {!canAccess && <p className={styles.subtitle}>Please upgrade to premium to use this feature.</p>}
-
                 {/* ------------------- INITIAL FORM ------------------- */}
-                {!loading && !tierLoading && !draft && !sessionId && canAccess && (
+                {!loading && !tierLoading && !draft && !sessionId && (
                     <>
                         <div className={styles.formHeader}>
-                            <p className={styles.subtitle}>Generate a cover letter tailored to your personal data.</p>
-                            <div className={styles.dropdownContainer}>
-                                <SelectDropdown
-                                    value={sessionId}
-                                    options={[
-                                        ...cachedList.map((item) => ({
-                                            value: item.session_id,
-                                            label: `${item.job_title ?? "Untitled"} @ ${item.company_name ?? "Unknown"}`
-                                        })),
-                                    ]}
-                                    loading={cachedListLoading}
-                                    disabled={cachedList.length === 0}
-                                    placeholder={
-                                        cachedListLoading
-                                            ? "Loading cached cover letters..."
-                                            : cachedList.length === 0
-                                                ? "No cached cover letters"
-                                                : "Select a cached cover letter..."
-                                    }
-                                    ariaLabel="Cached cover letters"
-                                    onChange={async (id) => {
-                                        setSessionId(id);
-                                        if (id) await loadSession(id);
-                                    }}
-                                />
-                            </div>
+                            <p className={styles.subtitle}>Generate a cover letter tailored to your personal data. Uses {AI_CREDIT_COSTS.coverLetter.generate} AI credits.</p>
+                            {isPremium && (
+                                <div className={styles.dropdownContainer}>
+                                    <SelectDropdown
+                                        value={sessionId}
+                                        options={[
+                                            ...cachedList.map((item) => ({
+                                                value: item.session_id,
+                                                label: `${item.job_title ?? "Untitled"} @ ${item.company_name ?? "Unknown"}`
+                                            })),
+                                        ]}
+                                        loading={cachedListLoading}
+                                        disabled={cachedList.length === 0}
+                                        placeholder={
+                                            cachedListLoading
+                                                ? "Loading cached cover letters..."
+                                                : cachedList.length === 0
+                                                    ? "No cached cover letters"
+                                                    : "Select a cached cover letter..."
+                                        }
+                                        ariaLabel="Cached cover letters"
+                                        onChange={async (id) => {
+                                            setSessionId(id);
+                                            if (id) await loadSession(id);
+                                        }}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div className={styles.inputsContainer}>
@@ -489,6 +499,34 @@ export default function CoverLetterPage() {
                             </div>
                         </div>
                     </>
+                )}
+
+                {/* Non-premium generations are one-shot and are never cached. */}
+                {!revisionLoading && draft && !sessionId && (
+                    <div className={styles.reviseContainer}>
+                        <div className={styles.revisionLeftContainer}>
+                            <div className={styles.pdfPreviewContainer}>
+                                {pdfPreviewUrl ? (
+                                    <iframe
+                                        src={pdfPreviewUrl}
+                                        title="Cover Letter PDF Preview"
+                                        className={styles.pdfIframe}
+                                    />
+                                ) : (
+                                    <TextInput
+                                        label="Cover Letter Draft"
+                                        name="draft"
+                                        type="textarea"
+                                        textAreaRows={26}
+                                        value={draft}
+                                        isInInputForm={true}
+                                        onChange={() => { }}
+                                        disabled
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {/* ------------------- REVISION UI ------------------- */}

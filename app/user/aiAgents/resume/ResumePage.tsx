@@ -15,6 +15,7 @@ import { hasTier, useTier } from "@/app/context/TierProvider";
 import { useToast } from "@/app/context/ToastProvider";
 import { useUser } from "@/app/context/UserProvider";
 import { ICachedResume } from "@/app/interfaces/ICachedResume";
+import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
 
 import styles from "./ResumePage.module.css";
 import ResumeSelectionStep from "./steps/ResumeSelectionStep";
@@ -107,6 +108,7 @@ const TARGET_JOB_OPTIONS: SelectableItem[] = [
 ];
 
 const manualModeBenefits = [
+    `Uses ${AI_CREDIT_COSTS.resume.generate} AI credit`,
     "Select exactly what to include",
     "Choose from our resume templates",
     "Build your resume with full control",
@@ -114,6 +116,7 @@ const manualModeBenefits = [
 ];
 
 const aiModeBenefits = [
+    `Uses ${AI_CREDIT_COSTS.resume.generateAi} AI credits`,
     "Let the model choose your strongest content",
     "Enhance your information for best resume quality",
     "Cater your resume to the jobs you want",
@@ -138,7 +141,7 @@ export default function ResumePage() {
 
     const { tier, loading: tierLoading } = useTier();
     const { state } = useUser();
-    const canAccess = hasTier(tier, "premium");
+    const isPremium = hasTier(tier, "premium");
 
     const [step, setStep] = useState<ResumeStep>("start");
     const [loading, setLoading] = useState(false);
@@ -152,7 +155,7 @@ export default function ResumePage() {
 
     // load cached resumes
     useEffect(() => {
-        if (!canAccess || tierLoading) return;
+        if (!isPremium || tierLoading) return;
 
         let cancelled = false;
 
@@ -179,7 +182,7 @@ export default function ResumePage() {
         return () => {
             cancelled = true;
         };
-    }, [canAccess, tierLoading, toast]);
+    }, [isPremium, tierLoading, toast]);
 
     const orderedSteps = useMemo(() => {
         if (formData.generationType === "generateAi") {
@@ -289,7 +292,10 @@ export default function ResumePage() {
 
             const res = await fetch("/api/internal/user/aiAgents/resume", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Idempotency-Key": crypto.randomUUID(),
+                },
                 body: JSON.stringify(payload),
             });
 
@@ -299,8 +305,9 @@ export default function ResumePage() {
 
             setResumeUrl(data.url);
             toast.success("Success", "Resume generated successfully.");
-        } catch {
-            toast.error("Error", "Failed to generate resume.");
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Failed to generate resume.";
+            toast.error("Error", message);
         } finally {
             setLoading(false);
         }
@@ -405,7 +412,7 @@ export default function ResumePage() {
         <PageContentWrapper>
             <PageContentHeader
                 title="Resume Agent"
-                buttonOne={canAccess ? primaryButton : undefined}
+                buttonOne={primaryButton}
                 buttonFour={backButton}
                 className={styles.resumePageContentContainer}
                 icon={Bot}
@@ -426,45 +433,40 @@ export default function ResumePage() {
 
                 {tierLoading && <LoadingSpinner />}
 
-                {!tierLoading && !canAccess && (
-                    <p className={styles.subtitle}>
-                        Please upgrade to premium to use this feature.
-                    </p>
-                )}
-
-                {!loading && !tierLoading && canAccess && !resumeUrl && (
+                {!loading && !tierLoading && !resumeUrl && (
                     <>
-                        {/* cache selection header */}
-                        <div className={styles.formHeader}>
-                            <p className={styles.subtitle}>
-                                View a previous resume or create a new one.
-                            </p>
+                        {isPremium && (
+                            <div className={styles.formHeader}>
+                                <p className={styles.subtitle}>
+                                    View a previous resume or create a new one.
+                                </p>
 
-                            <div className={styles.dropdownContainer}>
-                                <SelectDropdown
-                                    value={selectedCachedResumeId}
-                                    options={cachedResumes.map((item) => ({
-                                        value: item.id,
-                                        label: new Date(item.created_at).toLocaleString(),
-                                    }))}
-                                    loading={cachedResumesLoading}
-                                    disabled={cachedResumes.length === 0}
-                                    placeholder={
-                                        cachedResumesLoading
-                                            ? "Loading cached resumes..."
-                                            : cachedResumes.length === 0
-                                                ? "No cached resumes"
-                                                : "Select a cached resume..."
-                                    }
-                                    ariaLabel="Cached resumes"
-                                    onChange={(id) => {
-                                        setSelectedCachedResumeId(id);
-                                        const selected = cachedResumes.find((item) => item.id === id);
-                                        if (selected?.url) setResumeUrl(selected.url);
-                                    }}
-                                />
+                                <div className={styles.dropdownContainer}>
+                                    <SelectDropdown
+                                        value={selectedCachedResumeId}
+                                        options={cachedResumes.map((item) => ({
+                                            value: item.id,
+                                            label: new Date(item.created_at).toLocaleString(),
+                                        }))}
+                                        loading={cachedResumesLoading}
+                                        disabled={cachedResumes.length === 0}
+                                        placeholder={
+                                            cachedResumesLoading
+                                                ? "Loading cached resumes..."
+                                                : cachedResumes.length === 0
+                                                    ? "No cached resumes"
+                                                    : "Select a cached resume..."
+                                        }
+                                        ariaLabel="Cached resumes"
+                                        onChange={(id) => {
+                                            setSelectedCachedResumeId(id);
+                                            const selected = cachedResumes.find((item) => item.id === id);
+                                            if (selected?.url) setResumeUrl(selected.url);
+                                        }}
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {step === "start" && (
                             <StartStep

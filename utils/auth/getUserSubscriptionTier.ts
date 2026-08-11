@@ -1,17 +1,11 @@
+import {
+  getSubscriptionPlanForPriceId,
+  isPaidSubscriptionStatus,
+  Tier,
+} from "../subscriptions/config";
 import { createClient } from "../supabase/server";
 
-export type Tier = "free" | "developer" | "premium";
-
-const PRICE_TO_TIER: Record<string, Exclude<Tier, "free">> = {
-  [process.env.NEXT_PUBLIC_DEVELOPER_MONTHLY_PRICE_ID!]: "developer",
-  [process.env.NEXT_PUBLIC_DEVELOPER_YEARLY_PRICE_ID!]: "developer",
-  [process.env.NEXT_PUBLIC_PREMIUM_MONTHLY_PRICE_ID!]: "premium",
-  [process.env.NEXT_PUBLIC_PREMIUM_YEARLY_PRICE_ID!]: "premium",
-};
-
-function isPaidStatus(status: string | null | undefined) {
-  return status === "active" || status === "trialing";
-}
+export type { Tier } from "../subscriptions/config";
 
 export async function getUserSubscriptionTier(userId: string): Promise<Tier> {
   const supabase = await createClient();
@@ -27,10 +21,6 @@ export async function getUserSubscriptionTier(userId: string): Promise<Tier> {
   const priceId = data?.price_id ?? null;
 
   // derive the tier
-  let tier: Tier = "free";
-  if (isPaidStatus(status) && priceId && PRICE_TO_TIER[priceId]) {
-    tier = PRICE_TO_TIER[priceId];
-  }
-
-  return tier;
+  const plan = getSubscriptionPlanForPriceId(priceId);
+  return isPaidSubscriptionStatus(status) && plan ? plan.tier : "free";
 }

@@ -13,10 +13,12 @@ import PageContentHeader, {
 import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
 import SelectDropdown from "@/app/components/SelectDropdown/SelectDropdown";
 import TextInput from "@/app/components/TextInput/TextInput";
+import { hasTier, useTier } from "@/app/context/TierProvider";
 import { useToast } from "@/app/context/ToastProvider";
 import { useUser } from "@/app/context/UserProvider";
 import { ICachedHeadshot } from "@/app/interfaces/ICachedHeadshot";
 import { headerFont } from "@/app/localFonts";
+import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
 import { compressImage } from "@/utils/file-upload/compress";
 import { uploadFile } from "@/utils/file-upload/upload";
 
@@ -38,6 +40,8 @@ const NEW_HEADSHOT_ID = "new";
 export default function HeadshotPage() {
   const { dispatch } = useUser();
   const toast = useToast();
+  const { tier, loading: tierLoading } = useTier();
+  const isPremium = hasTier(tier, "premium");
 
   const [referenceImage, setReferenceImage] = useState<File | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
@@ -67,6 +71,8 @@ export default function HeadshotPage() {
 
   // load cached headshots
   useEffect(() => {
+    if (!isPremium || tierLoading) return;
+
     let cancelled = false;
 
     async function loadCachedHeadshots() {
@@ -97,7 +103,7 @@ export default function HeadshotPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isPremium, tierLoading]);
 
   async function handleGenerate() {
     if (!referenceImage) return;
@@ -120,6 +126,7 @@ export default function HeadshotPage() {
 
       const res = await fetch("/api/internal/user/aiAgents/headshot", {
         method: "POST",
+        headers: { "Idempotency-Key": crypto.randomUUID() },
         body: formData,
       });
 
@@ -132,26 +139,29 @@ export default function HeadshotPage() {
       // update app state
       setGeneratedUrl(data.url);
 
-      setCachedHeadshots((prev) => [
-        {
-          id: data.id,
-          user_id: "",
-          generated_url: data.url,
-          reference_url: data.referenceUrl ?? null,
-          background_url: data.backgroundUrl ?? null,
-          background_description: backgroundDescription || null,
-          created_at: new Date().toISOString(),
-          validation: data.validation,
-          attire,
-          layout,
-        },
-        ...prev,
-      ]);
+      if (data.id) {
+        setCachedHeadshots((prev) => [
+          {
+            id: data.id,
+            user_id: "",
+            generated_url: data.url,
+            reference_url: data.referenceUrl ?? null,
+            background_url: data.backgroundUrl ?? null,
+            background_description: backgroundDescription || null,
+            created_at: new Date().toISOString(),
+            validation: data.validation,
+            attire,
+            layout,
+          },
+          ...prev,
+        ]);
 
-      setSelectedCachedHeadshotId(data.id);
+        setSelectedCachedHeadshotId(data.id);
+      }
     } catch (error) {
       console.error(error);
-      alert("Failed to generate headshot.");
+      const message = error instanceof Error ? error.message : "Failed to generate headshot.";
+      toast.error("Generation failed", message);
     } finally {
       setLoading(false);
     }
@@ -231,61 +241,62 @@ export default function HeadshotPage() {
       />
 
       <div className={styles.pageContentContainer}>
-        {/* cache selection header */}
-        <div className={styles.formHeader}>
-          <p className={styles.subtitle}>
-            View a previous headshot or create a new one.
-          </p>
+        {isPremium && (
+          <div className={styles.formHeader}>
+            <p className={styles.subtitle}>
+              View a previous headshot or create a new one.
+            </p>
 
-          <div className={styles.dropdownContainer}>
-            <SelectDropdown
-              value={selectedCachedHeadshotId}
-              options={[
-                { value: NEW_HEADSHOT_ID, label: "Generate a new headshot" },
-                ...cachedHeadshots.map((item) => ({
-                  value: item.id,
-                  label: new Date(item.created_at).toLocaleString(),
-                })),
-              ]}
-              loading={cachedHeadshotsLoading}
-              disabled={cachedHeadshotsLoading}
-              placeholder="Generate a new headshot"
-              ariaLabel="Cached headshots"
-              onChange={(id) => {
-                setSelectedCachedHeadshotId(id);
+            <div className={styles.dropdownContainer}>
+              <SelectDropdown
+                value={selectedCachedHeadshotId}
+                options={[
+                  { value: NEW_HEADSHOT_ID, label: "Generate a new headshot" },
+                  ...cachedHeadshots.map((item) => ({
+                    value: item.id,
+                    label: new Date(item.created_at).toLocaleString(),
+                  })),
+                ]}
+                loading={cachedHeadshotsLoading}
+                disabled={cachedHeadshotsLoading}
+                placeholder="Generate a new headshot"
+                ariaLabel="Cached headshots"
+                onChange={(id) => {
+                  setSelectedCachedHeadshotId(id);
 
-                if (id === NEW_HEADSHOT_ID) {
-                  setGeneratedUrl(null);
-                  setBackgroundDescription("");
-                  setLayout("auto");
-                  setAttire("auto");
-                  setCachedReferenceUrl(null);
-                  setCachedBackgroundUrl(null);
-                  setReferenceImage(null);
-                  setBackgroundImage(null);
-                  setUploadResetKey((prev) => prev + 1);
-                  return;
-                }
+                  if (id === NEW_HEADSHOT_ID) {
+                    setGeneratedUrl(null);
+                    setBackgroundDescription("");
+                    setLayout("auto");
+                    setAttire("auto");
+                    setCachedReferenceUrl(null);
+                    setCachedBackgroundUrl(null);
+                    setReferenceImage(null);
+                    setBackgroundImage(null);
+                    setUploadResetKey((prev) => prev + 1);
+                    return;
+                  }
 
-                const selected = cachedHeadshots.find((item) => item.id === id);
+                  const selected = cachedHeadshots.find((item) => item.id === id);
 
-                if (selected?.generated_url) {
-                  setGeneratedUrl(selected.generated_url);
-                  setBackgroundDescription(
-                    selected.background_description ?? ""
-                  );
-                  setLayout((selected.layout as HeadshotLayout) ?? "auto");
-                  setAttire((selected.attire as HeadshotAttire) ?? "auto");
-                  setCachedReferenceUrl(selected.reference_url ?? null);
-                  setCachedBackgroundUrl(selected.background_url ?? null);
-                  setReferenceImage(null);
-                  setBackgroundImage(null);
-                  setUploadResetKey((prev) => prev + 1);
-                }
-              }}
-            />
+                  if (selected?.generated_url) {
+                    setGeneratedUrl(selected.generated_url);
+                    setBackgroundDescription(
+                      selected.background_description ?? ""
+                    );
+                    setLayout((selected.layout as HeadshotLayout) ?? "auto");
+                    setAttire((selected.attire as HeadshotAttire) ?? "auto");
+                    setCachedReferenceUrl(selected.reference_url ?? null);
+                    setCachedBackgroundUrl(selected.background_url ?? null);
+                    setReferenceImage(null);
+                    setBackgroundImage(null);
+                    setUploadResetKey((prev) => prev + 1);
+                  }
+                }}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         <div className={styles.pageContent}>
           <div className={styles.inputsContainer}>
@@ -387,6 +398,9 @@ export default function HeadshotPage() {
               onClick={handleGenerate}
               isDisabled={loading || (!referenceImage && !cachedReferenceUrl)}
             />
+            <p className={styles.subtitle}>
+              Generation uses {AI_CREDIT_COSTS.headshot.generate} AI credits.
+            </p>
           </div>
 
           <div className={styles.resultsContainer}>

@@ -3,9 +3,19 @@ import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { IUserInfoInternal } from "@/app/interfaces/IUserInfoInternal";
+import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
+import {
+  AiGenerationCharge,
+  AiGenerationRequestError,
+  chargeAiGeneration,
+  DuplicateAiGenerationError,
+  refundAiGeneration,
+} from "@/utils/aiCredits/generation";
+import { InsufficientAiCreditsError } from "@/utils/aiCredits/service";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
+import { getUserSubscriptionTier } from "@/utils/auth/getUserSubscriptionTier";
 import { requireTier } from "@/utils/auth/requireTier";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -298,12 +308,14 @@ export async function GET(_req: NextRequest) {
   if (!gate.ok) return gate.response;
 
   try {
-    const supabase = await createClient();
+    const admin = createAdminClient();
 
     // retrieve all user's generated resumes from cache
-    const { data, error } = await supabase.rpc("get_latest_cached_resumes", {
-      p_user_id: user.id,
-    });
+    const { data, error } = await admin
+      .from("cached_resumes")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -327,9 +339,7 @@ export async function POST(req: NextRequest) {
   const { user, supabase, response } = await getAuthenticatedUser();
   if (!user) return response;
 
-  // gate this feature
-  const gate = await requireTier(user.id, "premium");
-  if (!gate.ok) return gate.response;
+  let charge: AiGenerationCharge | null = null;
 
   try {
     if (!AGENT_BASE) {
@@ -340,8 +350,6 @@ export async function POST(req: NextRequest) {
     }
 
     const rawBody: unknown = await req.json();
-
-    console.log(rawBody);
 
     if (!rawBody || typeof rawBody !== "object") {
       return NextResponse.json(
@@ -377,6 +385,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = rawBody as RequestBody;
+    const isPremium = (await getUserSubscriptionTier(user.id)) === "premium";
 
     const { data: internalUserInfo, error: userInfoError } = await supabase.rpc(
       "get_user_info_internal",
@@ -426,7 +435,12 @@ export async function POST(req: NextRequest) {
       };
     }
 
-    console.log(payload);
+    charge = await chargeAiGeneration(
+      req,
+      user.id,
+      `resume_${generationType}`,
+      AI_CREDIT_COSTS.resume[generationType],
+    );
 
     const agentRes = await fetch(`${AGENT_BASE}/${generationType}`, {
       method: "POST",
@@ -434,37 +448,67 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify(payload),
     });
 
-    console.log(agentRes);
-
     const data = await agentRes.json().catch(() => null);
     const url: string | null = data?.resumeUrl ?? null;
 
     if (!agentRes.ok || !data || data?.success === false || !url) {
-      return NextResponse.json(
-        { error: data?.error ?? "Resume generation failed" },
-        { status: agentRes.status || 502 },
+      throw new AiGenerationRequestError(
+        data?.error ?? "Resume generation failed",
+        502,
       );
     }
 
-    // insert into cached_resumes table
-    const cachedResumeId = randomUUID();
+    let cachedResumeId: string | null = null;
 
-    const cachedResumePayload = {
-      id: cachedResumeId,
-      user_id: user.id,
-      url,
-    };
+    if (isPremium) {
+      const admin = createAdminClient();
+      cachedResumeId = randomUUID();
+      const cachedResumePayload = {
+        id: cachedResumeId,
+        user_id: user.id,
+        url,
+      };
 
-    const { error } = await supabase
-      .from("cached_resumes")
-      .insert(cachedResumePayload);
+      const { error } = await admin
+        .from("cached_resumes")
+        .insert(cachedResumePayload);
 
-    if (error) {
-      throw new Error(`Resume cache insert failed: ${error.message}`);
+      if (error) {
+        throw new Error(`Resume cache insert failed: ${error.message}`);
+      }
     }
 
     return NextResponse.json({ url, id: cachedResumeId }, { status: 200 });
   } catch (error) {
+    if (charge) {
+      try {
+        await refundAiGeneration(user.id, charge);
+      } catch (refundError) {
+        console.error("Resume credit refund failed:", refundError);
+      }
+    }
+
+    if (error instanceof InsufficientAiCreditsError) {
+      return NextResponse.json(
+        { error: error.message, code: "INSUFFICIENT_AI_CREDITS" },
+        { status: 402 },
+      );
+    }
+
+    if (error instanceof DuplicateAiGenerationError) {
+      return NextResponse.json(
+        { error: error.message, code: "DUPLICATE_AI_GENERATION" },
+        { status: 409 },
+      );
+    }
+
+    if (error instanceof AiGenerationRequestError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
+    }
+
     console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },

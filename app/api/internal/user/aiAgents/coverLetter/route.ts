@@ -4,9 +4,19 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { ICachedCoverLetter } from "@/app/interfaces/ICachedCoverLetter";
 import { IUserInfoInternal } from "@/app/interfaces/IUserInfoInternal";
+import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
+import {
+  AiGenerationCharge,
+  AiGenerationRequestError,
+  chargeAiGeneration,
+  DuplicateAiGenerationError,
+  refundAiGeneration,
+} from "@/utils/aiCredits/generation";
+import { InsufficientAiCreditsError } from "@/utils/aiCredits/service";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
+import { getUserSubscriptionTier } from "@/utils/auth/getUserSubscriptionTier";
 import { requireTier } from "@/utils/auth/requireTier";
-import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -34,7 +44,7 @@ export async function GET(req: NextRequest) {
   if (!gate.ok) return gate.response;
 
   try {
-    const supabase = await createClient();
+    const admin = createAdminClient();
     const { searchParams } = new URL(req.url);
 
     const mode = searchParams.get("mode");
@@ -42,8 +52,9 @@ export async function GET(req: NextRequest) {
 
     // Case 1: list view (latest draft per conversation)
     if (mode === "list") {
-      const { data, error } = await supabase.rpc(
-        "get_latest_cached_cover_letters",
+      const { data, error } = await admin.rpc(
+        "get_latest_cached_cover_letters_for_user",
+        { p_user_id: user.id },
       );
 
       if (error) {
@@ -62,9 +73,9 @@ export async function GET(req: NextRequest) {
 
     // Case 2: fetch all drafts for a conversation (full rows)
     if (sessionId) {
-      const { data, error } = await supabase.rpc(
-        "get_cached_cover_letters_by_session",
-        { p_session_id: sessionId },
+      const { data, error } = await admin.rpc(
+        "get_cached_cover_letters_by_session_for_user",
+        { p_user_id: user.id, p_session_id: sessionId },
       );
 
       if (error) {
@@ -234,9 +245,7 @@ export async function POST(req: NextRequest) {
   const { user, supabase, response } = await getAuthenticatedUser();
   if (!user) return response;
 
-  // gate this feature
-  const gate = await requireTier(user.id, "premium");
-  if (!gate.ok) return gate.response;
+  let charge: AiGenerationCharge | null = null;
 
   try {
     if (!AGENT_BASE) {
@@ -286,6 +295,8 @@ export async function POST(req: NextRequest) {
     const userInfo = mapUserInfoForCoverLetter(
       internalUserInfo as IUserInfoInternal,
     );
+    const isPremium = (await getUserSubscriptionTier(user.id)) === "premium";
+    const cacheAdmin = isPremium ? createAdminClient() : null;
 
     const agentPayload: CoverLetterAgentPayload = {
       userId: user.id,
@@ -298,6 +309,13 @@ export async function POST(req: NextRequest) {
         : {}),
     };
 
+    charge = await chargeAiGeneration(
+      req,
+      user.id,
+      "cover_letter_generate",
+      AI_CREDIT_COSTS.coverLetter.generate,
+    );
+
     const agentRes = await fetch(`${AGENT_BASE}/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -306,10 +324,16 @@ export async function POST(req: NextRequest) {
 
     const data = await agentRes.json().catch(() => null);
 
-    if (!agentRes.ok) {
-      return NextResponse.json(
-        { error: data?.error ?? "Cover letter generation failed" },
-        { status: 502 },
+    if (
+      !agentRes.ok ||
+      !data ||
+      data?.success === false ||
+      typeof data?.currentDraft !== "string" ||
+      !data.currentDraft.trim()
+    ) {
+      throw new AiGenerationRequestError(
+        data?.error ?? "Cover letter generation failed",
+        502,
       );
     }
 
@@ -323,7 +347,7 @@ export async function POST(req: NextRequest) {
     let sessionId: string | null = null;
 
     // store the generation as a session
-    if (draft && jobData) {
+    if (cacheAdmin && draft && jobData) {
       sessionId = randomUUID();
       const sessionPayload = {
         id: sessionId,
@@ -334,7 +358,7 @@ export async function POST(req: NextRequest) {
         writing_sample: writingSample?.trim() ? writingSample : null,
       };
 
-      const { error } = await supabase
+      const { error } = await cacheAdmin
         .from("cover_letter_sessions")
         .insert(sessionPayload);
 
@@ -342,7 +366,7 @@ export async function POST(req: NextRequest) {
     }
 
     // cache the cover letter generation only if a session insert occurred
-    if (sessionId && skillsMatchScore) {
+    if (cacheAdmin && sessionId && skillsMatchScore) {
       const cachedCoverLetterPayload: ICachedCoverLetter = {
         user_id: user.id,
         job_title: agentPayload.jobTitle,
@@ -363,7 +387,7 @@ export async function POST(req: NextRequest) {
         draft,
       };
 
-      const { error } = await supabase
+      const { error } = await cacheAdmin
         .from("cached_cover_letters")
         .insert(cachedCoverLetterPayload);
 
@@ -373,6 +397,35 @@ export async function POST(req: NextRequest) {
     // return the session id and all the cover letter data
     return NextResponse.json({ ...data, sessionId }, { status: 200 });
   } catch (error) {
+    if (charge) {
+      try {
+        await refundAiGeneration(user.id, charge);
+      } catch (refundError) {
+        console.error("Cover letter credit refund failed:", refundError);
+      }
+    }
+
+    if (error instanceof InsufficientAiCreditsError) {
+      return NextResponse.json(
+        { error: error.message, code: "INSUFFICIENT_AI_CREDITS" },
+        { status: 402 },
+      );
+    }
+
+    if (error instanceof DuplicateAiGenerationError) {
+      return NextResponse.json(
+        { error: error.message, code: "DUPLICATE_AI_GENERATION" },
+        { status: 409 },
+      );
+    }
+
+    if (error instanceof AiGenerationRequestError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
+    }
+
     console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -389,6 +442,8 @@ export async function PUT(req: NextRequest) {
   // gate this feature
   const gate = await requireTier(user.id, "premium");
   if (!gate.ok) return gate.response;
+
+  let charge: AiGenerationCharge | null = null;
 
   try {
     if (!AGENT_BASE) {
@@ -412,6 +467,8 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Missing feedback" }, { status: 400 });
     }
 
+    const admin = createAdminClient();
+
     const { data: internalUserInfo, error: userInfoError } = await supabase.rpc(
       "get_user_info_internal",
       {
@@ -434,7 +491,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    const { data: sessionData, error: sessionError } = await supabase
+    const { data: sessionData, error: sessionError } = await admin
       .from("cover_letter_sessions")
       .select("job_data, writing_analysis, writing_sample, current_draft")
       .eq("id", sessionId)
@@ -470,6 +527,13 @@ export async function PUT(req: NextRequest) {
       feedback: feedback.trim(),
     };
 
+    charge = await chargeAiGeneration(
+      req,
+      user.id,
+      "cover_letter_revise",
+      AI_CREDIT_COSTS.coverLetter.revise,
+    );
+
     const agentRes = await fetch(`${AGENT_BASE}/revise`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -479,9 +543,9 @@ export async function PUT(req: NextRequest) {
     const data = await agentRes.json().catch(() => null);
 
     if (!agentRes.ok) {
-      return NextResponse.json(
-        { error: data?.error ?? "Cover letter revision failed" },
-        { status: 502 },
+      throw new AiGenerationRequestError(
+        data?.error ?? "Cover letter revision failed",
+        502,
       );
     }
 
@@ -489,16 +553,17 @@ export async function PUT(req: NextRequest) {
     const draftName: string = data?.draftName ?? "";
 
     if (!revisedDraft.trim() || !draftName.trim()) {
-      return NextResponse.json(
-        { error: "An error occurred while revising the draft" },
-        { status: 500 },
+      throw new AiGenerationRequestError(
+        "An error occurred while revising the draft",
+        502,
       );
     }
 
     // insert into cached_cover_letters table
-    const { data: savedRow, error: rpcError } = await supabase.rpc(
-      "save_cover_letter_revision",
+    const { data: savedRow, error: rpcError } = await admin.rpc(
+      "save_cover_letter_revision_for_user",
       {
+        p_user_id: user.id,
         p_session_id: sessionId,
         p_draft_name: `${draftName}: ${getNowFormatted()}`,
         p_revised_draft: revisedDraft,
@@ -519,6 +584,35 @@ export async function PUT(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
+    if (charge) {
+      try {
+        await refundAiGeneration(user.id, charge);
+      } catch (refundError) {
+        console.error("Cover letter revision credit refund failed:", refundError);
+      }
+    }
+
+    if (error instanceof InsufficientAiCreditsError) {
+      return NextResponse.json(
+        { error: error.message, code: "INSUFFICIENT_AI_CREDITS" },
+        { status: 402 },
+      );
+    }
+
+    if (error instanceof DuplicateAiGenerationError) {
+      return NextResponse.json(
+        { error: error.message, code: "DUPLICATE_AI_GENERATION" },
+        { status: 409 },
+      );
+    }
+
+    if (error instanceof AiGenerationRequestError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status },
+      );
+    }
+
     console.error(error);
     return NextResponse.json(
       { error: "Internal server error" },
