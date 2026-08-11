@@ -178,7 +178,7 @@ export async function POST(req: NextRequest) {
     const backgroundImage = formData.get("backgroundImage");
     const backgroundDescriptionRaw = formData.get("backgroundDescription");
     const attireRaw = formData.get("attire");
-    const layoutRaw = formData.get("layout");
+    const layoutRaw = formData.get("layout") ?? "1024x1024";
 
     if (!(referenceImage instanceof File)) {
       return NextResponse.json(
