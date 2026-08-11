@@ -79,11 +79,6 @@ export default function ProjectsPage() {
     const handleDelete = async (rowIndex: number) => {
         const project = state.projects[rowIndex];
         try {
-            // delete the project thumbnail if one exists
-            if (project.thumbnail_url) {
-                await handleFileDelete(project.thumbnail_url)
-            }
-
             const res = await fetch(`/api/internal/user/projects?projectID=${project.id}`, { method: "DELETE" });
             if (!res.ok) throw new Error(`Error deleting project: ${project.name}.`);
 
@@ -116,23 +111,6 @@ export default function ProjectsPage() {
             return publicProjectThumbnailUrl;
         } catch {
             toast.error("Error", "Failed to upload your project thumbnail. Please try again.");
-        }
-    };
-
-    const handleFileDelete = async (url: string | undefined) => {
-        try {
-            if (!url) throw new Error("Invalid url");
-            const res = await fetch(`/api/internal/storage?publicURL=${url}`, { method: "DELETE" });
-
-            if (res.status !== 204) {
-                const data = await res.json();
-                throw new Error(data.message);
-            }
-
-            // update state
-            setFormValues({ ...formValues, thumbnail_url: null })
-        } catch {
-            toast.error("Error", "Error deleting your document.");
         }
     };
 
@@ -201,11 +179,6 @@ export default function ProjectsPage() {
                     id: projectToEdit.id,
                     ...newProject
                 };
-
-                // delete the old thumbnail if one exists
-                if (formValues.thumbnail_url) {
-                    await handleFileDelete(formValues.thumbnail_url)
-                }
 
                 // update cached state
                 dispatch({ type: "UPDATE_PROJECT", payload: { old: projectToEdit, new: newProjectInternal } });
