@@ -42,7 +42,7 @@ export default function HeadshotPage() {
   const [referenceImage, setReferenceImage] = useState<File | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<File | null>(null);
   const [backgroundDescription, setBackgroundDescription] = useState("");
-  const [layout, setLayout] = useState<HeadshotLayout>("auto");
+  const [layout, setLayout] = useState<HeadshotLayout>("1024x1024");
   const [attire, setAttire] = useState<HeadshotAttire>("auto");
   const [loading, setLoading] = useState(false);
   const [generatedUrl, setGeneratedUrl] = useState<string | null>(null);
@@ -257,7 +257,7 @@ export default function HeadshotPage() {
                 if (id === NEW_HEADSHOT_ID) {
                   setGeneratedUrl(null);
                   setBackgroundDescription("");
-                  setLayout("auto");
+                  setLayout("1024x1024");
                   setAttire("auto");
                   setCachedReferenceUrl(null);
                   setCachedBackgroundUrl(null);
@@ -274,7 +274,9 @@ export default function HeadshotPage() {
                   setBackgroundDescription(
                     selected.background_description ?? ""
                   );
-                  setLayout((selected.layout as HeadshotLayout) ?? "auto");
+                  setLayout(
+                    (selected.layout as HeadshotLayout) ?? "1024x1024"
+                  );
                   setAttire((selected.attire as HeadshotAttire) ?? "auto");
                   setCachedReferenceUrl(selected.reference_url ?? null);
                   setCachedBackgroundUrl(selected.background_url ?? null);
