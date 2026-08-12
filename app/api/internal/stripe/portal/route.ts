@@ -1,20 +1,12 @@
 import { NextResponse } from "next/server";
 
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { stripe } from "@/utils/stripe/stripe";
-import { createClient } from "@/utils/supabase/server";
 
 export async function POST() {
   try {
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: userErr,
-    } = await supabase.auth.getUser();
-
-    if (userErr || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     const { data: subRow, error: subErr } = await supabase
       .from("subscriptions")

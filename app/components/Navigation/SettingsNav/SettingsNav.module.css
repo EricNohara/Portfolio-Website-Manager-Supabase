@@ -14,6 +14,7 @@
 }
 
 .navItem {
+  text-decoration: none;
   padding: 0.75rem 1rem;
   margin-top: 1rem;
   margin-right: 1rem;
@@ -42,6 +43,21 @@
 .activeItem:hover {
   background-color: var(--btn-1);
   color: white;
+}
+
+.destructiveItem {
+  color: var(--fail-color);
+}
+
+.destructiveItem:hover {
+  color: var(--fail-color);
+  background-color: color-mix(in srgb, var(--fail-color) 14%, transparent);
+}
+
+.activeDestructiveItem,
+.activeDestructiveItem:hover {
+  color: white;
+  background-color: var(--fail-color);
 }
 
 /* settings content container */

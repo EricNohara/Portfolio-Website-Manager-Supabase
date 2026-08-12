@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { stripe } from "@/utils/stripe/stripe";
-import { createAdminClient, createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/server";
 
 type Body = { sessionId?: string };
 
@@ -11,6 +12,9 @@ function toIso(unix: number | null | undefined) {
 
 export async function POST(req: NextRequest) {
   try {
+    const { user, response } = await getAuthenticatedUser();
+    if (!user) return response;
+
     const { sessionId } = (await req.json()) as Body;
 
     if (!sessionId?.startsWith("cs_")) {
@@ -18,16 +22,6 @@ export async function POST(req: NextRequest) {
         { error: "Invalid checkout session" },
         { status: 400 },
       );
-    }
-
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: userErr,
-    } = await supabase.auth.getUser();
-
-    if (userErr || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
