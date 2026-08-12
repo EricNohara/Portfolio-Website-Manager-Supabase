@@ -9,13 +9,15 @@ export const DOCUMENTATION_PATHS = {
   terms: "/legal/terms",
   apiKeys: "/docs/creating-api-keys",
   aiAgents: "/product#generative-ai-agents",
+  // change this later after writing docs for ai credits
+  aiCredits: "/pricing",
 } as const;
 
 export type DocumentationPage = keyof typeof DOCUMENTATION_PATHS;
 
 export function createDocumentationUrl(
   page: DocumentationPage,
-  returnTo?: string
+  returnTo?: string,
 ): string {
   const docsBaseUrl = process.env.NEXT_PUBLIC_NUKLEIO_DOCS_BASE_URL;
 

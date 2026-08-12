@@ -1,0 +1,196 @@
+.container {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  padding: 0 0 2rem 2rem;
+  overflow-y: auto;
+}
+
+.pageHeader {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0 1rem 0;
+  border-bottom: 2px solid var(--page-box-border);
+}
+
+.pageTitle {
+  margin: 0;
+  color: var(--page-txt-1);
+  font-size: 1.5rem;
+}
+
+.infoButtonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.creditSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding-top: 2rem;
+}
+
+.creditSummaryCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 1.5rem;
+  color: var(--page-txt-2);
+  background: var(--page-box-bg);
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+}
+
+.creditSummaryCard strong {
+  grid-column: 1 / -1;
+  color: var(--page-txt-1);
+  font-size: 2rem;
+}
+
+.totalCreditCard {
+  border-color: var(--btn-1);
+}
+
+.activityPanel {
+  min-width: 0;
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background: var(--page-box-bg);
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+}
+
+.activityHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.activityHeader h2 {
+  margin: 0;
+  color: var(--page-txt-1);
+  font-size: 1.2rem;
+}
+
+.viewToggle {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--page-bg);
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+}
+
+.toggleButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--page-txt-2);
+  background: transparent;
+  border: 0;
+  border-radius: var(--global-border-radius);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.toggleButton:hover {
+  color: var(--page-txt-1);
+  background: var(--popup-hover);
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid var(--btn-1);
+  outline-offset: 2px;
+}
+
+.activeToggle,
+.activeToggle:hover {
+  color: white;
+  background: var(--btn-1);
+}
+
+.activityContent {
+  height: 20rem;
+  min-width: 0;
+  margin-top: 1rem;
+}
+
+.historyTableWrapper {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+.historyTable {
+  width: 100%;
+  min-width: 32rem;
+  border-collapse: collapse;
+  color: var(--page-txt-1);
+}
+
+.historyTable th,
+.historyTable td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--page-box-border);
+}
+
+.historyTable th {
+  position: sticky;
+  top: 0;
+  color: var(--page-txt-2);
+  background: var(--page-box-bg);
+}
+
+.positiveDelta {
+  color: var(--success-color);
+  font-weight: 700;
+}
+
+.negativeDelta {
+  color: var(--fail-color);
+  font-weight: 700;
+}
+
+.activityState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--page-txt-2);
+}
+
+.noMargin {
+  margin-bottom: 0 !important;
+}
+
+@media (max-width: 800px) {
+  .container {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .creditSummaryGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .activityHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .viewToggle {
+    align-self: flex-start;
+  }
+}

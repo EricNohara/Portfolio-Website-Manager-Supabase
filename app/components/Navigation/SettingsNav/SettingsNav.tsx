@@ -1,6 +1,6 @@
 "use client";
 
-import { AppWindow, DollarSign, KeySquare, LucideIcon, User } from "lucide-react";
+import { AppWindow, Banknote, CirclePoundSterling, KeySquare, LucideIcon, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { useLanguage } from "@/app/context/LanguageProvider";
@@ -22,7 +22,8 @@ const settingsLinks: ISettingsLink[] = [
     { name: "App", route: "/user/settings/app", icon: AppWindow },
     { name: "User", route: "/user/settings/user", icon: User },
     { name: "Password", route: "/user/settings/password", icon: KeySquare },
-    { name: "Billing", route: "/user/settings/billing", icon: DollarSign }
+    { name: "Billing", route: "/user/settings/billing", icon: Banknote },
+    { name: "AI Credits", route: "/user/settings/aiCredits", icon: CirclePoundSterling },
 ];
 
 export default function SettingsNav({ activeSetting }: ISettingsNavProps) {

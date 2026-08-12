@@ -36,6 +36,7 @@ const translations: Record<AppLanguage, Record<string, string>> = {
   en: {},
   es: {
     "AI Agents": "Agentes de IA",
+    "AI Credits": "Créditos de IA",
     "API Keys": "Claves API",
     "Add": "Añadir",
     "App": "Aplicación",
@@ -88,6 +89,7 @@ const translations: Record<AppLanguage, Record<string, string>> = {
   },
   fr: {
     "AI Agents": "Agents IA",
+    "AI Credits": "Crédits IA",
     "API Keys": "Clés API",
     "Add": "Ajouter",
     "App": "Application",
@@ -140,6 +142,7 @@ const translations: Record<AppLanguage, Record<string, string>> = {
   },
   de: {
     "AI Agents": "KI-Agenten",
+    "AI Credits": "KI-Guthaben",
     "API Keys": "API-Schlüssel",
     "Add": "Hinzufügen",
     "App": "App",
@@ -192,6 +195,7 @@ const translations: Record<AppLanguage, Record<string, string>> = {
   },
   ja: {
     "AI Agents": "AIエージェント",
+    "AI Credits": "AIクレジット",
     "API Keys": "APIキー",
     "Add": "追加",
     "App": "アプリ",

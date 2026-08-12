@@ -1,6 +1,6 @@
 "use client";
 
-import { Braces, CalendarClock, Coins, Crown, Infinity, Landmark } from "lucide-react";
+import { Braces, Crown, Landmark } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
 import { ButtonOne } from "@/app/components/Buttons/Buttons";
@@ -10,7 +10,6 @@ import { useTier } from "@/app/context/TierProvider";
 import { useToast } from "@/app/context/ToastProvider";
 import { headerFont } from "@/app/localFonts";
 import {
-    AI_CREDIT_COSTS,
     FREE_SIGNUP_LIFETIME_CREDITS,
     SUBSCRIPTION_CREDIT_ALLOCATIONS,
 } from "@/utils/aiCredits/config";
@@ -27,38 +26,6 @@ type SubscriptionStatus = {
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean | null;
     updatedAt: string | null;
-};
-
-type CreditBalance = {
-    subscriptionCredits: number;
-    lifetimeCredits: number;
-    totalCredits: number;
-    updatedAt: string | null;
-};
-
-type CreditHistoryEntry = {
-    id: number;
-    subscriptionDelta: number;
-    lifetimeDelta: number;
-    reason: string;
-    createdAt: string;
-};
-
-type CreditResponse = {
-    balance: CreditBalance;
-    history: CreditHistoryEntry[];
-    error?: string;
-};
-
-const CREDIT_REASON_LABELS: Record<string, string> = {
-    signup_grant: "Signup grant",
-    subscription_grant: "Subscription grant",
-    subscription_expiration: "Subscription credits expired",
-    credit_purchase: "Credit purchase",
-    ad_reward: "Ad reward",
-    agent_usage: "AI agent usage",
-    refund: "Generation refund",
-    admin_adjustment: "Account adjustment",
 };
 
 const PRICE_IDS = {
@@ -113,8 +80,6 @@ export default function BillingPage() {
     const { refresh } = useTier();
 
     const [sub, setSub] = useState<SubscriptionStatus | null>(null);
-    const [creditBalance, setCreditBalance] = useState<CreditBalance | null>(null);
-    const [creditHistory, setCreditHistory] = useState<CreditHistoryEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState<null | "checkout" | "portal">(null);
     const [selectedInterval, setSelectedInterval] = useState<Interval>("monthly");
@@ -144,32 +109,20 @@ export default function BillingPage() {
                     window.history.replaceState({}, "", url);
                 }
 
-                const [subscriptionRes, creditRes] = await Promise.all([
-                    fetch("/api/internal/user/subscription", {
-                        method: "GET",
-                        cache: "no-store",
-                    }),
-                    fetch("/api/internal/user/aiCredits?limit=25", {
-                        method: "GET",
-                        cache: "no-store",
-                    }),
-                ]);
+                const subscriptionRes = await fetch("/api/internal/user/subscription", {
+                    method: "GET",
+                    cache: "no-store",
+                });
                 const data = (await subscriptionRes.json()) as SubscriptionStatus & {
                     error?: string;
                     message?: string;
                 };
-                const creditData = (await creditRes.json()) as CreditResponse;
 
                 if (!subscriptionRes.ok) {
                     throw new Error(data.error || data.message || "Failed to load subscription.");
                 }
-                if (!creditRes.ok) {
-                    throw new Error(creditData.error || "Failed to load AI credits.");
-                }
 
                 setSub(data ?? null);
-                setCreditBalance(creditData.balance);
-                setCreditHistory(creditData.history ?? []);
 
                 const inferred = deriveIntervalFromPriceId(data?.priceId ?? null);
                 if (inferred) setSelectedInterval(inferred);
@@ -248,78 +201,6 @@ export default function BillingPage() {
                     />
                 </div>
             </div>
-
-            <section className={styles.creditsSection} aria-labelledby="ai-credits-heading">
-                <div className={styles.sectionHeading}>
-                    <div>
-                        <h2 id="ai-credits-heading" className={headerFont.className}>AI Credits</h2>
-                        <p>Subscription credits are used first and expire at the end of each billing period.</p>
-                    </div>
-                </div>
-
-                <div className={styles.creditSummaryGrid}>
-                    <div className={styles.creditSummaryCard}>
-                        <CalendarClock size={24} />
-                        <span>Subscription</span>
-                        <strong>{loading ? "—" : (creditBalance?.subscriptionCredits ?? 0)}</strong>
-                    </div>
-                    <div className={styles.creditSummaryCard}>
-                        <Infinity size={24} />
-                        <span>Lifetime</span>
-                        <strong>{loading ? "—" : (creditBalance?.lifetimeCredits ?? 0)}</strong>
-                    </div>
-                    <div className={`${styles.creditSummaryCard} ${styles.totalCreditCard}`}>
-                        <Coins size={24} />
-                        <span>Total available</span>
-                        <strong>{loading ? "—" : (creditBalance?.totalCredits ?? 0)}</strong>
-                    </div>
-                </div>
-
-                <div className={styles.creditDetailsGrid}>
-                    <div className={styles.creditPanel}>
-                        <h3 className={headerFont.className}>Agent costs</h3>
-                        <ul className={styles.costList}>
-                            <li><span>Resume</span><strong>{AI_CREDIT_COSTS.resume.generate} credit</strong></li>
-                            <li><span>AI-assisted resume</span><strong>{AI_CREDIT_COSTS.resume.generateAi} credits</strong></li>
-                            <li><span>Cover letter</span><strong>{AI_CREDIT_COSTS.coverLetter.generate} credits</strong></li>
-                            <li><span>Cover letter revision</span><strong>{AI_CREDIT_COSTS.coverLetter.revise} credit</strong></li>
-                            <li><span>Professional headshot</span><strong>{AI_CREDIT_COSTS.headshot.generate} credits</strong></li>
-                            <li><span>Headshot revision</span><strong>{AI_CREDIT_COSTS.headshot.revise} credits</strong></li>
-                        </ul>
-                    </div>
-
-                    <div className={styles.creditPanel}>
-                        <h3 className={headerFont.className}>Recent credit activity</h3>
-                        <div className={styles.historyTableWrapper}>
-                            <table className={styles.historyTable}>
-                                <thead>
-                                    <tr>
-                                        <th>Activity</th>
-                                        <th>Credits</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {creditHistory.length === 0 ? (
-                                        <tr><td colSpan={3} className={styles.emptyHistory}>No credit activity yet.</td></tr>
-                                    ) : creditHistory.map((entry) => {
-                                        const delta = entry.subscriptionDelta + entry.lifetimeDelta;
-                                        return (
-                                            <tr key={entry.id}>
-                                                <td>{CREDIT_REASON_LABELS[entry.reason] ?? entry.reason}</td>
-                                                <td className={delta > 0 ? styles.positiveDelta : styles.negativeDelta}>
-                                                    {delta > 0 ? "+" : ""}{delta}
-                                                </td>
-                                                <td>{new Date(entry.createdAt).toLocaleDateString()}</td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             {/* Plans */}
             <div className={styles.plans}>

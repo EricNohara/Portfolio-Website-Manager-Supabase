@@ -75,7 +75,7 @@ export default function AiAgentsPage() {
   const router = useRouter();
 
   const moreAboutButton: IButton = {
-    name: "More About the Agents",
+    name: "More Information",
     onClick: () => {
       window.location.assign(
         createDocumentationUrl("aiAgents", window.location.href)

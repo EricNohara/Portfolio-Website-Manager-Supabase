@@ -11,7 +11,7 @@
   padding: 16px 16px 16px 0;
   background: var(--page-box-bg);
   border: 1px solid var(--page-box-border);
-  border-radius: 14px;
+  border-radius: var(--global-border-radius);
   color: white;
   box-shadow: 0 0 25px 5px
     color-mix(in srgb, var(--page-box-border) 15%, transparent);
@@ -68,7 +68,7 @@
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: 10px;
+  border-radius: var(--global-border-radius);
   color: var(--page-txt-2);
   cursor: pointer;
   transition: 0.18s ease;

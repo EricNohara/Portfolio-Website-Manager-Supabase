@@ -166,6 +166,21 @@ const DEFAULT_SUGGESTIONS: ISuggestion[] = [
     kind: "settings",
   },
   {
+    label: "Password Settings Page",
+    path: "/user/settings/password",
+    kind: "settings",
+  },
+  {
+    label: "Billing Settings Page",
+    path: "/user/settings/billing",
+    kind: "settings",
+  },
+  {
+    label: "AI Credits Settings Page",
+    path: "/user/settings/aiCredits",
+    kind: "settings",
+  },
+  {
     label: "AI Agents Page",
     path: "/user/aiAgents",
     kind: "agent",
@@ -422,9 +437,8 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
       onBlur={handleBlur}
     >
       <form
-        className={`${styles.searchBarForm} ${
-          showDropdown && filtered.length > 0 ? styles.searchBarFormOpen : ""
-        }`}
+        className={`${styles.searchBarForm} ${showDropdown && filtered.length > 0 ? styles.searchBarFormOpen : ""
+          }`}
         onSubmit={handleSubmit}
       >
         <Search />
@@ -469,15 +483,13 @@ export default function SearchBar({ onFocusChange }: ISearchBarProps) {
                   ref={(element) => {
                     itemRefs.current[index] = element;
                   }}
-                  className={`${styles.dropdownItem} ${
-                    index === activeIndex ? styles.activeItem : ""
-                  }`}
+                  className={`${styles.dropdownItem} ${index === activeIndex ? styles.activeItem : ""
+                    }`}
                   onClick={() => handleSelect(item.path)}
                 >
                   <span
-                    className={`${styles.suggestionIcon} ${
-                      styles[`suggestionIcon_${item.kind}`]
-                    }`}
+                    className={`${styles.suggestionIcon} ${styles[`suggestionIcon_${item.kind}`]
+                      }`}
                   >
                     <SuggestionIcon size={20} />
                   </span>
