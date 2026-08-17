@@ -1,6 +1,6 @@
 "use client";
 
-import { TriangleAlert } from "lucide-react";
+import { Info, TriangleAlert } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { useToast } from "@/app/context/ToastProvider";
@@ -8,6 +8,8 @@ import { useUser } from "@/app/context/UserProvider";
 import { headerFont } from "@/app/localFonts";
 
 import styles from "./DeleteUserPage.module.css";
+import { ButtonOne } from "@/app/components/Buttons/Buttons";
+import { createDocumentationUrl } from "@/utils/navigation/documentation";
 
 const DELETE_CONFIRMATION_PHRASE = "DELETE MY ACCOUNT";
 
@@ -79,10 +81,19 @@ export default function DeleteUserPage() {
     return (
         <div className={styles.container}>
             <header className={styles.pageHeader}>
-                <h1 className={`${headerFont.className} ${styles.pageTitle}`}>
-                    Delete Account
-                </h1>
-                <p>Permanently delete your Nukleio account and all associated data.</p>
+                <div className={styles.headerText}>
+                    <h1 className={`${headerFont.className} ${styles.pageTitle}`}>
+                        Delete Account
+                    </h1>
+                    <p>Permanently delete your Nukleio account and all associated data.</p>
+                </div>
+
+                <ButtonOne onClick={() => window.location.assign(createDocumentationUrl("deleteUser", window.location.href))}>
+                    <span className={styles.infoButtonContent}>
+                        <Info />
+                        More Information
+                    </span>
+                </ButtonOne>
             </header>
 
             <section className={styles.warningPanel} aria-labelledby="delete-warning-heading">
@@ -107,10 +118,9 @@ export default function DeleteUserPage() {
 
             <form className={styles.confirmationForm} onSubmit={requestFinalConfirmation}>
                 <div className={styles.field}>
-                    <label htmlFor="delete-account-email" className={headerFont.className}>
+                    <label htmlFor="delete-account-email">
                         Enter your account email
                     </label>
-                    <span className={styles.fieldHint}>{accountEmail || "Loading account email..."}</span>
                     <input
                         id="delete-account-email"
                         type="email"
@@ -124,7 +134,7 @@ export default function DeleteUserPage() {
                 </div>
 
                 <div className={styles.field}>
-                    <label htmlFor="delete-account-phrase" className={headerFont.className}>
+                    <label htmlFor="delete-account-phrase">
                         Type <strong>{DELETE_CONFIRMATION_PHRASE}</strong> to continue
                     </label>
                     <input

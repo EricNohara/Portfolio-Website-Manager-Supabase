@@ -7,26 +7,40 @@
 }
 
 .pageHeader {
-  padding: 2rem 0 1.5rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  padding: 2rem 0 1rem 0;
   border-bottom: 2px solid var(--page-box-border);
 }
 
 .pageTitle {
   margin: 0;
-  color: var(--fail-color);
   font-size: 1.5rem;
+  color: var(--page-txt-1);
 }
 
 .pageHeader p {
-  margin: 0.5rem 0 0;
+  margin: 0;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: normal;
   color: var(--page-txt-2);
+}
+
+.infoButtonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 .warningPanel,
 .confirmationForm {
-  max-width: 52rem;
+  width: 100%;
   padding: 1.5rem;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   background: var(--page-box-bg);
   border: 1px solid var(--page-box-border);
   border-radius: var(--global-border-radius);
@@ -78,7 +92,8 @@
 
 .field label {
   color: var(--page-txt-1);
-  font-size: 0.9rem;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .field label strong {
@@ -101,8 +116,7 @@
 }
 
 .field input:focus {
-  outline: 2px solid var(--fail-color);
-  outline-offset: 2px;
+  outline: 1px solid var(--fail-color);
 }
 
 .acknowledgement {

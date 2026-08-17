@@ -181,6 +181,11 @@ const DEFAULT_SUGGESTIONS: ISuggestion[] = [
     kind: "settings",
   },
   {
+    label: "Delete User Settings Page",
+    path: "/user/settings/deleteUser",
+    kind: "settings",
+  },
+  {
     label: "AI Agents Page",
     path: "/user/aiAgents",
     kind: "agent",

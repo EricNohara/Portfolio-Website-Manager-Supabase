@@ -9,8 +9,9 @@ export const DOCUMENTATION_PATHS = {
   terms: "/legal/terms",
   apiKeys: "/docs/creating-api-keys",
   aiAgents: "/product#generative-ai-agents",
-  // change this later after writing docs for ai credits
+  // change these later after writing docs for ai credits
   aiCredits: "/pricing",
+  deleteUser: "/docs/troubleshooting",
 } as const;
 
 export type DocumentationPage = keyof typeof DOCUMENTATION_PATHS;
