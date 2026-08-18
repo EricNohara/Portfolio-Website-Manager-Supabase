@@ -6,7 +6,6 @@ import {
   CirclePoundSterling,
   KeySquare,
   LucideIcon,
-  Trash2,
   TriangleAlert,
   User,
 } from "lucide-react";

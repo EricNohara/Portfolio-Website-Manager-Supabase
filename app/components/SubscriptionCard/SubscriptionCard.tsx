@@ -1,7 +1,6 @@
 import {
   BadgeCheck,
   LucideIcon,
-  CircleCheck,
   Info,
   ShieldCheck,
 } from "lucide-react";

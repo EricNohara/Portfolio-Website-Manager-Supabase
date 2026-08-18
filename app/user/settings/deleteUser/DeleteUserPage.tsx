@@ -136,7 +136,7 @@ export default function DeleteUserPage() {
                         </span>
                         <div className={styles.warningPanelCardItemText}>
                             <h3>Access will be permanently removed</h3>
-                            <p>You won't be able to sign in or recover any data</p>
+                            <p>You won&apos;t be able to sign in or recover any data</p>
                         </div>
                     </div>
 

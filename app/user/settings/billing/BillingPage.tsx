@@ -57,23 +57,31 @@ function deriveIntervalFromPriceId(priceId: string | null): Interval | null {
   return null;
 }
 
-// eslint-disable-next-line
-async function postJson<T>(url: string, body?: any): Promise<T> {
+type ApiErrorResponse = {
+  error?: string;
+  message?: string;
+};
+
+async function postJson<T>(url: string, body?: unknown): Promise<T> {
   const res = await fetch(url, {
     method: "POST",
     headers: body ? { "Content-Type": "application/json" } : undefined,
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  const data = await res.json().catch(() => ({}));
+  const data: unknown = await res.json().catch(() => ({}));
+
   if (!res.ok) {
-    // eslint-disable-next-line
+    const errorData = data as ApiErrorResponse;
+
     const msg =
-      (data as any)?.error ||
-      (data as any)?.message ||
+      errorData.error ||
+      errorData.message ||
       `Request failed: ${res.status}`;
+
     throw new Error(msg);
   }
+
   return data as T;
 }
 
