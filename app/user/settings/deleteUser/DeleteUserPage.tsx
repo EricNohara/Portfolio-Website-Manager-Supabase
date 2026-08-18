@@ -110,43 +110,43 @@ export default function DeleteUserPage() {
                         </div>
                     </div>
 
-                    <div className={styles.warningPanelCardItem}>
-                        <span>
-                            <User />
-                        </span>
-                        <div className={styles.warningPanelCardItemText}>
-                            <h3>All your data will be lost</h3>
-                            <p>Profile, API keys, documents, AI generations</p>
+                    <div className={styles.warningPanelCardItems}>
+                        <div className={styles.warningPanelCardItem}>
+                            <span>
+                                <User />
+                            </span>
+                            <div className={styles.warningPanelCardItemText}>
+                                <h3>All your data will be lost</h3>
+                                <p>Profile, API keys, documents, AI generations</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className={styles.warningPanelCardItem}>
-                        <span>
-                            <Landmark />
-                        </span>
-                        <div className={styles.warningPanelCardItemText}>
-                            <h3>Financial data will be removed</h3>
-                            <p>AI credit balance, billing profile, invoices</p>
+                        <div className={styles.warningPanelCardItem}>
+                            <span>
+                                <Landmark />
+                            </span>
+                            <div className={styles.warningPanelCardItemText}>
+                                <h3>Financial data will be removed</h3>
+                                <p>AI credit balance, billing profile, invoices</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div className={styles.warningPanelCardItem}>
-                        <span>
-                            <LockKeyhole />
-                        </span>
-                        <div className={styles.warningPanelCardItemText}>
-                            <h3>Access will be permanently removed</h3>
-                            <p>You won&apos;t be able to sign in or recover any data</p>
+                        <div className={styles.warningPanelCardItem}>
+                            <span>
+                                <LockKeyhole />
+                            </span>
+                            <div className={styles.warningPanelCardItemText}>
+                                <h3>Access will be permanently removed</h3>
+                                <p>You won&apos;t be able to sign in or recover any data</p>
+                            </div>
                         </div>
                     </div>
 
                     <div className={styles.warningPanelInfoItem}>
-                        <span>
-                            <Info />
-                        </span>
+                        <Info size={30} />
                         <div>
-                            <h3>Active subscriptions are canceled immediately</h3>
-                            <p>Account deletion does not issue an automatic refund.</p>
+                            <h3>Subscriptions are canceled immediately</h3>
+                            <p>Account deletion does not issue a refund</p>
                         </div>
                     </div>
                 </section>

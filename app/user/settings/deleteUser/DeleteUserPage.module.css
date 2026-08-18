@@ -73,6 +73,9 @@
 
 .warningPanel {
   border-color: var(--fail-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .warningHeading {
@@ -80,8 +83,7 @@
   align-items: center;
   gap: 2rem;
   padding-bottom: 1rem;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid var(--fail-color);
+  border-bottom: 1px solid var(--page-box-border);
 }
 
 .warningHeading h2 {
@@ -100,13 +102,20 @@
   display: flex;
   align-items: center;
   gap: 2rem;
-  margin-bottom: 1rem;
 }
 
 .warningPanelCardItemText {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.warningPanelCardItems {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
 }
 
 .warningPanelCardItem span {
@@ -129,6 +138,30 @@
   margin: 0;
   color: var(--page-txt-2);
   font-size: 0.8rem;
+}
+
+.warningPanelInfoItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 2rem;
+  color: var(--fail-color);
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 1px solid var(--fail-color);
+}
+
+.warningPanelInfoItem h3 {
+  color: var(--page-txt-1);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.warningPanelInfoItem p {
+  color: var(--page-txt-2);
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0 0;
 }
 
 .confirmationForm {
