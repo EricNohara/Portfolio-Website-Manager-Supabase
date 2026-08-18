@@ -8,18 +8,17 @@
   box-sizing: border-box;
 }
 
-.deleteAccountCardContainer {
+.panels {
   margin-top: 2rem;
   display: flex;
   width: 100%;
   gap: 2rem;
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-height: 0;
   align-items: stretch;
 }
 
-.warningPanel,
-.confirmationForm {
+.panel {
   flex: 1;
   width: 100%;
   min-height: 0;
@@ -28,6 +27,9 @@
   background: var(--page-box-bg);
   border: 1px solid var(--page-box-border);
   border-radius: var(--global-border-radius);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .pageHeader {
@@ -61,7 +63,7 @@
   gap: 0.75rem;
 }
 
-.warningHeaderIcon {
+.panelHeaderIcon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -73,12 +75,9 @@
 
 .warningPanel {
   border-color: var(--fail-color);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
-.warningHeading {
+.panelHeading {
   display: flex;
   align-items: center;
   gap: 2rem;
@@ -86,39 +85,31 @@
   border-bottom: 1px solid var(--page-box-border);
 }
 
-.warningHeading h2 {
+.panelHeading h2 {
   margin: 0;
   font-size: 1.5rem;
   color: var(--page-txt-1);
 }
 
-.warningHeading p {
+.panelHeading p {
   margin: 0.5rem 0 0 0;
   font-size: 0.9rem;
   color: var(--page-txt-2);
 }
 
-.warningPanelCardItem {
+.warningItem {
   display: flex;
   align-items: center;
   gap: 2rem;
 }
 
-.warningPanelCardItemText {
+.warningItemText {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
-.warningPanelCardItems {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
-  width: 100%;
-}
-
-.warningPanelCardItem span {
+.warningItem span {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,19 +119,19 @@
   color: var(--fail-color);
 }
 
-.warningPanelCardItemText h3 {
+.warningItemText h3 {
   margin: 0;
   font-size: 1rem;
   color: var(--page-txt-1);
 }
 
-.warningPanelCardItemText p {
+.warningItemText p {
   margin: 0;
   color: var(--page-txt-2);
   font-size: 0.8rem;
 }
 
-.warningPanelInfoItem {
+.subscriptionNotice {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -152,86 +143,46 @@
   border: 1px solid var(--fail-color);
 }
 
-.warningPanelInfoItem h3 {
+.subscriptionNotice h3 {
   color: var(--page-txt-1);
   font-size: 0.9rem;
   margin: 0;
 }
 
-.warningPanelInfoItem p {
+.subscriptionNotice p {
   color: var(--page-txt-2);
   font-size: 0.8rem;
   margin: 0.5rem 0 0 0;
 }
 
-.confirmationForm {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.field label {
-  color: var(--page-txt-1);
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-.field label strong {
-  color: var(--fail-color);
-}
-
-.fieldHint {
-  color: var(--page-txt-2);
-  font-size: 0.8rem;
-}
-
-.field input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  color: var(--page-txt-1);
-  background: var(--page-box-bg);
-  border: 1.5px solid var(--page-box-border);
-  border-radius: var(--global-border-radius);
-  font: inherit;
-}
-
-.field input:focus {
-  outline: 1px solid var(--fail-color);
-}
-
 .acknowledgement {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  color: var(--page-txt-1);
-  line-height: 1.5;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--page-txt-2);
+  font-size: 0.9rem;
   cursor: pointer;
 }
 
 .acknowledgement input {
-  width: 1rem;
-  height: 1rem;
-  margin-top: 0.2rem;
+  width: 3rem;
+  height: 3rem;
+  margin: 0;
   accent-color: var(--fail-color);
 }
 
 .deleteButton,
 .finalDeleteButton,
 .cancelButton {
-  padding: 0.65rem 1rem;
+  padding: 1rem 2rem;
+  width: 100%;
   border: 0;
   border-radius: var(--global-border-radius);
-  font-weight: 700;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.deleteButton,
 .finalDeleteButton {
   align-self: flex-start;
   color: white;
@@ -245,15 +196,12 @@
   opacity: 0.6;
 }
 
-.dialogBackdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1000;
+.deleteButton span {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
-  background: rgb(0 0 0 / 65%);
+  gap: 1rem;
+  font-size: 1rem;
 }
 
 .dialog {

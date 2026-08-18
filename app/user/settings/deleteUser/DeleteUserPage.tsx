@@ -1,9 +1,11 @@
 "use client";
 
-import { Info, Landmark, LockKeyhole, TriangleAlert, User } from "lucide-react";
+import { Info, Landmark, LockKeyhole, Trash2, TriangleAlert, User } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
-import { ButtonOne } from "@/app/components/Buttons/Buttons";
+import { ButtonOne, DeleteButton } from "@/app/components/Buttons/Buttons";
+import Overlay from "@/app/components/Overlay/Overlay";
+import TextInput from "@/app/components/TextInput/TextInput";
 import { useToast } from "@/app/context/ToastProvider";
 import { useUser } from "@/app/context/UserProvider";
 import { headerFont } from "@/app/localFonts";
@@ -81,7 +83,7 @@ export default function DeleteUserPage() {
     return (
         <div className={styles.container}>
             <header className={styles.pageHeader}>
-                <div className={styles.headerText}>
+                <div>
                     <h1 className={`${headerFont.className} ${styles.pageTitle}`}>
                         Delete Account
                     </h1>
@@ -96,10 +98,13 @@ export default function DeleteUserPage() {
                 </ButtonOne>
             </header>
 
-            <div className={styles.deleteAccountCardContainer}>
-                <section className={styles.warningPanel} aria-labelledby="delete-warning-heading">
-                    <div className={styles.warningHeading}>
-                        <span className={styles.warningHeaderIcon}>
+            <div className={styles.panels}>
+                <section
+                    className={`${styles.panel} ${styles.warningPanel}`}
+                    aria-labelledby="delete-warning-heading"
+                >
+                    <div className={styles.panelHeading}>
+                        <span className={styles.panelHeaderIcon}>
                             <TriangleAlert aria-hidden="true" />
                         </span>
                         <div>
@@ -110,39 +115,37 @@ export default function DeleteUserPage() {
                         </div>
                     </div>
 
-                    <div className={styles.warningPanelCardItems}>
-                        <div className={styles.warningPanelCardItem}>
-                            <span>
-                                <User />
-                            </span>
-                            <div className={styles.warningPanelCardItemText}>
-                                <h3>All your data will be lost</h3>
-                                <p>Profile, API keys, documents, AI generations</p>
-                            </div>
-                        </div>
-
-                        <div className={styles.warningPanelCardItem}>
-                            <span>
-                                <Landmark />
-                            </span>
-                            <div className={styles.warningPanelCardItemText}>
-                                <h3>Financial data will be removed</h3>
-                                <p>AI credit balance, billing profile, invoices</p>
-                            </div>
-                        </div>
-
-                        <div className={styles.warningPanelCardItem}>
-                            <span>
-                                <LockKeyhole />
-                            </span>
-                            <div className={styles.warningPanelCardItemText}>
-                                <h3>Access will be permanently removed</h3>
-                                <p>You won&apos;t be able to sign in or recover any data</p>
-                            </div>
+                    <div className={styles.warningItem}>
+                        <span>
+                            <User />
+                        </span>
+                        <div className={styles.warningItemText}>
+                            <h3>All your data will be lost</h3>
+                            <p>Profile, API keys, documents, AI generations</p>
                         </div>
                     </div>
 
-                    <div className={styles.warningPanelInfoItem}>
+                    <div className={styles.warningItem}>
+                        <span>
+                            <Landmark />
+                        </span>
+                        <div className={styles.warningItemText}>
+                            <h3>Financial data will be removed</h3>
+                            <p>AI credit balance, billing profile, invoices</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.warningItem}>
+                        <span>
+                            <LockKeyhole />
+                        </span>
+                        <div className={styles.warningItemText}>
+                            <h3>Access will be permanently removed</h3>
+                            <p>You won&apos;t be able to sign in or recover any data</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.subscriptionNotice}>
                         <Info size={30} />
                         <div>
                             <h3>Subscriptions are canceled immediately</h3>
@@ -151,38 +154,38 @@ export default function DeleteUserPage() {
                     </div>
                 </section>
 
-                <form className={styles.confirmationForm} onSubmit={requestFinalConfirmation}>
-                    <div className={styles.field}>
-                        <label htmlFor="delete-account-email">
-                            Enter your account email
-                        </label>
-                        <input
-                            id="delete-account-email"
-                            type="email"
-                            value={email}
-                            onChange={(event) => setEmail(event.target.value)}
-                            autoComplete="off"
-                            spellCheck={false}
-                            disabled={!accountEmail || deleting}
-                            required
-                        />
+                <form className={styles.panel} onSubmit={requestFinalConfirmation}>
+                    <div className={styles.panelHeading}>
+                        <span className={styles.panelHeaderIcon}>
+                            <Trash2 aria-hidden="true" />
+                        </span>
+                        <div>
+                            <h2 id="delete-warning-heading" className={headerFont.className}>
+                                Delete your account
+                            </h2>
+                            <p>Please provide the information below</p>
+                        </div>
                     </div>
 
-                    <div className={styles.field}>
-                        <label htmlFor="delete-account-phrase">
-                            Type <strong>{DELETE_CONFIRMATION_PHRASE}</strong> to continue
-                        </label>
-                        <input
-                            id="delete-account-phrase"
-                            type="text"
-                            value={phrase}
-                            onChange={(event) => setPhrase(event.target.value)}
-                            autoComplete="off"
-                            spellCheck={false}
-                            disabled={deleting}
-                            required
-                        />
-                    </div>
+                    <TextInput
+                        label="Account email"
+                        name="email"
+                        type="email"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        disabled={!accountEmail || deleting}
+                        required
+                    />
+
+                    <TextInput
+                        label={`Type ${DELETE_CONFIRMATION_PHRASE} to continue`}
+                        name="phrase"
+                        type="text"
+                        value={phrase}
+                        onChange={(event) => setPhrase(event.target.value)}
+                        disabled={deleting}
+                        required
+                    />
 
                     <label className={styles.acknowledgement}>
                         <input
@@ -191,21 +194,20 @@ export default function DeleteUserPage() {
                             onChange={(event) => setAcknowledged(event.target.checked)}
                             disabled={deleting}
                         />
-                        <span>I understand that my account and data will be permanently deleted.</span>
+                        <span>I understand that my account and data will be permanently deleted. This action cannot be undone.</span>
                     </label>
 
-                    <button
-                        type="submit"
-                        className={`${styles.deleteButton} ${headerFont.className}`}
-                        disabled={!canConfirm}
-                    >
-                        Continue to final confirmation
-                    </button>
+                    <DeleteButton type="submit" className={styles.deleteButton} disabled={!canConfirm}>
+                        <span>
+                            <Trash2 />
+                            Delete my account
+                        </span>
+                    </DeleteButton>
                 </form>
             </div>
 
             {showDialog && (
-                <div className={styles.dialogBackdrop}>
+                <Overlay onClose={() => setShowDialog(false)}>
                     <div
                         className={styles.dialog}
                         role="alertdialog"
@@ -239,7 +241,7 @@ export default function DeleteUserPage() {
                             </button>
                         </div>
                     </div>
-                </div>
+                </Overlay>
             )}
         </div>
     );
