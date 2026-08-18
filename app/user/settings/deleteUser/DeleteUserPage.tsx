@@ -1,15 +1,15 @@
 "use client";
 
-import { Info, TriangleAlert } from "lucide-react";
+import { Info, Landmark, LockKeyhole, TriangleAlert, User } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 
+import { ButtonOne } from "@/app/components/Buttons/Buttons";
 import { useToast } from "@/app/context/ToastProvider";
 import { useUser } from "@/app/context/UserProvider";
 import { headerFont } from "@/app/localFonts";
+import { createDocumentationUrl } from "@/utils/navigation/documentation";
 
 import styles from "./DeleteUserPage.module.css";
-import { ButtonOne } from "@/app/components/Buttons/Buttons";
-import { createDocumentationUrl } from "@/utils/navigation/documentation";
 
 const DELETE_CONFIRMATION_PHRASE = "DELETE MY ACCOUNT";
 
@@ -96,77 +96,113 @@ export default function DeleteUserPage() {
                 </ButtonOne>
             </header>
 
-            <section className={styles.warningPanel} aria-labelledby="delete-warning-heading">
-                <div className={styles.warningHeading}>
-                    <TriangleAlert size={28} aria-hidden="true" />
-                    <h2 id="delete-warning-heading" className={headerFont.className}>
-                        This action cannot be undone
-                    </h2>
-                </div>
-                <p>Deleting your account permanently removes:</p>
-                <ul>
-                    <li>Your profile, portfolio, API keys, and API activity</li>
-                    <li>Your AI credit balances and credit activity</li>
-                    <li>Your uploaded documents, images, and project files</li>
-                    <li>Your saved AI generations and generated files</li>
-                    <li>Your billing profile and any active subscription</li>
-                </ul>
-                <p className={styles.refundNotice}>
-                    Active subscriptions are canceled immediately. Account deletion does not issue an automatic refund.
-                </p>
-            </section>
+            <div className={styles.deleteAccountCardContainer}>
+                <section className={styles.warningPanel} aria-labelledby="delete-warning-heading">
+                    <div className={styles.warningHeading}>
+                        <span className={styles.warningHeaderIcon}>
+                            <TriangleAlert aria-hidden="true" />
+                        </span>
+                        <div>
+                            <h2 id="delete-warning-heading" className={headerFont.className}>
+                                Before you delete
+                            </h2>
+                            <p>This action cannot be undone</p>
+                        </div>
+                    </div>
 
-            <form className={styles.confirmationForm} onSubmit={requestFinalConfirmation}>
-                <div className={styles.field}>
-                    <label htmlFor="delete-account-email">
-                        Enter your account email
+                    <div className={styles.warningPanelCardItem}>
+                        <span>
+                            <User />
+                        </span>
+                        <div className={styles.warningPanelCardItemText}>
+                            <h3>All your data will be lost</h3>
+                            <p>Profile, API keys, documents, AI generations</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.warningPanelCardItem}>
+                        <span>
+                            <Landmark />
+                        </span>
+                        <div className={styles.warningPanelCardItemText}>
+                            <h3>Financial data will be removed</h3>
+                            <p>AI credit balance, billing profile, invoices</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.warningPanelCardItem}>
+                        <span>
+                            <LockKeyhole />
+                        </span>
+                        <div className={styles.warningPanelCardItemText}>
+                            <h3>Access will be permanently removed</h3>
+                            <p>You won't be able to sign in or recover any data</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.warningPanelInfoItem}>
+                        <span>
+                            <Info />
+                        </span>
+                        <div>
+                            <h3>Active subscriptions are canceled immediately</h3>
+                            <p>Account deletion does not issue an automatic refund.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <form className={styles.confirmationForm} onSubmit={requestFinalConfirmation}>
+                    <div className={styles.field}>
+                        <label htmlFor="delete-account-email">
+                            Enter your account email
+                        </label>
+                        <input
+                            id="delete-account-email"
+                            type="email"
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                            autoComplete="off"
+                            spellCheck={false}
+                            disabled={!accountEmail || deleting}
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.field}>
+                        <label htmlFor="delete-account-phrase">
+                            Type <strong>{DELETE_CONFIRMATION_PHRASE}</strong> to continue
+                        </label>
+                        <input
+                            id="delete-account-phrase"
+                            type="text"
+                            value={phrase}
+                            onChange={(event) => setPhrase(event.target.value)}
+                            autoComplete="off"
+                            spellCheck={false}
+                            disabled={deleting}
+                            required
+                        />
+                    </div>
+
+                    <label className={styles.acknowledgement}>
+                        <input
+                            type="checkbox"
+                            checked={acknowledged}
+                            onChange={(event) => setAcknowledged(event.target.checked)}
+                            disabled={deleting}
+                        />
+                        <span>I understand that my account and data will be permanently deleted.</span>
                     </label>
-                    <input
-                        id="delete-account-email"
-                        type="email"
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        autoComplete="off"
-                        spellCheck={false}
-                        disabled={!accountEmail || deleting}
-                        required
-                    />
-                </div>
 
-                <div className={styles.field}>
-                    <label htmlFor="delete-account-phrase">
-                        Type <strong>{DELETE_CONFIRMATION_PHRASE}</strong> to continue
-                    </label>
-                    <input
-                        id="delete-account-phrase"
-                        type="text"
-                        value={phrase}
-                        onChange={(event) => setPhrase(event.target.value)}
-                        autoComplete="off"
-                        spellCheck={false}
-                        disabled={deleting}
-                        required
-                    />
-                </div>
-
-                <label className={styles.acknowledgement}>
-                    <input
-                        type="checkbox"
-                        checked={acknowledged}
-                        onChange={(event) => setAcknowledged(event.target.checked)}
-                        disabled={deleting}
-                    />
-                    <span>I understand that my account and data will be permanently deleted.</span>
-                </label>
-
-                <button
-                    type="submit"
-                    className={`${styles.deleteButton} ${headerFont.className}`}
-                    disabled={!canConfirm}
-                >
-                    Continue to final confirmation
-                </button>
-            </form>
+                    <button
+                        type="submit"
+                        className={`${styles.deleteButton} ${headerFont.className}`}
+                        disabled={!canConfirm}
+                    >
+                        Continue to final confirmation
+                    </button>
+                </form>
+            </div>
 
             {showDialog && (
                 <div className={styles.dialogBackdrop}>
