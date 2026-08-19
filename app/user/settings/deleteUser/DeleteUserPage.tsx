@@ -1,7 +1,7 @@
 "use client";
 
 import { Info, Landmark, LockKeyhole, Trash2, TriangleAlert, User } from "lucide-react";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { ButtonOne, DeleteButton } from "@/app/components/Buttons/Buttons";
 import Overlay from "@/app/components/Overlay/Overlay";
@@ -18,7 +18,6 @@ const DELETE_CONFIRMATION_PHRASE = "DELETE MY ACCOUNT";
 export default function DeleteUserPage() {
     const { state } = useUser();
     const toast = useToast();
-    const confirmButtonRef = useRef<HTMLButtonElement>(null);
     const [email, setEmail] = useState("");
     const [phrase, setPhrase] = useState("");
     const [acknowledged, setAcknowledged] = useState(false);
@@ -35,7 +34,6 @@ export default function DeleteUserPage() {
 
     useEffect(() => {
         if (!showDialog) return;
-        confirmButtonRef.current?.focus();
 
         const closeOnEscape = (event: KeyboardEvent) => {
             if (event.key === "Escape" && !deleting) setShowDialog(false);
@@ -222,6 +220,15 @@ export default function DeleteUserPage() {
                             Your data will be deleted immediately and cannot be recovered.
                         </p>
                         <div className={styles.dialogButtons}>
+                            <DeleteButton
+                                type="button"
+                                className={styles.deleteButton}
+                                onClick={deleteAccount}
+                                disabled={deleting}
+                            >
+                                {deleting ? "Deleting account..." : "Permanently delete account"}
+                            </DeleteButton>
+
                             <button
                                 type="button"
                                 className={styles.cancelButton}
@@ -229,15 +236,6 @@ export default function DeleteUserPage() {
                                 disabled={deleting}
                             >
                                 Cancel
-                            </button>
-                            <button
-                                ref={confirmButtonRef}
-                                type="button"
-                                className={styles.finalDeleteButton}
-                                onClick={deleteAccount}
-                                disabled={deleting}
-                            >
-                                {deleting ? "Deleting account..." : "Permanently delete account"}
                             </button>
                         </div>
                     </div>
