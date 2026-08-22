@@ -3,7 +3,7 @@
 import { Info, Landmark, LockKeyhole, Trash2, TriangleAlert, User } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 
-import { ButtonOne, DeleteButton } from "@/app/components/Buttons/Buttons";
+import { ButtonFour, ButtonOne, DeleteButton } from "@/app/components/Buttons/Buttons";
 import Overlay from "@/app/components/Overlay/Overlay";
 import TextInput from "@/app/components/TextInput/TextInput";
 import { useToast } from "@/app/context/ToastProvider";
@@ -226,17 +226,19 @@ export default function DeleteUserPage() {
                                 onClick={deleteAccount}
                                 disabled={deleting}
                             >
-                                {deleting ? "Deleting account..." : "Permanently delete account"}
+                                <span>
+                                    {deleting ? "Deleting account..." : "Permanently delete account"}
+                                </span>
                             </DeleteButton>
 
-                            <button
+                            <ButtonFour
                                 type="button"
                                 className={styles.cancelButton}
                                 onClick={() => setShowDialog(false)}
                                 disabled={deleting}
                             >
-                                Cancel
-                            </button>
+                                <span>Cancel</span>
+                            </ButtonFour>
                         </div>
                     </div>
                 </Overlay>

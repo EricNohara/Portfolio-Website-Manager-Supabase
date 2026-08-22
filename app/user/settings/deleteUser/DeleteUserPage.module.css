@@ -173,7 +173,6 @@
 }
 
 .deleteButton,
-.finalDeleteButton,
 .cancelButton {
   padding: 1rem 2rem;
   width: 100%;
@@ -183,45 +182,37 @@
   cursor: pointer;
 }
 
-.finalDeleteButton {
-  align-self: flex-start;
-  color: white;
-  background: var(--fail-color);
-}
-
 .deleteButton:disabled,
-.finalDeleteButton:disabled,
 .cancelButton:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-.deleteButton span {
+.deleteButton span,
+.cancelButton span {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .dialog {
-  width: min(100%, 30rem);
-  padding: 1.5rem;
+  width: min(100%, 40rem);
+  padding: 2rem;
   color: var(--page-txt-1);
   background: var(--page-box-bg);
   border: 1px solid var(--fail-color);
   border-radius: var(--global-border-radius);
-  box-shadow: 0 1rem 3rem rgb(0 0 0 / 35%);
 }
 
 .dialog h2 {
   margin: 0;
-  color: var(--fail-color);
+  font-size: 1.75rem;
 }
 
 .dialog p {
   color: var(--page-txt-2);
-  line-height: 1.5;
 }
 
 .dialogButtons {
@@ -229,11 +220,6 @@
   flex-direction: column;
   gap: 1rem;
   margin-top: 2rem;
-}
-
-.cancelButton {
-  color: var(--page-txt-1);
-  background: var(--popup-hover);
 }
 
 .noMargin {
