@@ -1,16 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 
 import AuthBackground from "@/app/components/AuthBackground/AuthBackground";
 import Navigation from "@/app/components/Navigation/Navigation";
 import TitleLogo from "@/app/components/TitleLogo/TitleLogo";
+import { useToast } from "@/app/context/ToastProvider";
 import { titleFont, headerFont } from "@/app/localFonts";
 
 import LoginForm from "./LoginForm";
 import styles from "./LoginPage.module.css";
 
 export default function LoginPage() {
+  const toast = useToast();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("accountDeleted") !== "true") {
+      return;
+    }
+
+    toast.success(
+      "Account deleted",
+      "Your data has been deleted successfully.",
+    );
+
+    window.history.replaceState(null, "", "/user/login");
+  }, [toast]);
+
+
   return (
     <div className={styles.container}>
       <div className={styles.leftPanel}>

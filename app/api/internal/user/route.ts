@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { IProject } from "@/app/interfaces/IProject";
 import IUser from "@/app/interfaces/IUser";
+import { deleteAccount } from "@/utils/accountDeletion/service";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { refreshCachedUserInfo } from "@/utils/cachedUserInfo/refreshCachedUserInfo";
-import parseURL, {
-  isStorageObjectOwnedByUser,
-} from "@/utils/general/parseURL";
-import { createAdminClient } from "@/utils/supabase/server";
 
 export async function GET(_req: NextRequest): Promise<NextResponse> {
   try {
@@ -96,77 +92,66 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-// user only able to delete its own account and only if it is logged in
-export async function DELETE(_req: NextRequest): Promise<NextResponse> {
-  const serviceRoleSupabase = createAdminClient();
+const DELETE_CONFIRMATION_PHRASE = "DELETE MY ACCOUNT";
+
+function isSameOriginRequest(req: NextRequest) {
+  const origin = req.headers.get("origin");
+  const forwardedHost = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const expectedHost = forwardedHost || req.headers.get("host");
+  if (!origin || !expectedHost) return false;
 
   try {
-    // authenticate user
-    const { user, supabase, response } = await getAuthenticatedUser();
-    if (!user) return response;
+    return new URL(origin).host === expectedHost;
+  } catch {
+    return false;
+  }
+}
 
-    // delete all items in storage associated with the user
-    const publicURLs = [];
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
+  const { user, supabase, response } = await getAuthenticatedUser({
+    allowPendingDeletion: true,
+  });
+  if (!user) return response;
 
-    const { data: projectData, error: projectError } = await supabase
-      .from("projects")
-      .select()
-      .eq("user_id", user.id);
+  if (!isSameOriginRequest(req)) {
+    return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+  }
 
-    if (projectError) throw projectError;
-
-    projectData?.forEach((project: IProject) => {
-      if (project.thumbnail_url && project.thumbnail_url !== "") {
-        publicURLs.push(project.thumbnail_url);
-      }
-    });
-
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select()
-      .eq("id", user.id)
-      .single();
-
-    if (userError) throw userError;
-
-    if (userData.portrait_url && userData.portrait_url !== null)
-      publicURLs.push(userData.portrait_url);
-    if (userData.resume_url && userData.resume_url !== null)
-      publicURLs.push(userData.resume_url);
-    if (userData.transcript_url && userData.transcript_url !== null)
-      publicURLs.push(userData.transcript_url);
-
-    for (const url of publicURLs) {
-      if (!url || url === "") continue;
-      // Every URL in this list came from a DB row scoped to the authenticated
-      // user. The path namespace check prevents a poisoned URL field from
-      // turning account deletion into a cross-tenant storage delete.
-      const storageObject = parseURL(url);
-      if (
-        !storageObject ||
-        !isStorageObjectOwnedByUser(storageObject.parsedFilename, user.id)
-      ) {
-        continue;
-      }
-
-      const { parsedBucket, parsedFilename } = storageObject;
-      const { error } = await serviceRoleSupabase.storage
-        .from(parsedBucket)
-        .remove([parsedFilename]);
-      if (error) throw error;
+  try {
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ message: "Invalid confirmation" }, { status: 400 });
     }
 
-    // delete the user from the auth table - this will cause cascading deletions from all other tables
-    const { error } = await serviceRoleSupabase.auth.admin.deleteUser(user.id);
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ message: "Invalid confirmation" }, { status: 400 });
+    }
 
-    if (error) throw error;
+    const confirmation = body as Record<string, unknown>;
+    const submittedEmail = confirmation.email;
+    const phrase = confirmation.phrase;
+    const acknowledged = confirmation.acknowledged;
+    const emailMatches =
+      typeof submittedEmail === "string" &&
+      typeof user.email === "string" &&
+      submittedEmail.trim().toLowerCase() === user.email.trim().toLowerCase();
 
+    if (
+      !emailMatches ||
+      phrase !== DELETE_CONFIRMATION_PHRASE ||
+      acknowledged !== true
+    ) {
+      return NextResponse.json({ message: "Invalid confirmation" }, { status: 400 });
+    }
+
+    await deleteAccount(user.id, supabase);
     return new NextResponse(null, { status: 204 });
-  } catch (err) {
-    const error = err as Error;
-    console.error(error.message);
+  } catch (error) {
+    console.error(`Account deletion failed for user ${user.id}:`, error);
     return NextResponse.json(
-      { message: "Internal server error" },
+      { message: "Your account could not be deleted at this time. Please try again later." },
       { status: 500 }
     );
   }

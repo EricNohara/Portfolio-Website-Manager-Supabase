@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { isAccountActive } from "@/utils/accountDeletion/status";
 import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
 import {
   AiGenerationCharge,
@@ -35,6 +36,7 @@ type HeadshotAttire =
   | "academic";
 
 type GenerateProfessionalHeadshotBody = {
+  userId: string;
   referenceUrl: string;
   backgroundDescription: string | null;
   backgroundUrl?: string;
@@ -42,11 +44,16 @@ type GenerateProfessionalHeadshotBody = {
   layout: HeadshotLayout;
 };
 
-type ReviseProfessionalHeadshotBody = {
+type ReviseProfessionalHeadshotRequestBody = {
   headshotUrl: string;
   feedback: string;
   layout: HeadshotLayout;
 };
+
+type ReviseProfessionalHeadshotAgentBody =
+  ReviseProfessionalHeadshotRequestBody & {
+    userId: string;
+  };
 
 function isString(value: unknown): value is string {
   return typeof value === "string";
@@ -82,7 +89,7 @@ function hasOnlyAllowedKeys(
 
 function isReviseProfessionalHeadshotBody(
   body: unknown
-): body is ReviseProfessionalHeadshotBody {
+): body is ReviseProfessionalHeadshotRequestBody {
   if (!body || typeof body !== "object") return false;
 
   const obj = body as Record<string, unknown>;
@@ -271,6 +278,7 @@ export async function POST(req: NextRequest) {
     const referenceUrl = referencePublicUrlData.publicUrl;
 
     let backgroundUrl: string | undefined;
+    const uploadedInputPaths = [referenceStoragePath];
 
     if (backgroundImage instanceof File) {
       const backgroundImageId = randomUUID();
@@ -285,10 +293,15 @@ export async function POST(req: NextRequest) {
         });
 
       if (backgroundUploadError) {
+        await storageAdmin.storage
+          .from(STORAGE_BUCKET)
+          .remove(uploadedInputPaths);
         throw new Error(
           `Background image upload failed: ${backgroundUploadError.message}`
         );
       }
+
+      uploadedInputPaths.push(backgroundStoragePath);
 
       const { data: backgroundPublicUrlData } = supabase.storage
         .from(STORAGE_BUCKET)
@@ -297,7 +310,20 @@ export async function POST(req: NextRequest) {
       backgroundUrl = backgroundPublicUrlData.publicUrl;
     }
 
+    // Close the race where this request authenticated just before deletion
+    // acquired its lock, then finished its service-role uploads afterward.
+    if (!await isAccountActive(user.id)) {
+      await storageAdmin.storage
+        .from(STORAGE_BUCKET)
+        .remove(uploadedInputPaths);
+      throw new AiGenerationRequestError(
+        "Account deletion is in progress.",
+        423,
+      );
+    }
+
     const agentPayload: GenerateProfessionalHeadshotBody = {
+      userId: user.id,
       referenceUrl,
       backgroundDescription,
       backgroundUrl,
@@ -439,10 +465,15 @@ export async function PUT(req: NextRequest) {
       AI_CREDIT_COSTS.headshot.revise,
     );
 
+    const agentPayload: ReviseProfessionalHeadshotAgentBody = {
+      ...body,
+      userId: user.id,
+    };
+
     const agentRes = await fetch(`${AGENT_BASE}/revise`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(agentPayload),
     });
 
     const data = await agentRes.json().catch(() => null);

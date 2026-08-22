@@ -1,0 +1,243 @@
+.container {
+  padding: 0 2rem 2rem;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.panels {
+  margin-top: 2rem;
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+  flex: 1 1 0;
+  min-height: 0;
+  align-items: stretch;
+}
+
+.panel {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  background: var(--page-box-bg);
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  padding: 2rem 0 1rem;
+  border-bottom: 2px solid var(--page-box-border);
+  flex: 0 0 auto;
+}
+
+.pageTitle {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--page-txt-1);
+}
+
+.pageHeader p {
+  margin: 0;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: var(--page-txt-2);
+}
+
+.infoButtonContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.panelHeaderIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 1px solid var(--fail-color);
+  color: var(--fail-color);
+}
+
+.warningPanel {
+  border-color: var(--fail-color);
+}
+
+.panelHeading {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--page-box-border);
+}
+
+.panelHeading h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--page-txt-1);
+}
+
+.panelHeading p {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.9rem;
+  color: var(--page-txt-2);
+}
+
+.warningItem {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.warningItemText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.warningItem span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 1px solid var(--fail-color);
+  color: var(--fail-color);
+}
+
+.warningItemText h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--page-txt-1);
+}
+
+.warningItemText p {
+  margin: 0;
+  color: var(--page-txt-2);
+  font-size: 0.8rem;
+}
+
+.subscriptionNotice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 2rem;
+  color: var(--fail-color);
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 1px solid var(--fail-color);
+}
+
+.subscriptionNotice h3 {
+  color: var(--page-txt-1);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.subscriptionNotice p {
+  color: var(--page-txt-2);
+  font-size: 0.8rem;
+  margin: 0.5rem 0 0 0;
+}
+
+.acknowledgement {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--page-txt-2);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.acknowledgement input {
+  width: 3rem;
+  height: 3rem;
+  margin: 0;
+  accent-color: var(--fail-color);
+}
+
+.deleteButton,
+.cancelButton {
+  padding: 1rem 2rem;
+  width: 100%;
+  border: 0;
+  border-radius: var(--global-border-radius);
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.deleteButton:disabled,
+.cancelButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.deleteButton span,
+.cancelButton span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.dialog {
+  width: min(100%, 40rem);
+  padding: 2rem;
+  color: var(--page-txt-1);
+  background: var(--page-box-bg);
+  border: 1px solid var(--fail-color);
+  border-radius: var(--global-border-radius);
+}
+
+.dialog h2 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.dialog p {
+  color: var(--page-txt-2);
+}
+
+.dialogButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.noMargin {
+  margin-bottom: 0 !important;
+}
+
+@media (max-width: 700px) {
+  .container {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .dialogButtons {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .dialogButtons button {
+    width: 100%;
+  }
+}

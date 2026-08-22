@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { isAccountActive } from "@/utils/accountDeletion/status";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { refreshCachedUserInfo } from "@/utils/cachedUserInfo/refreshCachedUserInfo";
 import parseURL, {
@@ -95,6 +96,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       });
 
     if (uploadError) throw uploadError;
+
+    // An upload that began immediately before account deletion can finish
+    // after the deletion inventory was taken. Fail closed and roll it back.
+    if (!await isAccountActive(user.id)) {
+      await serviceRoleSupabase.storage.from(bucketName).remove([filepath]);
+      return NextResponse.json(
+        { message: "Account deletion is in progress" },
+        { status: 423 },
+      );
+    }
 
     // get the public URL
     const { data: publicURL } = await supabase.storage

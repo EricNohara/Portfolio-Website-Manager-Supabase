@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+import { isAccountDeletionPending } from "@/utils/accountDeletion/status";
 import { SUBSCRIPTION_CREDIT_ALLOCATIONS } from "@/utils/aiCredits/config";
 import {
   expireSubscriptionCredits,
@@ -77,7 +78,12 @@ function getInvoicePriceId(invoice: Stripe.Invoice): string | null {
   return null;
 }
 
-async function getUserIdForCustomer(customerId: string) {
+type CustomerOwner = {
+  userId: string | null;
+  customerDeleted: boolean;
+};
+
+async function getCustomerOwner(customerId: string): Promise<CustomerOwner> {
   const admin = createAdminClient();
 
   const { data, error } = await admin
@@ -86,17 +92,22 @@ async function getUserIdForCustomer(customerId: string) {
     .eq("stripe_customer_id", customerId)
     .maybeSingle();
 
-  if (!error && data?.user_id) return data.user_id;
+  if (error) throw error;
+  if (data?.user_id) {
+    return { userId: data.user_id, customerDeleted: false };
+  }
 
-  const customer = (await stripe.customers.retrieve(
-    customerId
-  )) as Stripe.Customer;
+  const customer = await stripe.customers.retrieve(customerId);
+  if (customer.deleted) {
+    return { userId: null, customerDeleted: true };
+  }
+
   const userId =
     typeof customer.metadata?.user_id === "string"
       ? customer.metadata.user_id
       : null;
 
-  return userId;
+  return { userId, customerDeleted: false };
 }
 
 async function grantCreditsForPaidInvoice(invoice: Stripe.Invoice) {
@@ -106,8 +117,10 @@ async function grantCreditsForPaidInvoice(invoice: Stripe.Invoice) {
   const customerId = getStripeId(invoice.customer);
   if (!customerId) throw new Error(`Invoice ${invoice.id} has no customer`);
 
-  const userId = await getUserIdForCustomer(customerId);
+  const { userId, customerDeleted } = await getCustomerOwner(customerId);
+  if (customerDeleted) return;
   if (!userId) throw new Error(`No user found for Stripe customer ${customerId}`);
+  if (await isAccountDeletionPending(userId)) return;
 
   const priceId = getInvoicePriceId(invoice);
   const plan = getSubscriptionPlanForPriceId(priceId);
@@ -129,8 +142,10 @@ async function expireCreditsForFailedRenewal(invoice: Stripe.Invoice) {
   const customerId = getStripeId(invoice.customer);
   if (!customerId) return;
 
-  const userId = await getUserIdForCustomer(customerId);
+  const { userId, customerDeleted } = await getCustomerOwner(customerId);
+  if (customerDeleted) return;
   if (!userId) throw new Error(`No user found for Stripe customer ${customerId}`);
+  if (await isAccountDeletionPending(userId)) return;
 
   await expireSubscriptionCredits(userId, `stripe_invoice_${invoice.id}`);
 }
@@ -169,7 +184,8 @@ export async function POST(req: Request) {
         const customerId =
           typeof sub.customer === "string" ? sub.customer : sub.customer.id;
 
-        const userId = await getUserIdForCustomer(customerId);
+        const { userId, customerDeleted } = await getCustomerOwner(customerId);
+        if (customerDeleted) break;
         if (!userId) {
           console.warn(
             "No userId for customer:",
@@ -179,6 +195,7 @@ export async function POST(req: Request) {
           );
           return new NextResponse("ok", { status: 200 });
         }
+        if (await isAccountDeletionPending(userId)) break;
 
         if (event.type === "customer.subscription.deleted") {
           const { data: currentSubscription, error: currentSubscriptionError } =
@@ -240,6 +257,11 @@ export async function POST(req: Request) {
         const userId = session.client_reference_id;
 
         if (customerId && userId) {
+          const { data: authUser, error: authUserError } =
+            await admin.auth.admin.getUserById(userId);
+          if (authUserError && authUserError.status !== 404) throw authUserError;
+          if (!authUser.user || await isAccountDeletionPending(userId)) break;
+
           const { error } = await admin.from("subscriptions").upsert(
             {
               user_id: userId,

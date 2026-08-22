@@ -1,4 +1,9 @@
-import { BadgeCheck, LucideIcon, CircleCheck } from "lucide-react";
+import {
+  BadgeCheck,
+  LucideIcon,
+  Info,
+  ShieldCheck,
+} from "lucide-react";
 
 import { titleFont, headerFont } from "@/app/localFonts";
 
@@ -11,90 +16,110 @@ type Tier = "free" | "developer" | "premium";
 type Interval = "monthly" | "yearly";
 
 interface ISubscriptionCardProps {
-    tier: Tier;
-    title: string;
-    titleIcon: LucideIcon;
-    subtitle: string;
-    price: string;
-    billingInterval: Interval;
-    benefits: string[];
-    onCheckout: (tier: Exclude<Tier, "free">, interval: Interval) => Promise<void>;
-    isLoading: boolean;
-    disabled: boolean;
-    active: boolean;
-    onPortal?: () => Promise<void>;
-    currentTier: Tier;
+  tier: Tier;
+  title: string;
+  titleIcon: LucideIcon;
+  subtitle: string;
+  price: string;
+  billingInterval: Interval;
+  benefits: string[];
+  onCheckout: (
+    tier: Exclude<Tier, "free">,
+    interval: Interval,
+  ) => Promise<void>;
+  isLoading: boolean;
+  disabled: boolean;
+  active: boolean;
+  onPortal?: () => Promise<void>;
+  currentTier: Tier;
 }
 
-export default function SubscriptionCard(
-    { tier, title, titleIcon, subtitle, price, billingInterval, benefits, onCheckout, isLoading, disabled, active, onPortal, currentTier }: ISubscriptionCardProps) {
-    const TitleIcon = titleIcon;
+export default function SubscriptionCard({
+  tier,
+  title,
+  titleIcon,
+  subtitle,
+  price,
+  billingInterval,
+  benefits,
+  onCheckout,
+  isLoading,
+  disabled,
+  active,
+  onPortal,
+  currentTier,
+}: ISubscriptionCardProps) {
+  const TitleIcon = titleIcon;
 
-    const handleClick = async () => {
-        // Free plan: no checkout
-        if (tier === "free") {
-            if (currentTier !== "free") {
-                await onPortal?.();
-            }
-            return;
-        }
-        // paid tiers have normal checkout
-        await onCheckout(tier, billingInterval);
-    };
+  const handleClick = async () => {
+    // Free plan: no checkout
+    if (tier === "free") {
+      if (currentTier !== "free") {
+        await onPortal?.();
+      }
+      return;
+    }
+    // paid tiers have normal checkout
+    await onCheckout(tier, billingInterval);
+  };
 
-    const buttonLabel =
-        tier === "free"
-            ? active
-                ? "Current plan"
-                : "Free plan"
-            : active
-                ? "Current plan"
-                : "Choose this plan";
+  const buttonLabel =
+    tier === "free"
+      ? active
+        ? "Current plan"
+        : "Free plan"
+      : active
+        ? "Current plan"
+        : `Choose ${tier}`;
 
-    const buttonDisabled =
-        disabled ||
-        isLoading ||
-        (tier === "free" && currentTier === "free") || // free + already free => disabled
-        (tier !== "free" && active);
+  const buttonDisabled =
+    disabled ||
+    isLoading ||
+    (tier === "free" && currentTier === "free") || // free + already free => disabled
+    (tier !== "free" && active);
 
-    return (
-        <div className={`${styles.card} ${active && styles.activeCard}`}>
-            <div className={styles.header}>
-                <h1 className={headerFont.className}>
-                    <TitleIcon />
-                    {title}
-                </h1>
-                <h3 className={headerFont.className}>{subtitle}</h3>
-            </div>
+  return (
+    <div className={`${styles.card} ${active && styles.activeCard}`}>
+      <div className={styles.header}>
+        <h1 className={headerFont.className}>
+          <TitleIcon size={40} />
+          {title}
+        </h1>
+        <h3 className={headerFont.className}>{subtitle}</h3>
+      </div>
 
-            <div className={styles.pricing}>
-                <b className={titleFont.className}>$ {price} USD</b>
-                <p className={titleFont.className}>{billingInterval}</p>
-            </div>
+      <div className={styles.pricing}>
+        <b className={titleFont.className}>$ {price} USD</b>
+        <p className={titleFont.className}>{billingInterval}</p>
+      </div>
 
-            <ul className={styles.benefitsList}>
-                {
-                    benefits.map((b, i) =>
-                        <li key={i} className={styles.benefit}>
-                            <BadgeCheck size={20} color="var(--btn-1)" />
-                            <p>{b}</p>
-                        </li>
-                    )
-                }
-            </ul>
+      <ul className={styles.benefitsList}>
+        {benefits.map((b, i) => (
+          <li key={i} className={styles.benefit}>
+            <BadgeCheck size={20} color="var(--btn-1)" />
+            <p>{b}</p>
+          </li>
+        ))}
+      </ul>
 
-            <div className={styles.divider} />
+      <div className={styles.divider} />
 
-            <DocumentationLink page="pricing" className={styles.moreInfo}>More Information</DocumentationLink>
+      <DocumentationLink page="pricing" className={styles.moreInfo}>
+        <span className={styles.moreInfoContent}>
+          <Info size={18} />
+          More Information
+        </span>
+      </DocumentationLink>
 
-            <ButtonOne onClick={handleClick} disabled={buttonDisabled}>
-                <LoadableButtonContent isLoading={isLoading} buttonLabel={buttonLabel} />
-            </ButtonOne>
+      <ButtonOne onClick={handleClick} disabled={buttonDisabled}>
+        <LoadableButtonContent
+          isLoading={isLoading}
+          buttonLabel={buttonLabel}
+        />
+      </ButtonOne>
 
-            {/* active icon */}
-            {
-                active && <CircleCheck className={styles.activeIcon} />
-            }
-        </div>
-    )
+      {/* active icon */}
+      {active && <ShieldCheck className={styles.activeIcon} />}
+    </div>
+  );
 }

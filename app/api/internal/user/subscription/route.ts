@@ -1,24 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import {
   getSubscriptionPlanForPriceId,
   isPaidSubscriptionStatus,
 } from "@/utils/subscriptions/config";
-import { createClient } from "@/utils/supabase/server";
 
 export async function GET(_: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // get current user
-    const {
-      data: { user },
-      error: userErr,
-    } = await supabase.auth.getUser();
-
-    if (userErr || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     // lookup subscription row
     const { data: sub, error: subErr } = await supabase

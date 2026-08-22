@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { stripe } from "@/utils/stripe/stripe";
-import { createClient, createAdminClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/server";
 
 type Body = { priceId: string };
 
@@ -15,21 +16,13 @@ function toIso(unix: number | null | undefined) {
 
 export async function POST(req: NextRequest) {
   try {
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
+
     const { priceId } = (await req.json()) as Body;
 
     if (!priceId || !priceId.startsWith("price_")) {
       return NextResponse.json({ error: "Invalid priceId" }, { status: 400 });
-    }
-
-    const supabase = await createClient();
-
-    const {
-      data: { user },
-      error: userErr,
-    } = await supabase.auth.getUser();
-
-    if (userErr || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Look up stripe_customer_id from subscriptions (single-table approach)
