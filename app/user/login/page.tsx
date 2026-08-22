@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 
 import AuthBackground from "@/app/components/AuthBackground/AuthBackground";
@@ -14,14 +13,21 @@ import styles from "./LoginPage.module.css";
 
 export default function LoginPage() {
   const toast = useToast();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (searchParams.get("accountDeleted") === "true") {
-      toast.success("Account deleted", "Your data has been deleted successfully.");
-      window.history.replaceState(null, "", "/user/login");
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get("accountDeleted") !== "true") {
+      return;
     }
-  }, [searchParams, toast]);
+
+    toast.success(
+      "Account deleted",
+      "Your data has been deleted successfully.",
+    );
+
+    window.history.replaceState(null, "", "/user/login");
+  }, [toast]);
 
 
   return (
