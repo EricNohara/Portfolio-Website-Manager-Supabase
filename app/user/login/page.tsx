@@ -1,16 +1,16 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import React, { useEffect } from "react";
 
 import AuthBackground from "@/app/components/AuthBackground/AuthBackground";
 import Navigation from "@/app/components/Navigation/Navigation";
 import TitleLogo from "@/app/components/TitleLogo/TitleLogo";
+import { useToast } from "@/app/context/ToastProvider";
 import { titleFont, headerFont } from "@/app/localFonts";
 
 import LoginForm from "./LoginForm";
 import styles from "./LoginPage.module.css";
-import { useToast } from "@/app/context/ToastProvider";
-import { useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const toast = useToast();
