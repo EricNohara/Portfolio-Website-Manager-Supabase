@@ -3,6 +3,15 @@ import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { IUserInfoInternal } from "@/app/interfaces/IUserInfoInternal";
+import { AgentAwsConfigurationError } from "@/utils/aiAgents/awsConfig";
+import { invokeAiAgent } from "@/utils/aiAgents/client";
+import { AiAgentOperation } from "@/utils/aiAgents/operations";
+import {
+  AiRateLimitServiceError,
+  consumeAiRateLimit,
+} from "@/utils/aiAgents/rateLimit";
+import { createAiRateLimitResponse } from "@/utils/aiAgents/rateLimitResponse";
+import { getAiRequestId } from "@/utils/aiAgents/requestId";
 import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
 import {
   AiGenerationCharge,
@@ -435,6 +444,21 @@ export async function POST(req: NextRequest) {
       };
     }
 
+    const operation: AiAgentOperation =
+      generationType === "generateAi"
+        ? "resume_generate_ai"
+        : "resume_generate";
+    const requestId = getAiRequestId(req);
+    const rateLimit = await consumeAiRateLimit({
+      operation,
+      requestId,
+      userId: user.id,
+    });
+
+    if (!rateLimit.allowed) {
+      return createAiRateLimitResponse(operation, rateLimit);
+    }
+
     charge = await chargeAiGeneration(
       req,
       user.id,
@@ -442,10 +466,13 @@ export async function POST(req: NextRequest) {
       AI_CREDIT_COSTS.resume[generationType],
     );
 
-    const agentRes = await fetch(`${AGENT_BASE}/${generationType}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+    const agentRes = await invokeAiAgent({
+      baseUrl: AGENT_BASE,
+      path: generationType,
+      body: payload,
+      operation,
+      requestId,
+      userId: user.id,
     });
 
     const data = await agentRes.json().catch(() => null);
@@ -506,6 +533,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: error.message },
         { status: error.status },
+      );
+    }
+
+    if (
+      error instanceof AiRateLimitServiceError ||
+      error instanceof AgentAwsConfigurationError
+    ) {
+      console.error("AI agent security configuration error:", error);
+      return NextResponse.json(
+        { error: "AI generation is temporarily unavailable." },
+        { status: 503 },
       );
     }
 

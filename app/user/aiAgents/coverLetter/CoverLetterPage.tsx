@@ -15,6 +15,7 @@ import TextInput from "@/app/components/TextInput/TextInput";
 import { hasTier, useTier } from "@/app/context/TierProvider";
 import { useToast } from "@/app/context/ToastProvider";
 import { ICachedConversationListItem, ICachedCoverLetter, ISkillsMatchScore } from "@/app/interfaces/ICachedCoverLetter";
+import { showAiRateLimitToast } from "@/app/user/aiAgents/showAiRateLimitToast";
 import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
 
 import CoverLetterLoadingPanel from "./CoverLetterLoadingPanel";
@@ -246,7 +247,10 @@ export default function CoverLetterPage() {
                         }
                     );
                     const data = await res.json();
-                    if (!res.ok) throw new Error(data.error ?? "Error revising the draft");
+                    if (!res.ok) {
+                        if (showAiRateLimitToast(res, data, toast)) return;
+                        throw new Error(data.error ?? "Error revising the draft");
+                    }
                     const revisedDraft: string = data.revisedDraft;
                     setDraft(revisedDraft);
 
@@ -331,7 +335,10 @@ export default function CoverLetterPage() {
                     });
 
                     const data = await res.json();
-                    if (!res.ok) throw new Error(data.error);
+                    if (!res.ok) {
+                        if (showAiRateLimitToast(res, data, toast)) return;
+                        throw new Error(data.error);
+                    }
 
                     setDraft(data.currentDraft);
                     setSessionId(data.sessionId ?? "");

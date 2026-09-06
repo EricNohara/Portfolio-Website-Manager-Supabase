@@ -18,6 +18,7 @@ import { useToast } from "@/app/context/ToastProvider";
 import { useUser } from "@/app/context/UserProvider";
 import { ICachedHeadshot } from "@/app/interfaces/ICachedHeadshot";
 import { headerFont } from "@/app/localFonts";
+import { showAiRateLimitToast } from "@/app/user/aiAgents/showAiRateLimitToast";
 import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
 import { compressImage } from "@/utils/file-upload/compress";
 import { uploadFile } from "@/utils/file-upload/upload";
@@ -133,6 +134,7 @@ export default function HeadshotPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (showAiRateLimitToast(res, data, toast)) return;
         throw new Error(data?.error ?? "Generation failed");
       }
 

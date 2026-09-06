@@ -82,7 +82,6 @@ const nextConfig: NextConfig = {
     'self'
     https://vercel.analytics.edge.com
     https://api.vercel.com
-    https://m2uyqee3yri2agbs2vqroykaw40lcmud.lambda-url.us-east-2.on.aws
     ${supabaseUrl}
     https://graph.microsoft.com
     https://accounts.google.com

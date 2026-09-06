@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "postbuild": "next-sitemap",
     "knip": "knip --dependencies",
     "supabase:link:dev": "supabase link --project-ref iyothqqizacchsugxxae",
@@ -16,7 +17,11 @@
     "supabase:push": "supabase db push"
   },
   "dependencies": {
+    "@aws-crypto/sha256-js": "^5.2.0",
+    "@aws-sdk/client-dynamodb": "^3.1116.0",
     "@recharts/devtools": "^0.0.5",
+    "@smithy/protocol-http": "^5.6.2",
+    "@smithy/signature-v4": "^5.7.3",
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.46.1",
     "@vercel/analytics": "^1.5.0",
