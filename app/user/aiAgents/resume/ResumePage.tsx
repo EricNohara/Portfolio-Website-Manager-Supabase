@@ -15,6 +15,7 @@ import { hasTier, useTier } from "@/app/context/TierProvider";
 import { useToast } from "@/app/context/ToastProvider";
 import { useUser } from "@/app/context/UserProvider";
 import { ICachedResume } from "@/app/interfaces/ICachedResume";
+import { showAiRateLimitToast } from "@/app/user/aiAgents/showAiRateLimitToast";
 import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
 
 import styles from "./ResumePage.module.css";
@@ -301,7 +302,10 @@ export default function ResumePage() {
 
             const data = await res.json();
 
-            if (!res.ok) throw new Error(data?.error ?? "Resume generation failed");
+            if (!res.ok) {
+                if (showAiRateLimitToast(res, data, toast)) return;
+                throw new Error(data?.error ?? "Resume generation failed");
+            }
 
             setResumeUrl(data.url);
             toast.success("Success", "Resume generated successfully.");

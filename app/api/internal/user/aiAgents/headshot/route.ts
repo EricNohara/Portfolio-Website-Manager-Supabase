@@ -3,6 +3,15 @@ import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { isAccountActive } from "@/utils/accountDeletion/status";
+import { AgentAwsConfigurationError } from "@/utils/aiAgents/awsConfig";
+import { invokeAiAgent } from "@/utils/aiAgents/client";
+import { AiAgentOperation } from "@/utils/aiAgents/operations";
+import {
+  AiRateLimitServiceError,
+  consumeAiRateLimit,
+} from "@/utils/aiAgents/rateLimit";
+import { createAiRateLimitResponse } from "@/utils/aiAgents/rateLimitResponse";
+import { getAiRequestId } from "@/utils/aiAgents/requestId";
 import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
 import {
   AiGenerationCharge,
@@ -244,6 +253,18 @@ export async function POST(req: NextRequest) {
 
     const isPremium = (await getUserSubscriptionTier(user.id)) === "premium";
 
+    const operation: AiAgentOperation = "headshot_generate";
+    const requestId = getAiRequestId(req);
+    const rateLimit = await consumeAiRateLimit({
+      operation,
+      requestId,
+      userId: user.id,
+    });
+
+    if (!rateLimit.allowed) {
+      return createAiRateLimitResponse(operation, rateLimit);
+    }
+
     charge = await chargeAiGeneration(
       req,
       user.id,
@@ -331,10 +352,13 @@ export async function POST(req: NextRequest) {
       layout: layoutRaw,
     };
 
-    const agentRes = await fetch(`${AGENT_BASE}/generate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(agentPayload),
+    const agentRes = await invokeAiAgent({
+      baseUrl: AGENT_BASE,
+      path: "generate",
+      body: agentPayload,
+      operation,
+      requestId,
+      userId: user.id,
     });
 
     const data = await agentRes.json().catch(() => null);
@@ -420,6 +444,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (
+      error instanceof AiRateLimitServiceError ||
+      error instanceof AgentAwsConfigurationError
+    ) {
+      console.error("AI agent security configuration error:", error);
+      return NextResponse.json(
+        { error: "AI generation is temporarily unavailable." },
+        { status: 503 },
+      );
+    }
+
     console.error(error);
 
     return NextResponse.json(
@@ -458,6 +493,18 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    const operation: AiAgentOperation = "headshot_revise";
+    const requestId = getAiRequestId(req);
+    const rateLimit = await consumeAiRateLimit({
+      operation,
+      requestId,
+      userId: user.id,
+    });
+
+    if (!rateLimit.allowed) {
+      return createAiRateLimitResponse(operation, rateLimit);
+    }
+
     charge = await chargeAiGeneration(
       req,
       user.id,
@@ -470,10 +517,13 @@ export async function PUT(req: NextRequest) {
       userId: user.id,
     };
 
-    const agentRes = await fetch(`${AGENT_BASE}/revise`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(agentPayload),
+    const agentRes = await invokeAiAgent({
+      baseUrl: AGENT_BASE,
+      path: "revise",
+      body: agentPayload,
+      operation,
+      requestId,
+      userId: user.id,
     });
 
     const data = await agentRes.json().catch(() => null);
@@ -543,6 +593,17 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json(
         { error: error.message },
         { status: error.status },
+      );
+    }
+
+    if (
+      error instanceof AiRateLimitServiceError ||
+      error instanceof AgentAwsConfigurationError
+    ) {
+      console.error("AI agent security configuration error:", error);
+      return NextResponse.json(
+        { error: "AI generation is temporarily unavailable." },
+        { status: 503 },
       );
     }
 
