@@ -1,27 +1,135 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import {
+  consumeSignupRateLimit,
+  getSignupDevice,
+  getSignupDeviceCookieName,
+  SignupRateLimitServiceError,
+} from "@/utils/auth/signupRateLimit";
 import { createClient } from "@/utils/supabase/server";
+
+function withSignupDeviceCookie(response: NextResponse, device: {
+  value: string;
+  isNew: boolean;
+}): NextResponse {
+  if (device.isNew) {
+    response.cookies.set({
+      name: getSignupDeviceCookieName(),
+      value: device.value,
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 365 * 24 * 60 * 60,
+    });
+  }
+  return response;
+}
+
+function signupProviderErrorResponse(error: { message?: string; code?: string; status?: number }, device: {
+  value: string;
+  isNew: boolean;
+}): NextResponse {
+  const message = error.message?.toLowerCase() ?? "";
+  if (message.includes("captcha") || message.includes("bot")) {
+    return withSignupDeviceCookie(
+      NextResponse.json(
+        {
+          code: "CAPTCHA_FAILED",
+          message: "CAPTCHA verification failed. Complete it again and retry.",
+        },
+        { status: 400 },
+      ),
+      device,
+    );
+  }
+
+  if (error.code === "user_already_exists" || message.includes("already registered")) {
+    return withSignupDeviceCookie(
+      NextResponse.json(
+        {
+          code: "EMAIL_ALREADY_REGISTERED",
+          message: "An account with this email already exists. Try signing in instead.",
+        },
+        { status: 400 },
+      ),
+      device,
+    );
+  }
+
+  return withSignupDeviceCookie(
+    NextResponse.json(
+      {
+        code: "SIGNUP_REJECTED",
+        message: "Unable to create this account. Check your details and try again.",
+      },
+      { status: error.status && error.status >= 400 ? error.status : 400 },
+    ),
+    device,
+  );
+}
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const supabase = await createClient();
 
-    const { email, password }: { email: string; password: string } =
-      await req.json();
+    const body: unknown = await req.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ message: "Invalid signup request" }, { status: 400 });
+    }
+    const { email, password, captchaToken } = body as {
+      email?: unknown;
+      password?: unknown;
+      captchaToken?: unknown;
+    };
 
-    if (!email || !password) {
+    if (typeof email !== "string" || typeof password !== "string" || !email || !password) {
       return NextResponse.json(
         { message: "Email or password missing" },
         { status: 400 },
       );
     }
 
+    const device = getSignupDevice(req);
+    const signupLimit = await consumeSignupRateLimit({ request: req, device });
+    if (!signupLimit.allowed) {
+      return withSignupDeviceCookie(
+        NextResponse.json(
+          {
+            code: "SIGNUP_RATE_LIMIT_EXCEEDED",
+            message: "Too many signup attempts. Please try again later.",
+          },
+          {
+            status: 429,
+            headers: { "Retry-After": String(signupLimit.retryAfterSeconds) },
+          },
+        ),
+        device,
+      );
+    }
+
+    if (typeof captchaToken !== "string" || !captchaToken.trim()) {
+      return withSignupDeviceCookie(
+        NextResponse.json(
+          {
+            code: "CAPTCHA_REQUIRED",
+            message: "Complete the CAPTCHA challenge before signing up.",
+          },
+          { status: 400 },
+        ),
+        device,
+      );
+    }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: { captchaToken },
     });
 
-    if (error) throw error;
+    if (error) {
+      return signupProviderErrorResponse(error, device);
+    }
 
     // update the created_by_oauth field to false
     if (data.user) {
@@ -35,11 +143,24 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       }
     }
 
-    return NextResponse.json(
-      { message: "Sign up successful" },
-      { status: 201 },
+    return withSignupDeviceCookie(
+      NextResponse.json(
+        {
+          message: "Sign up successful. Check your email to confirm your account before signing in.",
+          requiresEmailConfirmation: true,
+        },
+        { status: 201 },
+      ),
+      device,
     );
   } catch (err) {
+    if (err instanceof SignupRateLimitServiceError) {
+      console.error("Signup abuse protection unavailable:", err);
+      return NextResponse.json(
+        { message: "Sign up is temporarily unavailable. Please try again later." },
+        { status: 503 },
+      );
+    }
     const error = err as Error;
     console.error(error.message);
     return NextResponse.json(

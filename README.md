@@ -50,6 +50,29 @@ The free tier of Supabase automatically freezes a project after a period of inac
 
 No known issues.
 
+## AI abuse-protection configuration
+
+Configure the following environment variables in each Vercel environment. Do
+not commit secret values.
+
+```text
+# Public Cloudflare Turnstile site key. Its matching secret remains in Supabase.
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+
+# Server-only random secret used to HMAC signup IP/device identifiers before
+# DynamoDB storage. Use a unique value for this purpose.
+SIGNUP_ABUSE_HMAC_SECRET=
+
+# Global daily AI-provider reservation ceiling, in USD.
+# Development: 5
+# Production: 20
+AI_AGENT_GLOBAL_DAILY_BUDGET_USD=
+```
+
+The existing `AI_AGENT_RATE_LIMIT_*` and `AI_AGENT_AWS_*` variables must remain
+configured. The daily budget is evaluated in UTC and reservations use the
+existing DynamoDB rate-limit table.
+
 ## Next Steps
 
 - Add fixes to AUDIT.md

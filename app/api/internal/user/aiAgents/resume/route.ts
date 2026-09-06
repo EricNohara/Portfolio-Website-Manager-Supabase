@@ -5,6 +5,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { IUserInfoInternal } from "@/app/interfaces/IUserInfoInternal";
 import { AgentAwsConfigurationError } from "@/utils/aiAgents/awsConfig";
 import { invokeAiAgent } from "@/utils/aiAgents/client";
+import {
+  GlobalAiBudgetServiceError,
+  logGlobalAiBudgetUsage,
+  reserveGlobalAiBudget,
+} from "@/utils/aiAgents/globalBudget";
 import { AiAgentOperation } from "@/utils/aiAgents/operations";
 import {
   AiRateLimitServiceError,
@@ -24,6 +29,7 @@ import { InsufficientAiCreditsError } from "@/utils/aiCredits/service";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { getUserSubscriptionTier } from "@/utils/auth/getUserSubscriptionTier";
 import { requireTier } from "@/utils/auth/requireTier";
+import { requireVerifiedEmailForAi } from "@/utils/auth/requireVerifiedEmail";
 import { createAdminClient } from "@/utils/supabase/server";
 
 export const runtime = "nodejs";
@@ -347,6 +353,8 @@ export async function GET(_req: NextRequest) {
 export async function POST(req: NextRequest) {
   const { user, supabase, response } = await getAuthenticatedUser();
   if (!user) return response;
+  const emailGate = requireVerifiedEmailForAi(user);
+  if (emailGate) return emailGate;
 
   let charge: AiGenerationCharge | null = null;
 
@@ -459,6 +467,18 @@ export async function POST(req: NextRequest) {
       return createAiRateLimitResponse(operation, rateLimit);
     }
 
+    const budget = await reserveGlobalAiBudget({ operation });
+    logGlobalAiBudgetUsage(budget, operation);
+    if (!budget.allowed) {
+      return NextResponse.json(
+        {
+          code: "AI_GLOBAL_DAILY_BUDGET_EXCEEDED",
+          error: "AI generation is temporarily unavailable.",
+        },
+        { status: 503 },
+      );
+    }
+
     charge = await chargeAiGeneration(
       req,
       user.id,
@@ -538,6 +558,7 @@ export async function POST(req: NextRequest) {
 
     if (
       error instanceof AiRateLimitServiceError ||
+      error instanceof GlobalAiBudgetServiceError ||
       error instanceof AgentAwsConfigurationError
     ) {
       console.error("AI agent security configuration error:", error);

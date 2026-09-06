@@ -5,6 +5,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAccountActive } from "@/utils/accountDeletion/status";
 import { AgentAwsConfigurationError } from "@/utils/aiAgents/awsConfig";
 import { invokeAiAgent } from "@/utils/aiAgents/client";
+import {
+  GlobalAiBudgetServiceError,
+  logGlobalAiBudgetUsage,
+  reserveGlobalAiBudget,
+} from "@/utils/aiAgents/globalBudget";
 import { AiAgentOperation } from "@/utils/aiAgents/operations";
 import {
   AiRateLimitServiceError,
@@ -24,6 +29,7 @@ import { InsufficientAiCreditsError } from "@/utils/aiCredits/service";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { getUserSubscriptionTier } from "@/utils/auth/getUserSubscriptionTier";
 import { requireTier } from "@/utils/auth/requireTier";
+import { requireVerifiedEmailForAi } from "@/utils/auth/requireVerifiedEmail";
 import {
   createAdminClient,
   createClient,
@@ -265,6 +271,18 @@ export async function POST(req: NextRequest) {
       return createAiRateLimitResponse(operation, rateLimit);
     }
 
+    const budget = await reserveGlobalAiBudget({ operation });
+    logGlobalAiBudgetUsage(budget, operation);
+    if (!budget.allowed) {
+      return NextResponse.json(
+        {
+          code: "AI_GLOBAL_DAILY_BUDGET_EXCEEDED",
+          error: "AI generation is temporarily unavailable.",
+        },
+        { status: 503 },
+      );
+    }
+
     charge = await chargeAiGeneration(
       req,
       user.id,
@@ -446,6 +464,7 @@ export async function POST(req: NextRequest) {
 
     if (
       error instanceof AiRateLimitServiceError ||
+      error instanceof GlobalAiBudgetServiceError ||
       error instanceof AgentAwsConfigurationError
     ) {
       console.error("AI agent security configuration error:", error);
@@ -467,6 +486,8 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   const { user, response } = await getAuthenticatedUser();
   if (!user) return response;
+  const emailGate = requireVerifiedEmailForAi(user);
+  if (emailGate) return emailGate;
 
   const gate = await requireTier(user.id, "premium");
   if (!gate.ok) return gate.response;
@@ -503,6 +524,18 @@ export async function PUT(req: NextRequest) {
 
     if (!rateLimit.allowed) {
       return createAiRateLimitResponse(operation, rateLimit);
+    }
+
+    const budget = await reserveGlobalAiBudget({ operation });
+    logGlobalAiBudgetUsage(budget, operation);
+    if (!budget.allowed) {
+      return NextResponse.json(
+        {
+          code: "AI_GLOBAL_DAILY_BUDGET_EXCEEDED",
+          error: "AI generation is temporarily unavailable.",
+        },
+        { status: 503 },
+      );
     }
 
     charge = await chargeAiGeneration(
@@ -598,6 +631,7 @@ export async function PUT(req: NextRequest) {
 
     if (
       error instanceof AiRateLimitServiceError ||
+      error instanceof GlobalAiBudgetServiceError ||
       error instanceof AgentAwsConfigurationError
     ) {
       console.error("AI agent security configuration error:", error);
