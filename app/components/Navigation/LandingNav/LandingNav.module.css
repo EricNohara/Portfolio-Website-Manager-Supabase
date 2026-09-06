@@ -12,19 +12,65 @@
   gap: 4rem;
 }
 
-.landingLinks > li > a {
+.landingLinks > li > a,
+.landingLinks > li > button {
+  position: relative;
+  display: inline-flex;
+  padding: 0;
+  border: none;
+  background: none;
   text-decoration: none;
+  font: inherit;
   font-size: 1.1rem;
+  line-height: inherit;
   color: white;
-  transition: 0.2s ease;
+  transition: color 0.2s ease;
+  cursor: pointer;
 }
 
-.landingLinks > li > a:hover {
+.landingLinks > li > a::after,
+.landingLinks > li > button::after {
+  position: absolute;
+  right: 0;
+  bottom: -0.45rem;
+  left: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8ee5c3, #378afb);
+  content: "";
+  opacity: 0;
+  transform: translateY(4px) scaleX(0.08) scaleY(0.7);
+  transform-origin: center;
+  transition:
+    transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 140ms ease;
+}
+
+.landingLinks > li > a:hover,
+.landingLinks > li > button:hover,
+.landingLinks > li > a:focus-visible,
+.landingLinks > li > button:focus-visible {
   color: var(--home-txt-3);
+}
+
+.landingLinks > li > a:hover::after,
+.landingLinks > li > button:hover::after,
+.landingLinks > li > a:focus-visible::after,
+.landingLinks > li > button:focus-visible::after {
+  opacity: 1;
+  transform: translateY(0) scaleX(1) scaleY(1);
 }
 
 .buttonsContainer {
   display: flex;
   align-items: center;
   gap: 2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landingLinks > li > a::after,
+  .landingLinks > li > button::after {
+    transform: none;
+    transition: opacity 140ms ease;
+  }
 }

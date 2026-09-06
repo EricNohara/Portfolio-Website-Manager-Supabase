@@ -2,7 +2,11 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
 
-const SUPABASE_URL = "https://jfsetifsqcpkwdtcrhdt.supabase.co";
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ??
+  "https://jfsetifsqcpkwdtcrhdt.supabase.co";
+
+const supabaseHostname = new URL(supabaseUrl).hostname;
 
 const nextConfig: NextConfig = {
   images: {
@@ -10,7 +14,7 @@ const nextConfig: NextConfig = {
       // Supabase storage
       {
         protocol: "https",
-        hostname: "jfsetifsqcpkwdtcrhdt.supabase.co",
+        hostname: supabaseHostname,
         pathname: "/**",
       },
 
@@ -69,15 +73,16 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ""} https://vercel.analytics.edge.com https://cdn.vercel-insights.com https://vercel.live https://va.vercel-scripts.com;
+  script-src 'self' 'unsafe-inline' ${
+    isDev ? "'unsafe-eval'" : ""
+  } https://vercel.analytics.edge.com https://cdn.vercel-insights.com https://vercel.live https://va.vercel-scripts.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' data: https: blob:;
   connect-src 
     'self'
     https://vercel.analytics.edge.com
     https://api.vercel.com
-    https://m2uyqee3yri2agbs2vqroykaw40lcmud.lambda-url.us-east-2.on.aws
-    ${SUPABASE_URL}
+    ${supabaseUrl}
     https://graph.microsoft.com
     https://accounts.google.com
     https://oauth2.googleapis.com
@@ -94,7 +99,7 @@ const nextConfig: NextConfig = {
     'self'
     blob:
     https://vercel.live
-    https://jfsetifsqcpkwdtcrhdt.supabase.co
+    ${supabaseUrl}
     https://accounts.google.com
     https://login.microsoftonline.com
     https://github.com

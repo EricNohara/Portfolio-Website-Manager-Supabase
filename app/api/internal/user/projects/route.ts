@@ -3,6 +3,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { IProjectInput } from "@/app/interfaces/IProject";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
 import { refreshCachedUserInfo } from "@/utils/cachedUserInfo/refreshCachedUserInfo";
+import parseURL, {
+  isStorageObjectOwnedByUser,
+} from "@/utils/general/parseURL";
+import { createAdminClient } from "@/utils/supabase/server";
+
+function isOwnedProjectThumbnail(url: string, userID: string): boolean {
+  const storageObject = parseURL(url);
+
+  return Boolean(
+    storageObject &&
+      storageObject.parsedBucket === "project_thumbnails" &&
+      isStorageObjectOwnedByUser(storageObject.parsedFilename, userID),
+  );
+}
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
@@ -81,6 +95,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ message: "Invalid input" }, { status: 400 });
     }
 
+    if (
+      sentProject.thumbnail_url &&
+      !isOwnedProjectThumbnail(sentProject.thumbnail_url, user.id)
+    ) {
+      return NextResponse.json(
+        { message: "Invalid project thumbnail" },
+        { status: 400 },
+      );
+    }
+
     const projectData = {
       ...sentProject,
       user_id: user.id,
@@ -121,13 +145,41 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ message: "Invalid input" }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const { data: project, error: projectError } = await supabase
+      .from("projects")
+      .select("id, thumbnail_url")
+      .eq("id", projectID)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (projectError) throw projectError;
+    if (!project) {
+      return NextResponse.json({ message: "Project not found" }, { status: 404 });
+    }
+
+    if (project.thumbnail_url) {
+      if (isOwnedProjectThumbnail(project.thumbnail_url, user.id)) {
+        const storageObject = parseURL(project.thumbnail_url)!;
+        const admin = createAdminClient();
+        const { error: removeError } = await admin.storage
+          .from(storageObject.parsedBucket)
+          .remove([storageObject.parsedFilename]);
+
+        if (removeError) throw removeError;
+      } else {
+        // Never follow a malformed or foreign DB reference with service-role
+        // credentials. The project can still be deleted safely.
+        console.warn("Skipped unowned project thumbnail during project delete");
+      }
+    }
+
+    const { error: deleteError } = await supabase
       .from("projects")
       .delete()
       .eq("id", projectID)
       .eq("user_id", user.id);
 
-    if (error) throw error;
+    if (deleteError) throw deleteError;
 
     // update the user info cache
     await refreshCachedUserInfo(supabase, user.id);
@@ -165,6 +217,28 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ message: "Invalid input" }, { status: 400 });
     }
 
+    if (
+      updatedProject.thumbnail_url &&
+      !isOwnedProjectThumbnail(updatedProject.thumbnail_url, user.id)
+    ) {
+      return NextResponse.json(
+        { message: "Invalid project thumbnail" },
+        { status: 400 },
+      );
+    }
+
+    const { data: existingProject, error: existingProjectError } = await supabase
+      .from("projects")
+      .select("id, thumbnail_url")
+      .eq("id", prevProjectID)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (existingProjectError) throw existingProjectError;
+    if (!existingProject) {
+      return NextResponse.json({ message: "Project not found" }, { status: 404 });
+    }
+
     const projectData = {
       ...updatedProject,
       user_id: user.id,
@@ -177,6 +251,24 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
       .eq("user_id", user.id);
 
     if (error) throw error;
+
+    if (
+      existingProject.thumbnail_url &&
+      existingProject.thumbnail_url !== updatedProject.thumbnail_url &&
+      isOwnedProjectThumbnail(existingProject.thumbnail_url, user.id)
+    ) {
+      const storageObject = parseURL(existingProject.thumbnail_url)!;
+      const admin = createAdminClient();
+      const { error: removeError } = await admin.storage
+        .from(storageObject.parsedBucket)
+        .remove([storageObject.parsedFilename]);
+
+      if (removeError) {
+        console.error(
+          `Failed to remove replaced project thumbnail: ${removeError.message}`,
+        );
+      }
+    }
 
     // update the user info cache
     await refreshCachedUserInfo(supabase, user.id);

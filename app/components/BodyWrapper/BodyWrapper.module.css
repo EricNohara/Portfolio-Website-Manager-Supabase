@@ -15,8 +15,3 @@
   height: 100vh;
   width: 100vw;
 }
-
-.policy {
-  flex-direction: row;
-  background-color: var(--page-bg);
-}

@@ -1,0 +1,64 @@
+.icon {
+  display: block;
+  flex: none;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.letter {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.node {
+  transform-box: view-box;
+  transform-origin: center;
+  color: #56aae7;
+  animation: nodeOrbit 7.5s linear infinite;
+}
+
+@keyframes nodeOrbit {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    color: #56aae7;
+  }
+
+  3.72% {
+    transform: translate(8.463%, 6.317%);
+    color: #4da1ed;
+  }
+
+  19.5% {
+    transform: translate(8.463%, 51.102%);
+    color: #398cfa;
+  }
+
+  36.6% {
+    transform: translate(-33.226%, 76.009%);
+    color: #4ea2ec;
+  }
+
+  53.71% {
+    transform: translate(-74.914%, 51.102%);
+    color: #78ced1;
+  }
+
+  69.48% {
+    transform: translate(-74.914%, 6.317%);
+    color: #8ce3c4;
+  }
+
+  86.59% {
+    transform: translate(-33.226%, -18.59%);
+    color: #77cdd2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .letter,
+  .node {
+    animation: none;
+  }
+}

@@ -1,8 +1,18 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 
+import { isAccountDeletionPending } from "@/utils/accountDeletion/status";
+import { SUBSCRIPTION_CREDIT_ALLOCATIONS } from "@/utils/aiCredits/config";
+import {
+  expireSubscriptionCredits,
+  replaceSubscriptionCredits,
+} from "@/utils/aiCredits/service";
 import { stripe } from "@/utils/stripe/stripe";
-import { createServiceRoleClient } from "@/utils/supabase/server";
+import {
+  getSubscriptionPlanForPriceId,
+  isPaidSubscriptionStatus,
+} from "@/utils/subscriptions/config";
+import { createAdminClient } from "@/utils/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -10,8 +20,71 @@ function toIso(unix: number | null | undefined) {
   return unix ? new Date(unix * 1000).toISOString() : null;
 }
 
-async function getUserIdForCustomer(customerId: string) {
-  const admin = createServiceRoleClient();
+function getStripeId(value: unknown): string | null {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object" && "id" in value) {
+    const id = (value as { id?: unknown }).id;
+    return typeof id === "string" ? id : null;
+  }
+  return null;
+}
+
+function getInvoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+  const invoiceData = invoice as unknown as {
+    subscription?: unknown;
+    parent?: {
+      subscription_details?: { subscription?: unknown } | null;
+    } | null;
+  };
+
+  return (
+    getStripeId(invoiceData.subscription) ??
+    getStripeId(invoiceData.parent?.subscription_details?.subscription)
+  );
+}
+
+function getSubscriptionPeriodEnd(subscription: Stripe.Subscription) {
+  const subscriptionData = subscription as unknown as {
+    current_period_end?: number | null;
+  };
+  return subscriptionData.current_period_end ?? null;
+}
+
+function getInvoicePriceId(invoice: Stripe.Invoice): string | null {
+  const getPriceId = (line: Stripe.InvoiceLineItem) => {
+    const lineData = line as unknown as {
+      price?: unknown;
+      pricing?: { price_details?: { price?: unknown } | null } | null;
+    };
+    return (
+      getStripeId(lineData.price) ??
+      getStripeId(lineData.pricing?.price_details?.price)
+    );
+  };
+
+  // Upgrade invoices can include a negative line for the old plan and a
+  // positive line for the new plan. Prefer the charged plan, then fall back to
+  // any configured subscription line for zero-dollar/trial invoices.
+  for (const line of invoice.lines.data.filter((item) => item.amount > 0)) {
+    const priceId = getPriceId(line);
+    if (priceId) return priceId;
+  }
+
+  for (const line of invoice.lines.data) {
+    const priceId = getPriceId(line);
+    if (priceId) return priceId;
+  }
+
+  return null;
+}
+
+type CustomerOwner = {
+  userId: string | null;
+  customerDeleted: boolean;
+};
+
+async function getCustomerOwner(customerId: string): Promise<CustomerOwner> {
+  const admin = createAdminClient();
 
   const { data, error } = await admin
     .from("subscriptions")
@@ -19,17 +92,62 @@ async function getUserIdForCustomer(customerId: string) {
     .eq("stripe_customer_id", customerId)
     .maybeSingle();
 
-  if (!error && data?.user_id) return data.user_id;
+  if (error) throw error;
+  if (data?.user_id) {
+    return { userId: data.user_id, customerDeleted: false };
+  }
 
-  const customer = (await stripe.customers.retrieve(
-    customerId,
-  )) as Stripe.Customer;
+  const customer = await stripe.customers.retrieve(customerId);
+  if (customer.deleted) {
+    return { userId: null, customerDeleted: true };
+  }
+
   const userId =
     typeof customer.metadata?.user_id === "string"
       ? customer.metadata.user_id
       : null;
 
-  return userId;
+  return { userId, customerDeleted: false };
+}
+
+async function grantCreditsForPaidInvoice(invoice: Stripe.Invoice) {
+  const subscriptionId = getInvoiceSubscriptionId(invoice);
+  if (!subscriptionId) return;
+
+  const customerId = getStripeId(invoice.customer);
+  if (!customerId) throw new Error(`Invoice ${invoice.id} has no customer`);
+
+  const { userId, customerDeleted } = await getCustomerOwner(customerId);
+  if (customerDeleted) return;
+  if (!userId) throw new Error(`No user found for Stripe customer ${customerId}`);
+  if (await isAccountDeletionPending(userId)) return;
+
+  const priceId = getInvoicePriceId(invoice);
+  const plan = getSubscriptionPlanForPriceId(priceId);
+  if (!plan) {
+    throw new Error(`No AI credit allocation configured for Stripe price ${priceId}`);
+  }
+
+  const allocation = SUBSCRIPTION_CREDIT_ALLOCATIONS[plan.tier][plan.interval];
+  await replaceSubscriptionCredits(
+    userId,
+    allocation,
+    `stripe_invoice_${invoice.id}`,
+  );
+}
+
+async function expireCreditsForFailedRenewal(invoice: Stripe.Invoice) {
+  if (invoice.billing_reason !== "subscription_cycle") return;
+
+  const customerId = getStripeId(invoice.customer);
+  if (!customerId) return;
+
+  const { userId, customerDeleted } = await getCustomerOwner(customerId);
+  if (customerDeleted) return;
+  if (!userId) throw new Error(`No user found for Stripe customer ${customerId}`);
+  if (await isAccountDeletionPending(userId)) return;
+
+  await expireSubscriptionCredits(userId, `stripe_invoice_${invoice.id}`);
 }
 
 export async function POST(req: Request) {
@@ -44,7 +162,7 @@ export async function POST(req: Request) {
     event = stripe.webhooks.constructEvent(
       rawBody,
       sig,
-      process.env.STRIPE_WEBHOOK_SECRET!,
+      process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err) {
     const error = err as Error;
@@ -54,7 +172,7 @@ export async function POST(req: Request) {
     });
   }
 
-  const admin = createServiceRoleClient();
+  const admin = createAdminClient();
 
   try {
     switch (event.type) {
@@ -66,23 +184,41 @@ export async function POST(req: Request) {
         const customerId =
           typeof sub.customer === "string" ? sub.customer : sub.customer.id;
 
-        const userId = await getUserIdForCustomer(customerId);
+        const { userId, customerDeleted } = await getCustomerOwner(customerId);
+        if (customerDeleted) break;
         if (!userId) {
           console.warn(
             "No userId for customer:",
             customerId,
             "event:",
-            event.type,
+            event.type
           );
           return new NextResponse("ok", { status: 200 });
+        }
+        if (await isAccountDeletionPending(userId)) break;
+
+        if (event.type === "customer.subscription.deleted") {
+          const { data: currentSubscription, error: currentSubscriptionError } =
+            await admin
+              .from("subscriptions")
+              .select("stripe_subscription_id, status")
+              .eq("user_id", userId)
+              .maybeSingle();
+
+          if (currentSubscriptionError) throw currentSubscriptionError;
+          if (
+            currentSubscription?.stripe_subscription_id &&
+            currentSubscription.stripe_subscription_id !== sub.id &&
+            isPaidSubscriptionStatus(currentSubscription.status)
+          ) {
+            break;
+          }
         }
 
         const item = sub.items?.data?.[0] ?? null;
         const priceId = item?.price?.id ?? null;
 
-        // IMPORTANT: period end should come from the subscription object (webhook payload)
-        // eslint-disable-next-line
-        const currentPeriodEndUnix = (sub as any).current_period_end ?? null;
+        const currentPeriodEndUnix = getSubscriptionPeriodEnd(sub);
 
         const payload = {
           user_id: userId,
@@ -100,6 +236,13 @@ export async function POST(req: Request) {
           .upsert(payload, { onConflict: "user_id" });
 
         if (upsertErr) throw upsertErr;
+
+        if (event.type === "customer.subscription.deleted") {
+          await expireSubscriptionCredits(
+            userId,
+            `stripe_subscription_${sub.id}_ended_${currentPeriodEndUnix ?? event.id}`,
+          );
+        }
         break;
       }
 
@@ -114,17 +257,34 @@ export async function POST(req: Request) {
         const userId = session.client_reference_id;
 
         if (customerId && userId) {
+          const { data: authUser, error: authUserError } =
+            await admin.auth.admin.getUserById(userId);
+          if (authUserError && authUserError.status !== 404) throw authUserError;
+          if (!authUser.user || await isAccountDeletionPending(userId)) break;
+
           const { error } = await admin.from("subscriptions").upsert(
             {
               user_id: userId,
               stripe_customer_id: customerId,
               updated_at: new Date().toISOString(),
             },
-            { onConflict: "user_id" },
+            { onConflict: "user_id" }
           );
 
           if (error) throw error;
         }
+        break;
+      }
+
+      case "invoice.paid": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await grantCreditsForPaidInvoice(invoice);
+        break;
+      }
+
+      case "invoice.payment_failed": {
+        const invoice = event.data.object as Stripe.Invoice;
+        await expireCreditsForFailedRenewal(invoice);
         break;
       }
 

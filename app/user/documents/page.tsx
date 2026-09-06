@@ -1,5 +1,6 @@
 "use client";
 
+import { File } from "lucide-react";
 import { useState } from "react";
 
 import FileDisplayBox from "@/app/components/FileDisplayBox/FileDisplayBox";
@@ -48,7 +49,10 @@ export default function DocumentsPage() {
     try {
       if (!url || !docType) throw new Error("Invalid url or doc type");
 
-      const res = await fetch(`/api/internal/storage?publicURL=${url}`, { method: "DELETE" });
+      const res = await fetch(
+        `/api/internal/storage?publicURL=${encodeURIComponent(url)}`,
+        { method: "DELETE" },
+      );
 
       if (res.status !== 204) {
         const data = await res.json();
@@ -127,7 +131,7 @@ export default function DocumentsPage() {
 
   return (
     <PageContentWrapper>
-      <PageContentHeader title="Documents" buttonOne={shouldRenderButton() ? buttonOne : undefined} />
+      <PageContentHeader title="Documents" buttonOne={shouldRenderButton() ? buttonOne : undefined} icon={File} />
       <div className={styles.fileUploadBoxContainer}>
         {
           state.portrait_url && !isEditing.portrait_url ?

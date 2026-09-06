@@ -6,14 +6,7 @@ import styles from "./BodyWrapper.module.css";
 
 export default function BodyWrapper({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
-    const isLandingOrDoc = pathname === "/"
-        || pathname === "/documentation/product"
-        || pathname === "/documentation/contact"
-        || pathname === "/documentation/doc"
-        || pathname === "/documentation/pricing";
-    const isPolicy = pathname === "/policy/privacy" || pathname === "/policy/tos";
-
-    const wrapperClass = isLandingOrDoc ? styles.landing : isPolicy ? styles.policy : styles.app;
+    const wrapperClass = pathname === "/" ? styles.landing : styles.app;
 
     return (
         <div className={wrapperClass}>

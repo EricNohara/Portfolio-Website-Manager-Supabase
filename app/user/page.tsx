@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, CircleArrowUp, Zap, CircleCheck, Info } from "lucide-react";
+import { Clock, CircleArrowUp, Zap, CircleCheck, Info, RefreshCcw, Home } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -83,6 +83,7 @@ export default function UserHomePage() {
   const refreshButton: IButton = {
     name: "Refresh",
     onClick: () => window.location.reload(),
+    icon: RefreshCcw
   };
 
   const toggleInfo = (key: Exclude<InfoKey, null>) => {
@@ -91,7 +92,7 @@ export default function UserHomePage() {
 
   return (
     <PageContentWrapper>
-      <PageContentHeader title="Home Dashboard" buttonOne={refreshButton} />
+      <PageContentHeader title="Home Dashboard" buttonOne={refreshButton} icon={Home} />
 
       <div className={styles.grid}>
         <div className={styles.recentActivity}>

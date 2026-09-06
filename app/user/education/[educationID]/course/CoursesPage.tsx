@@ -1,5 +1,6 @@
 "use client";
 
+import { GraduationCap } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -234,7 +235,12 @@ export default function CoursesPage({ educationID }: { educationID: string }) {
 
     return (
         <PageContentWrapper>
-            <PageContentHeader title={education ? `${education.institution} Courses` : "Courses"} buttonOne={buttonOne} buttonFour={buttonFour} />
+            <PageContentHeader
+                title={education ? `${education.institution} Courses` : "Courses"}
+                buttonOne={buttonOne}
+                buttonFour={buttonFour}
+                icon={GraduationCap}
+            />
             <Table
                 columns={columns}
                 rows={rows}

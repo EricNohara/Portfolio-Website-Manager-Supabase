@@ -2,7 +2,6 @@
   height: 100%;
   width: 100%;
   padding-left: 2rem;
-  padding-right: 2rem;
 }
 
 .formHeader {
@@ -27,9 +26,88 @@
 
 /* Plans */
 .plans {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   width: 100%;
-  gap: 2rem;
+  gap: 1rem;
   justify-content: center;
   padding-top: 2rem;
+}
+
+.noMargin {
+  margin-bottom: 0 !important;
+}
+
+.intervalDropdown {
+  width: 15rem !important;
+}
+
+.creditCard {
+  grid-column: 1 / -1;
+
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  padding: 1.5rem 2rem;
+  background-color: var(--page-box-bg);
+
+  border: 1px solid var(--page-box-border);
+  border-radius: 0.75rem;
+}
+
+.creditIcon {
+  flex-shrink: 0;
+  color: var(--page-txt-1);
+}
+
+.creditContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  width: 100%;
+  color: var(--page-txt-1);
+}
+
+.creditContent b {
+  font-size: 1.25rem;
+}
+
+.creditContent p {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--page-txt-2);
+}
+
+@media (max-width: 1000px) {
+  .plans {
+    flex-direction: column;
+  }
+
+  .creditCard {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 700px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .formHeader,
+  .buttons {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .intervalDropdown {
+    width: 100% !important;
+  }
+
+  .creditContent {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }

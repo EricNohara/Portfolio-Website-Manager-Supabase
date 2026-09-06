@@ -23,6 +23,7 @@ interface TextInputProps {
     className?: string;
     outerClassname?: string;
     focusLabelColor?: string;
+    maxWords?: number;
 }
 
 type StyleWithFocusLabelVar = CSSProperties & {
@@ -43,6 +44,7 @@ export default function TextInput({
     className = "",
     outerClassname = "",
     focusLabelColor,
+    maxWords
 }: TextInputProps) {
     const [showPassword, setShowPassword] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -58,6 +60,9 @@ export default function TextInput({
     const focusStyle: StyleWithFocusLabelVar | undefined = focusLabelColor
         ? { "--focus-label-color": focusLabelColor }
         : undefined;
+
+    const wordCount = value.trim() === "" ? 0 : value.trim().split(/\s+/).length;
+    const isOverWordLimit = maxWords !== undefined && wordCount > maxWords;
 
     const openDatePicker = () => {
         if (!inputRef.current) return;
@@ -77,15 +82,38 @@ export default function TextInput({
         inputRef.current.click();
     };
 
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (maxWords === undefined) {
+            onChange(e);
+            return;
+        }
+
+        const nextValue = e.target.value;
+        const nextWordCount = nextValue.trim() === "" ? 0 : nextValue.trim().split(/\s+/).length;
+
+        if (nextWordCount <= maxWords) {
+            onChange(e);
+        }
+    };
+
     return (
         <div className={`${styles.inputDiv} ${outerClassname ? outerClassname : ""}`} style={focusStyle}>
-            <label
-                className={`${styles.inputLabel} ${isInInputForm && styles.inputFormInputLabel} ${headerFont.className}`}
-                htmlFor={name}
-            >
-                {label}
-                {required && <span className={styles.required}> *</span>}
-            </label>
+            <div className={styles.labelRow}>
+                <label
+                    className={`${styles.inputLabel} ${isInInputForm && styles.inputFormInputLabel} ${headerFont.className}`}
+                    htmlFor={name}
+                >
+                    {label}
+                    {required && <span className={styles.required}> *</span>}
+                </label>
+
+
+                {maxWords !== undefined && (
+                    <div className={`${styles.wordCount} ${isOverWordLimit ? styles.wordCountOver : ""}`}>
+                        {wordCount}/{maxWords}
+                    </div>
+                )}
+            </div>
 
             {type === "textarea" ? (
                 <textarea
@@ -93,7 +121,7 @@ export default function TextInput({
                     id={name}
                     name={name}
                     value={value}
-                    onChange={onChange}
+                    onChange={handleChange}
                     placeholder={placeholder}
                     required={required}
                     rows={textAreaRows}
@@ -107,7 +135,7 @@ export default function TextInput({
                         id={name}
                         name={name}
                         value={value}
-                        onChange={onChange}
+                        onChange={handleChange}
                         placeholder={placeholder}
                         type={actualType}
                         required={required}

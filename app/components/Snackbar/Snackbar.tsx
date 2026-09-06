@@ -1,6 +1,13 @@
 "use client";
 
-import { X, TriangleAlert, CircleAlert, CircleCheck, Info, LucideIcon } from "lucide-react";
+import {
+    X,
+    TriangleAlert,
+    CircleAlert,
+    CircleCheck,
+    Info,
+    LucideIcon,
+} from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 
 import styles from "./Snackbar.module.css";
@@ -23,6 +30,13 @@ type SnackbarProps = {
 
 const EXIT_MS = 200;
 
+const ICONS: Record<SnackbarVariant, LucideIcon> = {
+    success: CircleCheck,
+    error: TriangleAlert,
+    warning: CircleAlert,
+    info: Info,
+};
+
 export default function Snackbar({
     message,
     messageDescription = "",
@@ -34,6 +48,7 @@ export default function Snackbar({
 
     const startClose = useCallback(() => {
         if (isExiting) return;
+
         setIsExiting(true);
 
         window.setTimeout(() => {
@@ -44,22 +59,25 @@ export default function Snackbar({
     useEffect(() => {
         if (!duration) return;
 
-        const timer = window.setTimeout(() => {
-            startClose();
-        }, duration);
+        const timer = window.setTimeout(startClose, duration);
 
         return () => clearTimeout(timer);
     }, [duration, startClose]);
 
-    const Icon: LucideIcon =
-        variant === "error" ? TriangleAlert :
-            variant === "warning" ? CircleAlert :
-                variant === "success" ? CircleCheck :
-                    Info;
+    const Icon = ICONS[variant];
 
     return (
-        <div className={`${styles.snackbar} ${styles[variant]} ${styles.enter} ${isExiting ? styles.exit : ""}`}>
-            <Icon size={35} color="white" />
+        <div
+            className={`${styles.snackbar} ${styles[variant]} ${isExiting ? styles.exit : styles.enter
+                }`}
+            role="status"
+            aria-live="polite"
+        >
+            <div className={styles.accent} />
+
+            <div className={styles.iconContainer}>
+                <Icon size={30} />
+            </div>
 
             <div className={styles.messageContainer}>
                 <h3>{message}</h3>
@@ -71,8 +89,9 @@ export default function Snackbar({
                     className={styles.close}
                     onClick={startClose}
                     aria-label="Close notification"
+                    type="button"
                 >
-                    <X size={25} />
+                    <X size={20} />
                 </button>
             )}
         </div>

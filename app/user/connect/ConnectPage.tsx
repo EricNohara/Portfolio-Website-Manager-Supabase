@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCcw } from "lucide-react";
+import { Info, KeyRound, Plus, RefreshCcw } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 
@@ -12,6 +12,7 @@ import Table from "@/app/components/Table/Table";
 import { useToast } from "@/app/context/ToastProvider";
 import { useUser } from "@/app/context/UserProvider";
 import { IApiKeyInternal, IApiKeyInternalInput } from "@/app/interfaces/IApiKey";
+import { createDocumentationUrl } from "@/utils/navigation/documentation";
 
 import PageContentHeader, { IButton } from "../../components/PageContentHeader/PageContentHeader";
 
@@ -35,8 +36,16 @@ export default function ConnectPage() {
     const toast = useToast();
 
     const buttonFour: IButton = {
-        name: "API Docs",
-        onClick: () => { router.push("/documentation/doc"); }
+        name: "API Key Docs",
+        onClick: () => {
+            window.location.assign(
+                createDocumentationUrl(
+                    "apiKeys",
+                    window.location.href
+                )
+            );
+        },
+        icon: Info
     };
 
     // used to open given key if inputted as search param
@@ -171,7 +180,7 @@ export default function ConnectPage() {
     };
 
     const buttonOne: IButton = {
-        name: "Generate API Key",
+        name: "New API Key",
         onClick: () => {
             setFormValues({
                 description: "",
@@ -179,7 +188,8 @@ export default function ConnectPage() {
             });
             setApiKeyToRefresh(null);
             setIsFormOpen(true);
-        }
+        },
+        icon: Plus
     };
 
     const rows = apiKeys.map((key) => ({
@@ -224,7 +234,7 @@ export default function ConnectPage() {
 
     return (
         <PageContentWrapper>
-            <PageContentHeader title="API Keys" buttonOne={buttonOne} buttonFour={buttonFour} />
+            <PageContentHeader title="API Keys" buttonOne={buttonOne} buttonFour={buttonFour} icon={KeyRound} />
             <Table
                 columns={columns}
                 rows={rows}

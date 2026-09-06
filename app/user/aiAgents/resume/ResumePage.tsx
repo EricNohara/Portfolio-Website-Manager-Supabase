@@ -1,0 +1,532 @@
+"use client";
+
+import { Bot, MoveLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+
+import LoadingSpinner from "@/app/components/AsyncButtonWrapper/LoadingSpinner/LoadingSpinner";
+import LoadingMessageSpinner from "@/app/components/LoadingMessageSpinner/LoadingMessageSpinner";
+import PageContentHeader, {
+    IButton,
+} from "@/app/components/PageContentHeader/PageContentHeader";
+import PageContentWrapper from "@/app/components/PageContentWrapper/PageContentWrapper";
+import SelectDropdown from "@/app/components/SelectDropdown/SelectDropdown";
+import { hasTier, useTier } from "@/app/context/TierProvider";
+import { useToast } from "@/app/context/ToastProvider";
+import { useUser } from "@/app/context/UserProvider";
+import { ICachedResume } from "@/app/interfaces/ICachedResume";
+import { showAiRateLimitToast } from "@/app/user/aiAgents/showAiRateLimitToast";
+import { AI_CREDIT_COSTS } from "@/utils/aiCredits/config";
+
+import styles from "./ResumePage.module.css";
+import ResumeSelectionStep from "./steps/ResumeSelectionStep";
+import ReviewStep from "./steps/ReviewStep";
+import { SelectableItem } from "./steps/SelectionStep";
+import StartStep from "./steps/StartStep";
+import TemplateStep from "./steps/TemplateStep";
+
+type ResumeStep =
+    | "start"
+    | "template"
+    | "jobs"
+    | "education"
+    | "courses"
+    | "experience"
+    | "projects"
+    | "skills"
+    | "review";
+
+type GenerationType = "generate" | "generateAi";
+
+type ResumeFormData = {
+    generationType: GenerationType;
+    templateId: string;
+    targetJobs: string[];
+    educationIds: string[];
+    courseIds: string[];
+    experienceIds: string[];
+    projectIds: string[];
+    skillIds: string[];
+};
+
+type GenerateResumeRequest = {
+    generationType: "generate";
+    templateId?: string;
+    educationIds?: string[];
+    courseIds?: string[];
+    experienceIds?: string[];
+    projectIds?: string[];
+    skillIds?: string[];
+};
+
+type GenerateResumeAiRequest = {
+    generationType: "generateAi";
+    templateId?: string;
+    targetJobs?: string[];
+};
+
+type ResumeRequestBody = GenerateResumeRequest | GenerateResumeAiRequest;
+
+type MultiSelectKey =
+    | "targetJobs"
+    | "educationIds"
+    | "courseIds"
+    | "experienceIds"
+    | "projectIds"
+    | "skillIds";
+
+const TEMPLATE_OPTIONS = [
+    {
+        id: "default",
+        name: "Default",
+        imageUrl: "/images/resumeTemplates/default.jpg",
+    },
+    {
+        id: "awesomecv",
+        name: "AwesomeCV",
+        imageUrl: "/images/resumeTemplates/awesomecv.jpg",
+    },
+];
+
+const TARGET_JOB_OPTIONS: SelectableItem[] = [
+    { id: "frontend", label: "Frontend Developer", subtitle: "UI, UX, client-side apps" },
+    { id: "backend", label: "Backend Developer", subtitle: "APIs, servers, databases" },
+    { id: "fullstack", label: "Full Stack Developer", subtitle: "Frontend + backend systems" },
+    { id: "software", label: "Software Engineer", subtitle: "General application development" },
+    { id: "cloud", label: "Cloud Engineer", subtitle: "Cloud infra, scaling, DevOps" },
+    { id: "data", label: "Data Engineer", subtitle: "Pipelines, ETL, big data" },
+    { id: "devops", label: "DevOps Engineer", subtitle: "CI/CD, automation, infra" },
+    { id: "mobile", label: "Mobile Developer", subtitle: "iOS, Android applications" },
+    { id: "ml", label: "ML Engineer", subtitle: "Models, training, deployment" },
+    { id: "ai", label: "AI Engineer", subtitle: "LLMs, AI systems, agents" },
+    { id: "security", label: "Security Engineer", subtitle: "App security, vulnerabilities" },
+    { id: "qa", label: "QA Engineer", subtitle: "Testing, reliability, automation" },
+    { id: "systems", label: "Systems Engineer", subtitle: "Low-level, performance systems" },
+    { id: "platform", label: "Platform Engineer", subtitle: "Internal tools, infrastructure" },
+    { id: "embedded", label: "Embedded Engineer", subtitle: "Hardware, firmware systems" },
+    { id: "game", label: "Game Developer", subtitle: "Game engines, gameplay systems" },
+    { id: "site-reliability", label: "Site Reliability Engineer", subtitle: "Uptime, monitoring, scaling" },
+];
+
+const manualModeBenefits = [
+    `Uses ${AI_CREDIT_COSTS.resume.generate} AI credit`,
+    "Select exactly what to include",
+    "Choose from our resume templates",
+    "Build your resume with full control",
+    "Download your resume to edit it"
+];
+
+const aiModeBenefits = [
+    `Uses ${AI_CREDIT_COSTS.resume.generateAi} AI credits`,
+    "Let the model choose your strongest content",
+    "Enhance your information for best resume quality",
+    "Cater your resume to the jobs you want",
+    "Build your resume with premium templates",
+];
+
+// default to manual process
+const DEFAULT_FORM_DATA: ResumeFormData = {
+    generationType: "generate",
+    templateId: "default",
+    targetJobs: [],
+    educationIds: [],
+    courseIds: [],
+    experienceIds: [],
+    projectIds: [],
+    skillIds: [],
+}
+
+export default function ResumePage() {
+    const router = useRouter();
+    const toast = useToast();
+
+    const { tier, loading: tierLoading } = useTier();
+    const { state } = useUser();
+    const isPremium = hasTier(tier, "premium");
+
+    const [step, setStep] = useState<ResumeStep>("start");
+    const [loading, setLoading] = useState(false);
+
+    const [resumeUrl, setResumeUrl] = useState("");
+    const [cachedResumes, setCachedResumes] = useState<ICachedResume[]>([]);
+    const [cachedResumesLoading, setCachedResumesLoading] = useState(false);
+    const [selectedCachedResumeId, setSelectedCachedResumeId] = useState("");
+
+    const [formData, setFormData] = useState<ResumeFormData>(DEFAULT_FORM_DATA);
+
+    // load cached resumes
+    useEffect(() => {
+        if (!isPremium || tierLoading) return;
+
+        let cancelled = false;
+
+        (async () => {
+            setCachedResumesLoading(true);
+            try {
+                const res = await fetch("/api/internal/user/aiAgents/resume");
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data?.error ?? "Failed to load resumes");
+
+                if (!cancelled) {
+                    setCachedResumes(Array.isArray(data?.items) ? data.items : []);
+                }
+            } catch {
+                if (!cancelled) {
+                    toast.error("Error", "Failed to load cached resumes.");
+                }
+            } finally {
+                if (!cancelled) setCachedResumesLoading(false);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [isPremium, tierLoading, toast]);
+
+    const orderedSteps = useMemo(() => {
+        if (formData.generationType === "generateAi") {
+            return ["start", "template", "jobs", "review"] as ResumeStep[];
+        }
+
+        return [
+            "start",
+            "template",
+            "education",
+            "courses",
+            "experience",
+            "projects",
+            "skills",
+            "review",
+        ] as ResumeStep[];
+    }, [formData.generationType]);
+
+    const currentStepIndex = orderedSteps.indexOf(step);
+    const isFirstStep = currentStepIndex <= 0;
+    const isLastStep = currentStepIndex === orderedSteps.length - 1;
+
+    function updateFormData<K extends keyof ResumeFormData>(
+        key: K,
+        value: ResumeFormData[K],
+    ) {
+        setFormData((prev) => ({ ...prev, [key]: value }));
+    }
+
+    const handleToggle = (key: MultiSelectKey, id: string) => {
+        setFormData((prev) => {
+            const current = prev[key];
+            const exists = current.includes(id);
+
+            return {
+                ...prev,
+                [key]: exists
+                    ? current.filter((itemId) => itemId !== id)
+                    : [...current, id],
+            };
+        });
+    };
+
+    const handleToggleAll = (key: MultiSelectKey, ids: string[]) => {
+        setFormData((prev) => {
+            const current = prev[key];
+            const allSelected = ids.length > 0 && ids.every((id) => current.includes(id));
+
+            return {
+                ...prev,
+                [key]: allSelected ? [] : ids,
+            };
+        });
+    };
+
+    function canGoNext() {
+        switch (step) {
+            case "start":
+                return !!formData.generationType;
+            case "template":
+                return !!formData.templateId;
+            default:
+                return true;
+        }
+    }
+
+    function handleNext() {
+        if (!canGoNext()) {
+            toast.info("Please complete this step first.");
+            return;
+        }
+
+        if (!isLastStep) {
+            setStep(orderedSteps[currentStepIndex + 1]);
+        }
+    }
+
+    function handleBackStep() {
+        if (!isFirstStep) {
+            setStep(orderedSteps[currentStepIndex - 1]);
+            return;
+        }
+
+        router.push("/user/aiAgents");
+    }
+
+    async function handleGenerate() {
+        setLoading(true);
+
+        try {
+            const payload: ResumeRequestBody =
+                formData.generationType === "generateAi"
+                    ? {
+                        generationType: "generateAi",
+                        templateId: formData.templateId,
+                        targetJobs: formData.targetJobs,
+                    }
+                    : {
+                        generationType: "generate",
+                        templateId: formData.templateId,
+                        educationIds: formData.educationIds,
+                        courseIds: formData.courseIds,
+                        experienceIds: formData.experienceIds,
+                        projectIds: formData.projectIds,
+                        skillIds: formData.skillIds,
+                    };
+
+            const res = await fetch("/api/internal/user/aiAgents/resume", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Idempotency-Key": crypto.randomUUID(),
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                if (showAiRateLimitToast(res, data, toast)) return;
+                throw new Error(data?.error ?? "Resume generation failed");
+            }
+
+            setResumeUrl(data.url);
+            toast.success("Success", "Resume generated successfully.");
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Failed to generate resume.";
+            toast.error("Error", message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function resetFlow() {
+        setResumeUrl("");
+        setSelectedCachedResumeId("");
+        setStep("start");
+        setFormData(DEFAULT_FORM_DATA);
+    }
+
+    const primaryButton: IButton | undefined = resumeUrl
+        ? undefined
+        : isLastStep
+            ? {
+                name: "Generate",
+                onClick: handleGenerate,
+                isAsync: true,
+                disabled: loading,
+                isLoading: loading,
+            }
+            : {
+                name: "Next",
+                onClick: handleNext,
+                disabled: !canGoNext() || loading,
+            };
+
+    const backButton: IButton = {
+        name: isFirstStep && !resumeUrl ? "Back to Agents" : "Back",
+        onClick: resumeUrl ? resetFlow : handleBackStep,
+        icon: MoveLeft
+    };
+
+    // data needed in review step
+    const templateName =
+        TEMPLATE_OPTIONS.find((template) => template.id === formData.templateId)?.name ??
+        "None";
+
+    const educationItems: SelectableItem[] =
+        state.education?.map((education) => ({
+            id: education.id,
+            label: education.institution,
+            subtitle: [
+                education.degree,
+                education.majors?.join(", "),
+                education.year_start && education.year_end
+                    ? `${education.year_start} - ${education.year_end}`
+                    : undefined,
+            ]
+                .filter(Boolean)
+                .join(" • "),
+        })) ?? [];
+
+    const courseItems: SelectableItem[] =
+        state.education?.flatMap((education) =>
+            education.courses?.map((course) => ({
+                id: course.id,
+                label: course.name,
+                subtitle: education.institution,
+            })) ?? [],
+        ) ?? [];
+
+    const experienceItems: SelectableItem[] =
+        state.experiences?.map((experience) => ({
+            id: experience.id,
+            label: experience.job_title,
+            subtitle: experience.company,
+        })) ?? [];
+
+    const projectItems: SelectableItem[] =
+        state.projects?.map((project) => ({
+            id: project.id,
+            label: project.name,
+            subtitle: [
+                project.languages_used?.join(", "),
+                project.frameworks_used?.join(", "),
+                project.technologies_used?.join(", "),
+            ]
+                .filter(Boolean)
+                .join(" • "),
+        })) ?? [];
+
+    const skillItems: SelectableItem[] =
+        state.skills?.map((skill) => ({
+            id: skill.id,
+            label: skill.name,
+            subtitle: `${skill.proficiency ?? ""}`,
+        })) ?? [];
+
+    function handleRemoveSelection(
+        key: MultiSelectKey,
+        id: string,
+    ) {
+        setFormData((prev) => ({
+            ...prev,
+            [key]: prev[key].filter((itemId) => itemId !== id),
+        }));
+    }
+
+    return (
+        <PageContentWrapper>
+            <PageContentHeader
+                title="Resume Agent"
+                buttonOne={primaryButton}
+                buttonFour={backButton}
+                className={styles.resumePageContentContainer}
+                icon={Bot}
+            />
+
+            <div className={styles.resumePageContainer}>
+                {loading && (
+                    <LoadingMessageSpinner
+                        messages={[
+                            "Fetching user data...",
+                            "Selecting resume content...",
+                            "Generating resume...",
+                            "Creating PDF...",
+                        ]}
+                        interval={1200}
+                    />
+                )}
+
+                {tierLoading && <LoadingSpinner />}
+
+                {!loading && !tierLoading && !resumeUrl && (
+                    <>
+                        {isPremium && (
+                            <div className={styles.formHeader}>
+                                <p className={styles.subtitle}>
+                                    View a previous resume or create a new one.
+                                </p>
+
+                                <div className={styles.dropdownContainer}>
+                                    <SelectDropdown
+                                        value={selectedCachedResumeId}
+                                        options={cachedResumes.map((item) => ({
+                                            value: item.id,
+                                            label: new Date(item.created_at).toLocaleString(),
+                                        }))}
+                                        loading={cachedResumesLoading}
+                                        disabled={cachedResumes.length === 0}
+                                        placeholder={
+                                            cachedResumesLoading
+                                                ? "Loading cached resumes..."
+                                                : cachedResumes.length === 0
+                                                    ? "No cached resumes"
+                                                    : "Select a cached resume..."
+                                        }
+                                        ariaLabel="Cached resumes"
+                                        onChange={(id) => {
+                                            setSelectedCachedResumeId(id);
+                                            const selected = cachedResumes.find((item) => item.id === id);
+                                            if (selected?.url) setResumeUrl(selected.url);
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {step === "start" && (
+                            <StartStep
+                                generationType={formData.generationType}
+                                manualModeBenefits={manualModeBenefits}
+                                aiModeBenefits={aiModeBenefits}
+                                onSelectGenerationType={(type) => updateFormData("generationType", type)}
+                            />
+                        )}
+
+                        {step === "template" && (
+                            <TemplateStep
+                                templates={TEMPLATE_OPTIONS}
+                                selectedTemplateId={formData.templateId}
+                                onSelectTemplate={(id) => updateFormData("templateId", id)}
+                            />
+                        )}
+
+                        {["jobs", "education", "courses", "experience", "projects", "skills"].includes(step) && (
+                            <ResumeSelectionStep
+                                step={step as "jobs" | "education" | "courses" | "experience" | "projects" | "skills"}
+                                formData={formData}
+                                targetJobOptions={TARGET_JOB_OPTIONS}
+                                state={state}
+                                onToggle={handleToggle}
+                                onToggleAll={handleToggleAll}
+                            />
+                        )}
+
+                        {step === "review" && (
+                            <ReviewStep
+                                formData={formData}
+                                templateName={templateName}
+                                targetJobOptions={TARGET_JOB_OPTIONS}
+                                educationItems={educationItems}
+                                courseItems={courseItems}
+                                experienceItems={experienceItems}
+                                projectItems={projectItems}
+                                skillItems={skillItems}
+                                onRemove={handleRemoveSelection}
+                                onGoToStep={(step) => setStep(step)}
+                            />
+                        )}
+                    </>
+                )}
+
+                {!loading && !!resumeUrl && (
+                    <div className={styles.previewContainer}>
+                        <iframe
+                            src={resumeUrl}
+                            title="Resume Preview"
+                            className={styles.pdfIframe}
+                        />
+                    </div>
+                )}
+            </div>
+        </PageContentWrapper>
+    );
+}

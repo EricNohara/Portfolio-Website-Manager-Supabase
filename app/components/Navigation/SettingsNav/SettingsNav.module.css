@@ -1,11 +1,11 @@
 .settingsNav {
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
   height: 100%;
-  width: 200px;
+  width: 300px;
   margin: 0;
-  border-right: 2px solid var(--page-box-border);
+  padding-right: 1rem;
+  border-right: 1px solid var(--page-box-border);
 }
 
 .settingsNavList {
@@ -15,10 +15,11 @@
 }
 
 .navItem {
+  text-decoration: none;
   padding: 0.75rem 1rem;
   margin-top: 1rem;
   margin-right: 1rem;
-  color: var(--search-txt);
+  color: var(--page-txt-1);
   font-weight: bold;
   border-radius: var(--global-border-radius);
 
@@ -45,10 +46,24 @@
   color: white;
 }
 
+.destructiveItem {
+  color: var(--fail-color);
+}
+
+.destructiveItem:hover {
+  color: var(--fail-color);
+  background-color: color-mix(in srgb, var(--fail-color) 14%, transparent);
+}
+
+.activeDestructiveItem,
+.activeDestructiveItem:hover {
+  color: white;
+  background-color: var(--fail-color);
+}
+
 /* settings content container */
 .settingsContentWithNav {
   width: 100%;
   height: 100%;
-  border-top: 2px solid var(--page-box-border);
   display: flex;
 }

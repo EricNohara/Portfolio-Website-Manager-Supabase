@@ -1,0 +1,569 @@
+.resumePageContainer {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0;
+}
+
+.resumePageContentContainer {
+  padding-bottom: 1rem;
+}
+
+.subtitle {
+  color: var(--page-txt-2);
+  margin: 0;
+}
+
+.selectionLabel {
+  color: var(--page-txt-1);
+  font-weight: bold;
+  font-size: 1.25rem;
+  margin: 0.5rem 0 0.5rem 0;
+}
+
+.dropdownContainer {
+  width: 400px;
+}
+
+.formHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/*  */
+.modeContentContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.modeCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+}
+
+.modeCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 2px solid var(--page-box-border);
+  background: var(--page-box-bg);
+  color: var(--page-txt-1);
+  text-align: left;
+  transition: 0.1s ease;
+}
+
+.modeCard:hover {
+  cursor: pointer;
+  border-color: var(--btn-1);
+}
+
+.modeCard h3 {
+  color: var(--page-txt-1);
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.modeCard h4 {
+  color: var(--page-txt-2);
+  font-weight: normal;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.modeCard p {
+  color: var(--page-txt-2);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.benefitsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.benefitsList li {
+  color: var(--page-txt-2);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.modeTokens {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 1.5rem;
+  margin: 2rem 0 2rem 0;
+}
+
+.modeTokens h1 {
+  margin: 0;
+  font-size: 4rem;
+}
+
+.modeIconsRow {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  width: calc(100% - 2rem);
+  display: flex;
+  justify-content: space-between;
+}
+
+.modeIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 2px solid var(--page-box-border);
+  transition: 0.1s ease;
+}
+
+.selectedModeIcon {
+  border-color: white;
+  background-color: var(--btn-1);
+  color: white;
+}
+
+.stepContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 1.5px solid var(--page-box-border);
+  background: var(--page-box-bg);
+  overflow: hidden;
+  overflow-y: auto;
+}
+
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.templateHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.templateHeader h3 {
+  color: var(--page-txt-1);
+  font-size: 1.25rem;
+  font-weight: normal;
+  margin: 0;
+}
+
+.templateCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 2px solid var(--page-box-border);
+  background: var(--page-box-bg2, var(--page-box-bg));
+  color: var(--page-txt-1);
+  transition: 0.1s ease;
+}
+
+.templateImagePlaceholder {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 200px;
+  overflow: hidden;
+  border-radius: var(--global-border-radius);
+  border: 1px solid var(--page-box-border);
+}
+
+.templateImage {
+  object-fit: cover;
+  object-position: top;
+}
+
+.templateCard:hover {
+  cursor: pointer;
+  border-color: var(--btn-1);
+}
+
+.selectionList {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+.itemContentSubtitle {
+  position: relative;
+  z-index: 1;
+  color: var(--page-txt-2);
+  text-align: left;
+  margin: 0;
+  font-weight: bold;
+}
+
+.itemContentFooter {
+  position: relative;
+  z-index: 1;
+  color: var(--page-txt-2);
+  text-align: left;
+  margin: 0;
+  font-style: italic;
+}
+
+.selectionCardHeader {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.selectionCardHeader h3 {
+  color: var(--page-txt-1);
+  font-weight: normal;
+  font-size: 1.25rem;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.selectionCheckboxWrapper {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.selectionCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  height: 200px;
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 2px solid var(--page-box-border);
+  background: var(--page-box-bg);
+  color: var(--page-txt-1);
+  transition: 0.1s ease;
+  overflow: hidden;
+}
+
+.selectionCard:hover {
+  cursor: pointer;
+  border-color: var(--btn-1);
+}
+
+.selectionCard li {
+  display: block;
+  color: var(--page-txt-2);
+  font-size: 0.85rem;
+}
+
+.selectedCard {
+  border-color: var(--btn-1);
+  background: var(--btn-1-hover);
+  color: white;
+}
+
+.selectedCard h3 {
+  color: white;
+}
+
+.selectedCard li,
+.selectedCard h4,
+.selectedCard p {
+  color: #e6e6e6;
+}
+
+/* background container */
+.selectionCardBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* image */
+.selectionBgImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* dark overlay */
+.selectionOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 20, 0.75);
+}
+
+.selectedOverlay {
+  transition: 0.1s ease;
+  background: rgba(44, 111, 203, 0.85);
+}
+
+.selectionCardDark {
+  color: white !important;
+}
+
+.selectionCardDarkContent {
+  color: #c2c2c2 !important;
+}
+
+.selectionTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.selectAllButton {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 2px solid var(--page-box-border);
+  background: var(--page-box-bg);
+  color: var(--page-txt-2);
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: var(--global-border-radius);
+  padding: 0.5rem 1rem;
+  transition: 0.1s ease;
+  flex-shrink: 0;
+}
+
+.selectAllButton:hover {
+  cursor: pointer;
+  border-color: var(--btn-1);
+}
+
+.selectAllButtonSelected {
+  border-color: var(--btn-1);
+}
+
+.reviewCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 1rem;
+  border-radius: var(--global-border-radius);
+  border: 1.5px solid var(--page-box-border);
+  background: var(--page-box-bg2, var(--page-box-bg));
+}
+
+.reviewCard p {
+  color: var(--page-txt-1);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.previewContainer {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--global-border-radius);
+  border: 1.5px solid var(--page-box-border);
+  background: var(--page-box-bg);
+  overflow: hidden;
+}
+
+.pdfIframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+@media (max-width: 1100px) {
+  .templateGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .selectionList {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .modeCards {
+    grid-template-columns: 1fr;
+  }
+
+  .templateGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .previewContainer {
+    min-height: 550px;
+  }
+}
+
+/* review step */
+.reviewHeader {
+  margin-bottom: 1rem;
+  border-bottom: 1.5px solid var(--page-box-border);
+  color: var(--page-txt-1);
+}
+
+.reviewHeader h2 {
+  margin: 0.5rem 0 0 0;
+}
+
+.reviewSubtitle {
+  color: var(--page-txt-2);
+  font-size: 0.9rem;
+  margin: 1rem 0 1rem 0;
+}
+
+.reviewTopCards {
+  display: flex;
+  gap: 1rem;
+}
+
+.summaryCard {
+  flex: 1;
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+  padding: 0.75rem 1rem;
+  background: var(--page-bg);
+}
+
+.summaryLabel {
+  font-size: 0.75rem;
+  margin: 0 0 0.25rem 0;
+  color: var(--page-txt-2);
+}
+
+.summaryValue {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--page-txt-1);
+  margin: 0;
+}
+
+.reviewSection {
+  margin-bottom: 1rem;
+}
+
+.reviewSectionTitle {
+  font-size: 1rem;
+  margin: 0 0 1rem 0;
+  font-weight: bold;
+  color: var(--page-txt-1);
+}
+
+.chipContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chipSubtitle {
+  font-size: 0.75rem;
+  color: var(--page-txt-2);
+  font-weight: normal;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reviewSectionTitleButton {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--page-txt-1);
+  cursor: pointer;
+  transition: 0.1s ease;
+}
+
+.reviewSectionTitleButton:hover {
+  color: var(--btn-1);
+}
+
+.chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--global-border-radius);
+  background: var(--page-bg);
+  border: 1px solid var(--page-box-border);
+  color: var(--page-txt-1);
+  font-size: 0.8rem;
+  font-weight: bold;
+  flex: 0 0 calc(20% - 0.75rem);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.removeChipButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  border: none;
+  background: none;
+  color: var(--page-txt-1);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1;
+  padding: 0;
+  transition: 0.1s ease;
+}
+
+.removeChipButton:hover {
+  color: var(--exit-btn);
+}

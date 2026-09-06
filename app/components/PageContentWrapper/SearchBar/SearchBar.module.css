@@ -7,8 +7,9 @@
 .searchBarForm {
   display: flex;
   align-items: center;
-  background-color: var(--search-bg);
-  color: var(--search-txt);
+  background-color: var(--page-box-bg);
+  border: 1.5px solid var(--page-box-border);
+  color: var(--page-txt-1);
   width: 100%;
   padding: 0 1rem;
   border-radius: var(--global-border-radius);
@@ -16,7 +17,7 @@
 
 .searchBarInput {
   background-color: inherit;
-  color: var(--search-txt);
+  color: var(--page-txt-1);
   border: none;
   width: 100%;
   font-size: 1rem;
@@ -27,35 +28,169 @@
   outline: none;
 }
 
-/* dropdown */
+.searchBarFormOpen {
+  border-bottom-color: transparent;
+  border-radius: var(--global-border-radius) var(--global-border-radius) 0 0;
+}
+
 .dropdown {
   position: absolute;
   width: 100%;
-  background: var(--search-bg);
-  border-radius: var(--global-border-radius);
+  background: var(--page-box-bg);
+  border-radius: 0 0 var(--global-border-radius) var(--global-border-radius);
+  border: 1.5px solid var(--page-box-border);
   list-style: none;
   z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  margin-top: 0.5rem;
-  padding: 1rem 0;
-  max-height: 300px;
-  overflow: scroll;
+  margin: 0;
+  padding: 0;
+  color: var(--page-txt-1);
+  overflow: hidden;
+}
+
+.dropdownScroll {
+  max-height: 400px;
+  padding: 0.5rem;
+  overflow-y: auto;
   overflow-x: hidden;
-  color: var(--search-txt);
 }
 
 .dropdownItem {
-  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: 0.2s ease;
+  border-radius: var(--global-border-radius);
+  transition: background-color 150ms ease;
 }
 
-.dropdownItem:hover {
-  background: var(--popup-hover);
+.dropdownItem:hover,
+.activeItem {
+  background: rgba(55, 137, 251, 0.1);
 }
 
-.dropdownItem.activeItem {
-  background-color: var(--popup-hover);
-  transition: 0.2s ease;
+.suggestionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0.5rem;
+  border: 1px solid;
+  border-radius: var(--global-border-radius);
+}
+
+.suggestionIcon_home {
+  color: #8ee5c3;
+  border-color: #8ee5c3;
+  background: rgba(54, 189, 216, 0.25);
+}
+
+.suggestionIcon_user {
+  color: #67dcc1;
+  border-color: #67dcc1;
+  background: rgb(54, 190, 216, 0.25);
+}
+
+.suggestionIcon_document {
+  color: #42cfca;
+  border-color: #42cfca;
+  background: rgba(66, 207, 202, 0.25);
+}
+
+.suggestionIcon_experience {
+  color: #36bed8;
+  border-color: #36bed8;
+  background: rgba(54, 189, 216, 0.25);
+}
+
+.suggestionIcon_education {
+  color: #5d78ff;
+  border-color: #5d78ff;
+  background: rgba(93, 120, 255, 0.25);
+}
+
+.suggestionIcon_course {
+  color: #378afb;
+  border-color: #378afb;
+  background: rgba(55, 137, 251, 0.25);
+}
+
+.suggestionIcon_project {
+  color: #527bf5;
+  border-color: #527bf5;
+  background: rgba(82, 123, 245, 0.25);
+}
+
+.suggestionIcon_skill {
+  color: #6c70ed;
+  border-color: #6c70ed;
+  background: rgba(108, 112, 237, 0.25);
+}
+
+.suggestionIcon_apiKey {
+  color: #5873f7;
+  border-color: #5873f7;
+  background: rgb(88, 115, 247, 0.25);
+}
+
+.suggestionIcon_settings {
+  color: #3d70fb;
+  border-color: #3d70fb;
+  background: rgba(61, 112, 251, 0.25);
+}
+
+.suggestionIcon_agent {
+  color: #81bcff;
+  border-color: #81bcff;
+  background: rgba(129, 188, 255, 0.25);
+}
+
+.suggestionLabel {
+  overflow: hidden;
+  color: var(--page-txt-1);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem;
+  color: var(--page-txt-2);
+  background: none;
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+  cursor: pointer;
+  transition: 150ms ease;
+}
+
+.closeButton:hover {
+  color: var(--page-txt-1);
+  background: var(--page-box-border);
+}
+
+.escapeKey {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  color: var(--page-txt-2);
+  background: none;
+  border: 1px solid var(--page-box-border);
+  border-radius: var(--global-border-radius);
+  font-family: inherit;
+  font-size: 0.75rem;
+  line-height: 1;
+  letter-spacing: 0.05em;
 }

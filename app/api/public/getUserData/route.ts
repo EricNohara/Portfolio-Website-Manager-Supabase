@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { after, NextRequest, NextResponse } from "next/server";
 
 import { parseApiKey, signApiKeySecret } from "@/utils/auth/apiKeys";
-import { createServiceRoleClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/server";
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET,OPTIONS",
-  "Access-Control-Allow-Headers":
-    "Authorization, User-Email, Content-Type, Accept, X-Target-User-Id",
+  "Access-Control-Allow-Headers": "Authorization, Content-Type, Accept",
 };
 
 type PublicCachedUserInfoRow = {
@@ -20,24 +18,20 @@ type PublicCachedUserInfoRow = {
 export async function GET(req: NextRequest): Promise<NextResponse> {
   // create fields for log
   const requestedAt = new Date().toISOString();
-  let userId: string | null = null;
-  let keyDescription: string | null = null;
   let statusCode: number = 500;
-  let apiKey: string | undefined;
   let keyId: string | null = null;
-  let supabase: Awaited<ReturnType<typeof createServiceRoleClient>> | null =
-    null;
+  let supabase: Awaited<ReturnType<typeof createAdminClient>> | null = null;
 
   try {
-    supabase = await createServiceRoleClient();
+    supabase = await createAdminClient();
 
     // get the api key from the authorization header
-    apiKey = req.headers.get("Authorization")?.split(" ")[1];
+    const apiKey = req.headers.get("Authorization")?.split(" ")[1];
     if (!apiKey) {
       statusCode = 401;
       return NextResponse.json(
         { message: "Unauthorized" },
-        { status: statusCode, headers: CORS_HEADERS },
+        { status: statusCode, headers: CORS_HEADERS }
       );
     }
 
@@ -47,18 +41,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       statusCode = 401;
       return NextResponse.json(
         { message: "Invalid API key format" },
-        { status: statusCode, headers: CORS_HEADERS },
+        { status: statusCode, headers: CORS_HEADERS }
       );
     }
 
     keyId = parsed.keyId;
     const hashedKey = signApiKeySecret(parsed.secret);
 
-    const targetUserId = req.headers.get("X-Target-User-Id");
     const { data, error } = await supabase.rpc("get_public_cached_user_info", {
       p_key_id: keyId,
       p_hashed_key: hashedKey,
-      p_target_user_id: targetUserId,
     });
     if (error) throw error;
 
@@ -70,24 +62,17 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       statusCode = 401;
       return NextResponse.json(
         { message: "Unauthorized" },
-        { status: statusCode, headers: CORS_HEADERS },
+        { status: statusCode, headers: CORS_HEADERS }
       );
     }
 
-    userId = row.user_id;
-    keyDescription = row.key_description;
-
     statusCode = 200;
 
-    if (
-      row.key_description &&
-      row.key_description !== "Nukleio Super Key" &&
-      row.user_id
-    ) {
+    if (row.key_description && row.user_id) {
       after(async () => {
         try {
           if (!supabase) {
-            supabase = createServiceRoleClient();
+            supabase = createAdminClient();
           }
           const respondedAt = new Date().toISOString();
           const userAgent = req.headers.get("user-agent") || "unknown";
@@ -111,7 +96,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       {
         status: statusCode,
         headers: CORS_HEADERS,
-      },
+      }
     );
   } catch (err) {
     const error = err as Error;
@@ -123,7 +108,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       {
         status: statusCode,
         headers: CORS_HEADERS,
-      },
+      }
     );
   }
 }

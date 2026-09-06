@@ -1,3 +1,8 @@
+"use client";
+
+import { LucideIcon } from "lucide-react";
+
+import { useLanguage } from "@/app/context/LanguageProvider";
 import { headerFont } from "@/app/localFonts";
 
 import styles from "./PageContentHeader.module.css";
@@ -13,18 +18,30 @@ export interface IButton {
     form?: string;          // form id to submit (works even outside form)
     disabled?: boolean;
     isLoading?: boolean;
+    icon?: LucideIcon;
 }
 
 export interface IPageContentHeaderProps {
     title: string;
+    icon?: LucideIcon;
     buttonOne?: IButton;
     buttonFour?: IButton | null;
+    className?: string;
 }
 
-export default function PageContentHeader({ title, buttonOne, buttonFour }: IPageContentHeaderProps) {
+export default function PageContentHeader({ title, icon: Icon, buttonOne, buttonFour, className }: IPageContentHeaderProps) {
+    const { t } = useLanguage();
+
     return (
-        <div className={styles.container}>
-            <h1 className={`${styles.title} ${headerFont.className}`}>{title}</h1>
+        <div className={`${styles.container} ${className ?? ""}`}>
+            <div className={styles.titleContainer}>
+                {Icon && (
+                    <span className={styles.titleIconWrapper}>
+                        <Icon size={28} />
+                    </span>
+                )}
+                <h1 className={`${styles.title} ${headerFont.className}`}>{t(title)}</h1>
+            </div>
             <div className={styles.buttons}>
                 {buttonFour && (
                     (buttonFour.isAsync ?? false) ? (
@@ -34,11 +51,13 @@ export default function PageContentHeader({ title, buttonOne, buttonFour }: IPag
                                     type={buttonFour.type ?? "button"}
                                     form={buttonFour.form}
                                     disabled={buttonFour.disabled}
+                                    className={styles.button}
                                 >
+                                    {buttonFour.icon && <buttonFour.icon size={20} />}
                                     {
                                         buttonFour.isLoading ?
-                                            <LoadableButtonContent isLoading={buttonFour.isLoading} buttonLabel={buttonFour.name} />
-                                            : buttonFour.name
+                                            <LoadableButtonContent isLoading={buttonFour.isLoading} buttonLabel={t(buttonFour.name)} />
+                                            : t(buttonFour.name)
                                     }
                                 </ButtonFour>
                             }
@@ -50,8 +69,10 @@ export default function PageContentHeader({ title, buttonOne, buttonFour }: IPag
                             form={buttonFour.form}
                             disabled={buttonFour.disabled}
                             onClick={buttonFour.onClick}
+                            className={styles.button}
                         >
-                            {buttonFour.name}
+                            {buttonFour.icon && <buttonFour.icon size={20} />}
+                            {t(buttonFour.name)}
                         </ButtonFour>
                     )
                 )}
@@ -63,11 +84,14 @@ export default function PageContentHeader({ title, buttonOne, buttonFour }: IPag
                                     type={buttonOne.type ?? "button"}
                                     form={buttonOne.form}
                                     disabled={buttonOne.disabled}
+                                    className={styles.button}
                                 >
+                                    {buttonOne.icon && <buttonOne.icon size={20} />}
+
                                     {
                                         buttonOne.isLoading ?
-                                            <LoadableButtonContent isLoading={buttonOne.isLoading} buttonLabel={buttonOne.name} />
-                                            : buttonOne.name
+                                            <LoadableButtonContent isLoading={buttonOne.isLoading} buttonLabel={t(buttonOne.name)} />
+                                            : t(buttonOne.name)
                                     }
                                 </ButtonOne>
                             }
@@ -79,8 +103,10 @@ export default function PageContentHeader({ title, buttonOne, buttonFour }: IPag
                             form={buttonOne.form}
                             disabled={buttonOne.disabled}
                             onClick={buttonOne.onClick}
+                            className={styles.button}
                         >
-                            {buttonOne.name}
+                            {buttonOne.icon && <buttonOne.icon size={20} />}
+                            {t(buttonOne.name)}
                         </ButtonOne>
                     )
                 )}

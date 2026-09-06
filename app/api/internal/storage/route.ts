@@ -1,8 +1,14 @@
+import { randomUUID } from "crypto";
+
 import { NextRequest, NextResponse } from "next/server";
 
+import { isAccountActive } from "@/utils/accountDeletion/status";
 import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
-import parseURL from "@/utils/general/parseURL";
-import { createServiceRoleClient } from "@/utils/supabase/server";
+import { refreshCachedUserInfo } from "@/utils/cachedUserInfo/refreshCachedUserInfo";
+import parseURL, {
+  isStorageObjectOwnedByUser,
+} from "@/utils/general/parseURL";
+import { createAdminClient } from "@/utils/supabase/server";
 
 export const config = {
   api: {
@@ -17,9 +23,33 @@ const ALLOWED_BUCKETS = [
   "transcripts",
 ];
 
+const DOCUMENT_FIELDS = {
+  portraits: "portrait_url",
+  resumes: "resume_url",
+  transcripts: "transcript_url",
+} as const;
+
+type DocumentBucket = keyof typeof DOCUMENT_FIELDS;
+type DocumentField = (typeof DOCUMENT_FIELDS)[DocumentBucket];
+type DocumentURLRow = Partial<Record<DocumentField, string | null>>;
+
+function isDocumentBucket(bucketName: string): bucketName is DocumentBucket {
+  return bucketName in DOCUMENT_FIELDS;
+}
+
+function sanitizeFilename(filename: string): string {
+  const sanitized = filename
+    .normalize("NFKC")
+    .replace(/[^a-zA-Z0-9._-]/g, "_")
+    .replace(/_+/g, "_")
+    .slice(-160);
+
+  return sanitized || "upload";
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const serviceRoleSupabase = createServiceRoleClient();
+    const serviceRoleSupabase = createAdminClient();
     const { user, supabase, response } = await getAuthenticatedUser();
     if (!user) return response;
 
@@ -37,7 +67,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ) {
       return NextResponse.json(
         { message: "Only image files allowed" },
-        { status: 400 },
+        { status: 400 }
       );
     } else if (
       (bucketName === "resumes" || bucketName === "transcripts") &&
@@ -45,7 +75,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     ) {
       return NextResponse.json(
         { message: "Only PDF files allowed" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -57,10 +87,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     // upload to supabase
     const fileContent = await file.arrayBuffer();
     const buffer = Buffer.from(fileContent);
-    const filepath =
-      bucketName === "project_thumbnails"
-        ? `${user.id}-${Date.now()}-${file.name}`
-        : `${user.id}-${file.name}`;
+    const filepath = `${user.id}-${randomUUID()}-${sanitizeFilename(file.name)}`;
 
     const { error: uploadError } = await serviceRoleSupabase.storage
       .from(bucketName)
@@ -70,39 +97,44 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     if (uploadError) throw uploadError;
 
+    // An upload that began immediately before account deletion can finish
+    // after the deletion inventory was taken. Fail closed and roll it back.
+    if (!await isAccountActive(user.id)) {
+      await serviceRoleSupabase.storage.from(bucketName).remove([filepath]);
+      return NextResponse.json(
+        { message: "Account deletion is in progress" },
+        { status: 423 },
+      );
+    }
+
     // get the public URL
     const { data: publicURL } = await supabase.storage
       .from(bucketName)
       .getPublicUrl(filepath);
 
     if (bucketName !== "project_thumbnails") {
-      let documentField: string;
-      let updateData;
-      if (bucketName === "portraits") {
-        documentField = "portrait_url";
-        updateData = { portrait_url: publicURL.publicUrl };
-      } else if (bucketName === "resumes") {
-        documentField = "resume_url";
-        updateData = { resume_url: publicURL.publicUrl };
-      } else {
-        documentField = "transcript_url";
-        updateData = { transcript_url: publicURL.publicUrl };
+      if (!isDocumentBucket(bucketName)) {
+        throw new Error("Unsupported document bucket");
       }
+
+      const documentField = DOCUMENT_FIELDS[bucketName];
+      const updateData = { [documentField]: publicURL.publicUrl };
 
       // check if user already has a document - if so delete the document and its reference
       const { data: userData, error: existsError } = await supabase
         .from("users")
         .select(documentField)
-        .eq("id", user.id);
+        .eq("id", user.id)
+        .single();
 
       if (existsError) {
-        // if error checking if url exists, delete from storage
-        await serviceRoleSupabase.storage.from(bucketName).remove([file.name]);
+        // This exact path was generated and uploaded for the authenticated user
+        // in this request, so it is safe to roll back before a DB reference exists.
+        await serviceRoleSupabase.storage.from(bucketName).remove([filepath]);
         throw existsError;
       }
 
-      const existingURLObject = userData[0];
-      const existingURL = Object.values(existingURLObject)[0] as string;
+      const existingURL = (userData as DocumentURLRow)[documentField] ?? null;
 
       // add it to the user's row
       const { error: updateError } = await supabase
@@ -111,28 +143,42 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         .eq("id", user?.id);
 
       if (updateError) {
-        await serviceRoleSupabase.storage.from(bucketName).remove([file.name]);
+        await serviceRoleSupabase.storage.from(bucketName).remove([filepath]);
         throw updateError;
       }
 
       // delete old document after the new doc successfully saves
       if (existingURL !== "" && existingURL) {
-        // user already has a document so need to delete it
-        const { parsedBucket, parsedFilename } = parseURL(existingURL);
+        // The URL came from the authenticated user's DB row. Also enforce the
+        // server-issued path namespace before using service-role deletion.
+        const existingObject = parseURL(existingURL);
+        if (
+          existingObject &&
+          existingObject.parsedBucket === bucketName &&
+          isStorageObjectOwnedByUser(
+            existingObject.parsedFilename,
+            user.id,
+          )
+        ) {
+          const { error: removeError } = await serviceRoleSupabase.storage
+            .from(existingObject.parsedBucket)
+            .remove([existingObject.parsedFilename]);
 
-        await serviceRoleSupabase.storage
-          .from(parsedBucket)
-          .remove([parsedFilename]);
+          if (removeError) throw removeError;
+        }
       }
+
+      // update the user info cache
+      await refreshCachedUserInfo(supabase, user.id);
 
       return NextResponse.json(
         { publicURL: publicURL.publicUrl },
-        { status: 201 },
+        { status: 201 }
       );
     } else {
       return NextResponse.json(
         { publicURL: publicURL.publicUrl },
-        { status: 201 },
+        { status: 201 }
       );
     }
   } catch (err) {
@@ -144,7 +190,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
-    const serviceRoleSupabase = createServiceRoleClient();
+    const serviceRoleSupabase = createAdminClient();
     const { user, supabase, response } = await getAuthenticatedUser();
     if (!user) return response;
 
@@ -153,38 +199,77 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ message: "Invalid input" }, { status: 400 });
     }
 
-    const { parsedBucket, parsedFilename } = parseURL(publicURL);
+    const storageObject = parseURL(publicURL);
 
     if (
-      !parsedBucket ||
-      !parsedFilename ||
-      !ALLOWED_BUCKETS.includes(parsedBucket)
+      !storageObject ||
+      !ALLOWED_BUCKETS.includes(storageObject.parsedBucket)
     ) {
       return NextResponse.json({ message: "Invalid input" }, { status: 400 });
     }
 
+    const { parsedBucket, parsedFilename } = storageObject;
+
+    if (!isStorageObjectOwnedByUser(parsedFilename, user.id)) {
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    }
+
     if (parsedBucket === "project_thumbnails") {
-      // if deleting project thumbnail, just need to delete from storage
-      const { error } = await serviceRoleSupabase.storage
+      // The object must be referenced by a project owned by this user. The path
+      // namespace check above prevents a poisoned DB URL from authorizing a
+      // cross-tenant delete.
+      const { data: ownedProjects, error: ownershipError } = await supabase
+        .from("projects")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("thumbnail_url", publicURL);
+
+      if (ownershipError) throw ownershipError;
+      if (!ownedProjects || ownedProjects.length === 0) {
+        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+      }
+
+      const { error: removeError } = await serviceRoleSupabase.storage
         .from(parsedBucket)
         .remove([parsedFilename]);
 
-      if (error) throw error;
+      if (removeError) throw removeError;
+
+      const projectIDs = ownedProjects.map((project) => project.id);
+      const { error: updateError } = await supabase
+        .from("projects")
+        .update({ thumbnail_url: null })
+        .in("id", projectIDs)
+        .eq("user_id", user.id)
+        .eq("thumbnail_url", publicURL);
+
+      if (updateError) throw updateError;
+
+      await refreshCachedUserInfo(supabase, user.id);
 
       return new NextResponse(null, { status: 204 });
     } else {
-      // try to delete from DB
-      const userData =
-        parsedBucket === "portraits"
-          ? { portrait_url: null }
-          : parsedBucket === "resumes"
-            ? { resume_url: null }
-            : { transcript_url: null };
+      if (!isDocumentBucket(parsedBucket)) {
+        return NextResponse.json({ message: "Invalid input" }, { status: 400 });
+      }
+
+      const documentField = DOCUMENT_FIELDS[parsedBucket];
+      const { data: userData, error: ownershipError } = await supabase
+        .from("users")
+        .select(documentField)
+        .eq("id", user.id)
+        .single();
+
+      if (ownershipError) throw ownershipError;
+      if ((userData as DocumentURLRow)[documentField] !== publicURL) {
+        return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+      }
 
       const { error: updateError } = await supabase
         .from("users")
-        .update(userData)
-        .eq("id", user?.id);
+        .update({ [documentField]: null })
+        .eq("id", user.id)
+        .eq(documentField, publicURL);
 
       if (updateError) throw updateError;
 
@@ -193,6 +278,9 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
         .remove([parsedFilename]);
 
       if (error) throw error;
+
+      // update the user info cache
+      await refreshCachedUserInfo(supabase, user.id);
 
       return new NextResponse(null, { status: 204 });
     }

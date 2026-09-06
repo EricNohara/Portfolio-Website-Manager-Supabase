@@ -1,33 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { createClient } from "@/utils/supabase/server";
-
-type Tier = "free" | "developer" | "premium";
-
-const PRICE_TO_TIER: Record<string, Exclude<Tier, "free">> = {
-  [process.env.NEXT_PUBLIC_DEVELOPER_MONTHLY_PRICE_ID!]: "developer",
-  [process.env.NEXT_PUBLIC_DEVELOPER_YEARLY_PRICE_ID!]: "developer",
-  [process.env.NEXT_PUBLIC_PREMIUM_MONTHLY_PRICE_ID!]: "premium",
-  [process.env.NEXT_PUBLIC_PREMIUM_YEARLY_PRICE_ID!]: "premium",
-};
-
-function isPaidStatus(status: string | null | undefined) {
-  return status === "active" || status === "trialing";
-}
+import { getAuthenticatedUser } from "@/utils/auth/getAuthenticatedUser";
+import {
+  getSubscriptionPlanForPriceId,
+  isPaidSubscriptionStatus,
+} from "@/utils/subscriptions/config";
 
 export async function GET(_: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // get current user
-    const {
-      data: { user },
-      error: userErr,
-    } = await supabase.auth.getUser();
-
-    if (userErr || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const { user, supabase, response } = await getAuthenticatedUser();
+    if (!user) return response;
 
     // lookup subscription row
     const { data: sub, error: subErr } = await supabase
@@ -49,10 +31,9 @@ export async function GET(_: NextRequest) {
     const priceId = sub?.price_id ?? null;
 
     // compute tier
-    let tier: Tier = "free";
-    if (isPaidStatus(status) && priceId && PRICE_TO_TIER[priceId]) {
-      tier = PRICE_TO_TIER[priceId];
-    }
+    const plan = getSubscriptionPlanForPriceId(priceId);
+    const tier =
+      isPaidSubscriptionStatus(status) && plan ? plan.tier : "free";
 
     const payload = {
       tier,
