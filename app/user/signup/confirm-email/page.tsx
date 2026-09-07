@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 
 import AuthBackground from "@/app/components/AuthBackground/AuthBackground";
 import Navigation from "@/app/components/Navigation/Navigation";
@@ -20,7 +20,9 @@ export default function ConfirmEmailPage() {
         <h3 className={`${styles.formSubtitle} ${headerFont.className}`}>
           Activate your Nukleio account to continue
         </h3>
-        <ConfirmEmailForm />
+        <Suspense fallback={null}>
+          <ConfirmEmailForm />
+        </Suspense>
       </div>
 
       <div className={styles.rightPanel}>
