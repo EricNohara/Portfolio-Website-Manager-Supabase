@@ -140,7 +140,9 @@ export default function SignUpForm() {
       if (!res.ok) throw new Error(data.message);
 
       toast.success(data.message);
-      router.push("/user/login");
+      router.push(
+        `/user/signup/confirm-email?email=${encodeURIComponent(userData.email)}&sent=1`,
+      );
     } catch (error) {
       const err = error as Error
       toast.error("Error", err.message)

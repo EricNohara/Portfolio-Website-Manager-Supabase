@@ -21,6 +21,15 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { error } = await supabase.auth.signInWithPassword(data);
 
     if (error) {
+      if (error.code === "email_not_confirmed") {
+        return NextResponse.json(
+          {
+            code: "EMAIL_NOT_CONFIRMED",
+            message: "Confirm your email address before signing in.",
+          },
+          { status: 403 },
+        );
+      }
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 

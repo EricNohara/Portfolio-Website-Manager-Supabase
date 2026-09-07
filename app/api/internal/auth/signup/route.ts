@@ -124,7 +124,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { captchaToken },
+      options: {
+        captchaToken,
+        emailRedirectTo: `${req.nextUrl.origin}/api/internal/auth/callback?next=/user`,
+      },
     });
 
     if (error) {

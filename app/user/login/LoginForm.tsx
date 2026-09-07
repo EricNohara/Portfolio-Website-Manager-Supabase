@@ -49,6 +49,12 @@ export default function LoginForm() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data.code === "EMAIL_NOT_CONFIRMED") {
+          router.push(
+            `/user/signup/confirm-email?email=${encodeURIComponent(credentials.email)}`,
+          );
+          return;
+        }
         throw new Error(data.message);
       }
 
