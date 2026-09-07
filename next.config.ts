@@ -75,7 +75,7 @@ const nextConfig: NextConfig = {
   default-src 'self';
   script-src 'self' 'unsafe-inline' ${
     isDev ? "'unsafe-eval'" : ""
-  } https://vercel.analytics.edge.com https://cdn.vercel-insights.com https://vercel.live https://va.vercel-scripts.com;
+  } https://vercel.analytics.edge.com https://cdn.vercel-insights.com https://vercel.live https://va.vercel-scripts.com https://challenges.cloudflare.com;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' data: https: blob:;
   connect-src 
@@ -104,7 +104,8 @@ const nextConfig: NextConfig = {
     https://login.microsoftonline.com
     https://github.com
     https://www.linkedin.com
-    https://gitlab.com;
+    https://gitlab.com
+    https://challenges.cloudflare.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self';
